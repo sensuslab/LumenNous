@@ -31,7 +31,7 @@ export function GlassCard({
   ariaLabelledby,
 }: GlassCardProps): JSX.Element {
   const classes = [
-    "glass",
+    "glass content-surface",
     hero ? "rounded-lg p-6 md:p-8" : "rounded-md p-5 md:p-6",
     interactive
       ? [

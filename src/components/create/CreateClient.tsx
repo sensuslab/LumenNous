@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type JSX } from "react";
+import { useEffect, useState, type JSX } from "react";
 import type {
   Affirmation,
   Category,
@@ -33,6 +33,17 @@ type State =
 export function CreateClient(props: CreateLibraryProps): JSX.Element {
   const [state, setState] = useState<State>({ kind: "form" });
   const [lastRequest, setLastRequest] = useState<EngineRequest | null>(null);
+  const resultFingerprint = state.kind === "result" ? state.result.fingerprint : null;
+
+  useEffect(() => {
+    if (!resultFingerprint) return;
+    const frame = window.requestAnimationFrame(() => {
+      const result = document.getElementById("engine-result");
+      result?.focus({ preventScroll: true });
+      result?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [resultFingerprint]);
 
   function compose(request: EngineRequest): void {
     const library: EngineLibrary = {
@@ -45,7 +56,6 @@ export function CreateClient(props: CreateLibraryProps): JSX.Element {
     try {
       const result = composeWithEngine(request, library);
       setState({ kind: "result", result });
-      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setState({
         kind: "error",

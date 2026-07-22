@@ -42,12 +42,14 @@
   --danger-quiet: #c98a8a;
 
   /* 2.5 — Lines & glass */
-  --line-subtle: rgba(230, 225, 211, 0.07);
-  --line: rgba(230, 225, 211, 0.12);
+  --line-subtle: rgba(230, 225, 211, 0.1);
+  --line: rgba(230, 225, 211, 0.17);
   --line-strong: rgba(217, 186, 133, 0.35);
-  --glass-bg: linear-gradient(160deg, rgba(148, 163, 216, 0.07), rgba(148, 163, 216, 0.03));
+  --glass-bg: linear-gradient(160deg, rgba(148, 163, 216, 0.1), rgba(148, 163, 216, 0.045));
   --glass-blur: blur(18px) saturate(140%);
-  --glass-bg-solid: #10162a;
+  --glass-bg-solid: #11182b;
+  --surface-bg: rgba(17, 24, 43, 0.94);
+  --surface-border: rgba(230, 225, 211, 0.16);
 
   /* 2.8 — Spacing (4px base) */
   --s-1: 0.25rem;
@@ -303,6 +305,20 @@ h1, h2, h3, h4 {
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--line-subtle);
+}
+
+/* Major reading and task surfaces carry more visual weight than controls. */
+.content-surface {
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
+  box-shadow: inset 0 1px 0 rgba(244, 240, 230, 0.035);
+}
+.field-surface {
+  background: rgba(6, 8, 15, 0.48);
+  border: 1px solid var(--line);
+}
+.field-surface:hover {
+  border-color: rgba(230, 225, 211, 0.24);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .glass {
