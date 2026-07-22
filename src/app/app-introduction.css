@@ -1,0 +1,508 @@
+/* --------------------------------------------------------------------------
+   First-launch introduction
+
+   Native CSS port of Animation/lumennous-intro. The portrait stage always
+   contains the full 1080 x 1920 composition; wider screens receive quiet
+   letterboxing instead of cropping the title or altar.
+   -------------------------------------------------------------------------- */
+
+html[data-intro="show"] body::before {
+  position: fixed;
+  inset: 0;
+  z-index: 199;
+  content: "";
+  background: #05050e;
+  pointer-events: auto;
+}
+
+html[data-intro="show"] #app-shell {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.app-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  background: #05050e;
+  opacity: 1;
+  transition: opacity 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  isolation: isolate;
+}
+
+.app-intro--leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-intro__stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 56.25vh;
+  width: 56.25dvh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #05050e;
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  transition: opacity 160ms ease-out;
+}
+
+.app-intro--loading .app-intro__stage {
+  opacity: 0;
+}
+
+.app-intro--loading .app-intro__stage *,
+.app-intro--loading .app-intro__stage *::before,
+.app-intro--loading .app-intro__stage *::after {
+  animation-play-state: paused !important;
+}
+
+.app-intro__skip {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 20;
+  display: inline-flex;
+  min-width: 76px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(244, 240, 230, 0.2);
+  border-radius: 4px;
+  background: rgba(5, 5, 14, 0.62);
+  color: rgba(244, 240, 230, 0.9);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    color 160ms ease-out,
+    border-color 160ms ease-out,
+    background-color 160ms ease-out,
+    transform 120ms ease-out;
+}
+
+.app-intro__skip:hover {
+  border-color: rgba(217, 186, 133, 0.52);
+  background: rgba(10, 10, 24, 0.78);
+  color: #f4f0e6;
+}
+
+.app-intro__skip:active {
+  transform: scale(0.98);
+}
+
+.app-intro--still .app-intro__skip {
+  top: auto;
+  right: 50%;
+  bottom: max(24px, calc(env(safe-area-inset-bottom) + 16px));
+  min-width: 128px;
+  transform: translateX(50%);
+}
+
+.app-intro--still .app-intro__skip:active {
+  transform: translateX(50%) scale(0.98);
+}
+
+.intro-layer {
+  position: absolute;
+  top: -0.4167%;
+  left: 0;
+  width: 100%;
+  height: 100.8334%;
+  opacity: 0;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity, filter;
+}
+
+.intro-layer__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform, opacity;
+}
+
+.intro-layer--bg {
+  z-index: 1;
+  animation: intro-bg-in 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s both;
+}
+
+.intro-layer--halo {
+  z-index: 2;
+  animation: intro-halo-in 2.6s cubic-bezier(0.39, 0.58, 0.57, 1) 1s both;
+}
+
+.intro-layer--halo .intro-layer__image {
+  opacity: 0.86;
+  animation:
+    intro-halo-scale 3.2s ease-in-out 3.6s 2 alternate both,
+    intro-light-pulse 1.9s ease-in-out 3s 4 alternate both;
+}
+
+.intro-layer--core {
+  z-index: 3;
+  animation: intro-core-in 2s cubic-bezier(0.39, 0.58, 0.57, 1) 1.5s both;
+}
+
+.intro-layer--core .intro-layer__image {
+  opacity: 0.88;
+  animation:
+    intro-core-scale 7s ease-in-out 1.5s both,
+    intro-light-pulse 2.2s ease-in-out 3.5s 3 alternate both;
+}
+
+.intro-layer--beam {
+  z-index: 4;
+  animation: intro-beam-in 2.1s cubic-bezier(0.39, 0.58, 0.57, 1) 0.5s both;
+}
+
+.intro-layer--beam .intro-layer__image {
+  opacity: 0.82;
+  animation: intro-light-pulse 2.4s ease-in-out 2.6s 3 alternate both;
+}
+
+.intro-layer--stone {
+  z-index: 5;
+  animation: intro-stone-in 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) 1.3s both;
+}
+
+.intro-aura {
+  position: absolute;
+  top: 51.0167%;
+  left: 24.0741%;
+  z-index: 6;
+  width: 51.8519%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(248, 231, 196, 0.5) 0%,
+    rgba(214, 186, 150, 0.22) 42%,
+    rgba(178, 152, 214, 0.08) 68%,
+    rgba(178, 152, 214, 0) 100%
+  );
+  opacity: 0;
+  animation: intro-aura-life 9s linear both;
+  will-change: transform, opacity;
+}
+
+.intro-rings {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.intro-ring {
+  position: absolute;
+  top: 54.6625%;
+  left: 30.5556%;
+  width: 38.8889%;
+  aspect-ratio: 1;
+  border: 2px solid rgba(243, 226, 192, 0.55);
+  border-radius: 50%;
+  opacity: 0;
+  box-shadow:
+    0 0 22px rgba(243, 226, 192, 0.22),
+    inset 0 0 22px rgba(243, 226, 192, 0.14);
+  will-change: transform, opacity;
+}
+
+.intro-ring--one {
+  animation: intro-ring-wave 3.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 2.9s 2 both;
+}
+
+.intro-ring--two {
+  border-color: rgba(206, 186, 232, 0.45);
+  box-shadow:
+    0 0 22px rgba(206, 186, 232, 0.2),
+    inset 0 0 22px rgba(206, 186, 232, 0.12);
+  animation: intro-ring-wave 3.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 4.2s 2 both;
+}
+
+.intro-ring--three {
+  animation: intro-ring-wave 3.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 5.5s 1 both;
+}
+
+.intro-layer--sigil {
+  z-index: 7;
+  animation: intro-sigil-in 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 2.7s both;
+}
+
+.intro-layer--sigil .intro-layer__image {
+  animation: intro-sigil-turn 4.6s ease-in-out 4.4s both;
+}
+
+.intro-layer--orb1,
+.intro-layer--orb2,
+.intro-layer--orb3,
+.intro-layer--orb4 {
+  z-index: 8;
+  animation-name: intro-orb-in;
+  animation-duration: 1.35s;
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation-fill-mode: both;
+}
+
+.intro-layer--orb1 {
+  --orb-rise: 2.686%;
+  animation-delay: 1.7s;
+}
+
+.intro-layer--orb1 .intro-layer__image {
+  --orb-float: -0.62%;
+  animation: intro-orb-float 2.6s ease-in-out 3.05s 3 alternate both;
+}
+
+.intro-layer--orb2 {
+  --orb-rise: 3.306%;
+  animation-delay: 1.94s;
+}
+
+.intro-layer--orb2 .intro-layer__image {
+  --orb-float: -0.826%;
+  animation: intro-orb-float 3.1s ease-in-out 3.29s 2 alternate both;
+}
+
+.intro-layer--orb3 {
+  --orb-rise: 2.996%;
+  animation-delay: 2.16s;
+}
+
+.intro-layer--orb3 .intro-layer__image {
+  --orb-float: -0.517%;
+  animation: intro-orb-float 2.8s ease-in-out 3.51s 2 alternate both;
+}
+
+.intro-layer--orb4 {
+  --orb-rise: 3.616%;
+  animation-delay: 2.38s;
+}
+
+.intro-layer--orb4 .intro-layer__image {
+  --orb-float: -0.775%;
+  animation: intro-orb-float 3.4s ease-in-out 3.73s 2 alternate both;
+}
+
+.intro-motes {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+}
+
+.intro-mote {
+  position: absolute;
+  top: var(--mote-y);
+  left: var(--mote-x);
+  width: var(--mote-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 246, 224, 0.95) 0%,
+    rgba(244, 224, 186, 0.5) 38%,
+    rgba(244, 224, 186, 0) 72%
+  );
+  opacity: 0;
+  box-shadow: 0 0 14px rgba(250, 232, 196, 0.55);
+  animation: intro-mote-rise var(--mote-duration) ease-in-out var(--mote-delay) both;
+  will-change: transform, opacity;
+}
+
+.intro-mote--violet {
+  background: radial-gradient(
+    circle,
+    rgba(232, 222, 252, 0.95) 0%,
+    rgba(196, 178, 232, 0.5) 38%,
+    rgba(196, 178, 232, 0) 72%
+  );
+  box-shadow: 0 0 14px rgba(206, 190, 240, 0.5);
+}
+
+.intro-layer--subtitle {
+  z-index: 10;
+  animation: intro-subtitle-in 1.7s cubic-bezier(0.39, 0.58, 0.57, 1) 4.8s both;
+}
+
+.intro-layer--title {
+  z-index: 11;
+  animation: intro-title-in 1.9s cubic-bezier(0.19, 1, 0.22, 1) 3.9s both;
+}
+
+.intro-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  background: radial-gradient(
+    ellipse 78% 62% at 50% 46%,
+    rgba(5, 5, 14, 0) 58%,
+    rgba(5, 5, 14, 0.42) 100%
+  );
+  pointer-events: none;
+}
+
+@keyframes intro-bg-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes intro-beam-in {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 0.96; transform: scale(1); }
+}
+
+@keyframes intro-halo-in {
+  from { opacity: 0; transform: scale(0.72); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes intro-halo-scale {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+@keyframes intro-light-pulse {
+  from { opacity: 0.84; }
+  to { opacity: 1; }
+}
+
+@keyframes intro-core-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes intro-core-scale {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+@keyframes intro-stone-in {
+  from { opacity: 0; transform: translateY(6.716%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes intro-aura-life {
+  0%, 32.2% { opacity: 0; transform: scale(0.7); }
+  52.2% { opacity: 0.75; transform: scale(1); }
+  81.1% { opacity: 0.75; transform: scale(1.1); }
+  100% { opacity: 0.75; transform: scale(1.025); }
+}
+
+@keyframes intro-ring-wave {
+  0% { opacity: 0; transform: scale(0.34); }
+  28% { opacity: 0.55; }
+  100% { opacity: 0; transform: scale(1.55); }
+}
+
+@keyframes intro-sigil-in {
+  from { opacity: 0; transform: scale(0.8) rotate(-6deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes intro-sigil-turn {
+  from { transform: rotate(0); }
+  to { transform: rotate(10deg); }
+}
+
+@keyframes intro-orb-in {
+  from { opacity: 0; transform: translateY(var(--orb-rise)) scale(0.7); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes intro-orb-float {
+  from { transform: translateY(0); }
+  to { transform: translateY(var(--orb-float)); }
+}
+
+@keyframes intro-mote-rise {
+  0% { opacity: 0; transform: translateY(0); }
+  30% { opacity: var(--mote-peak); }
+  100% { opacity: 0; transform: translateY(var(--mote-travel)); }
+}
+
+@keyframes intro-title-in {
+  from { opacity: 0; transform: translateY(1.343%); filter: blur(10px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes intro-subtitle-in {
+  from { opacity: 0; transform: translateY(0.723%); filter: blur(6px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* Low-stimulation and OS reduced-motion users receive the resolved final
+   composition with an explicit Continue action, never a nine-second wait. */
+.app-intro--still .intro-layer,
+html[data-stim="low"] .app-intro .intro-layer {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  animation: none !important;
+}
+
+.app-intro--still .intro-layer__image,
+html[data-stim="low"] .app-intro .intro-layer__image {
+  opacity: 1;
+  transform: none;
+  animation: none !important;
+}
+
+.app-intro--still .intro-aura,
+html[data-stim="low"] .app-intro .intro-aura {
+  opacity: 0.75;
+  transform: scale(1.025);
+  animation: none !important;
+}
+
+.app-intro--still .intro-ring,
+.app-intro--still .intro-mote,
+html[data-stim="low"] .app-intro .intro-ring,
+html[data-stim="low"] .app-intro .intro-mote {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-intro {
+    transition-duration: 0.01ms !important;
+  }
+
+  .app-intro .intro-layer,
+  .app-intro .intro-layer__image {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    animation: none !important;
+  }
+
+  .app-intro .intro-aura {
+    opacity: 0.75;
+    transform: scale(1.025);
+    animation: none !important;
+  }
+
+  .app-intro .intro-ring,
+  .app-intro .intro-mote {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .app-intro__skip {
+    background: #0a0a18;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

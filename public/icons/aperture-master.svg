@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="zenith" cx="50%" cy="0%" r="90%">
+      <stop offset="0%" stop-color="#6C5BB7" stop-opacity="0.16"/>
+      <stop offset="55%" stop-color="#6C5BB7" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="#0A0E1A"/>
+  <rect width="512" height="512" fill="url(#zenith)"/>
+  <path d="M 353.3 111.7 A 174.1 174.1 0 1 0 400.3 158.7"
+        fill="none" stroke="#D9BA85" stroke-width="8.7" stroke-linecap="round"/>
+  <circle cx="256" cy="256" r="111.4" fill="none" stroke="#D9BA85" stroke-opacity="0.72" stroke-width="5.6"/>
+  <circle cx="256" cy="256" r="26.1" fill="#D9BA85"/>
+  <circle cx="379.1" cy="132.9" r="17.4" fill="#D9BA85"/>
+</svg>

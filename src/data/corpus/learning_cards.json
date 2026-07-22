@@ -1,0 +1,85 @@
+{
+  "version": "2026-07-22",
+  "cards": [
+    {
+      "id": "LC01",
+      "title": "What LumenNous Means By Gnosticism",
+      "summary": "The app uses Gnostic language as a field of exploration, not as one fixed creed. Ancient sources differ across Sethian, Valentinian, Thomasine, Hermetic and later streams.",
+      "labels": ["HISTORICAL_SCHOLARSHIP"],
+      "source_ids": ["DIM02-016", "DIM02-017"],
+      "related_categories": ["C02", "C03", "C25"]
+    },
+    {
+      "id": "LC02",
+      "title": "The Source, Monad And Pleroma",
+      "summary": "These names point toward ultimate origin and fullness in several ancient texts. LumenNous presents them as depth-layer language users can choose, not required belief.",
+      "labels": ["PRIMARY_TEXT", "THEOLOGICAL_INTERPRETATION"],
+      "source_ids": ["PT-01", "PT-02", "PT-05"],
+      "related_categories": ["C02", "C25"]
+    },
+    {
+      "id": "LC03",
+      "title": "Sophia And Divine Wisdom",
+      "summary": "Sophia means wisdom. In some Gnostic texts she becomes a dramatic figure of descent, longing, error, lament and restoration. The app uses Sophia carefully as wisdom imagery.",
+      "labels": ["PRIMARY_TEXT", "THEOLOGICAL_INTERPRETATION"],
+      "source_ids": ["PT-14", "PT-16"],
+      "related_categories": ["C04", "C06", "C10"]
+    },
+    {
+      "id": "LC04",
+      "title": "Why Lament Belongs In Prayer",
+      "summary": "The Psalms preserve complaint, grief and unanswered pain as real prayer. LumenNous should not rush sorrow into gratitude or resolution.",
+      "labels": ["PRIMARY_TEXT", "HISTORICAL_SCHOLARSHIP", "TRADITIONAL_PRACTICE"],
+      "source_ids": ["DIM03"],
+      "related_categories": ["C10", "C11", "C06"]
+    },
+    {
+      "id": "LC05",
+      "title": "Affirmations Without Forced Positivity",
+      "summary": "The best-supported affirmation model is values-based and compassionate, not inflated self-praise. Strong positive statements can backfire for people who do not believe them.",
+      "labels": ["SCIENTIFIC_EVIDENCE"],
+      "source_ids": ["DIM09"],
+      "related_categories": ["C17", "C01", "C10"]
+    },
+    {
+      "id": "LC06",
+      "title": "Breath, Rhythm And Sacred Recitation",
+      "summary": "The strongest bridge between sacred sound and physiology is rhythm and pacing, especially slow recitation near six breaths per minute. Frequency healing claims need strong caution.",
+      "labels": ["SCIENTIFIC_EVIDENCE", "TRADITIONAL_PRACTICE"],
+      "source_ids": ["DIM11-D1"],
+      "related_categories": ["C01", "C02", "C20"]
+    },
+    {
+      "id": "LC07",
+      "title": "Aramaic Prayer And Translation Honesty",
+      "summary": "Syriac and Aramaic prayer lineages are real and beautiful, but modern devotional renderings should not be presented as exact translations of Jesus' original words.",
+      "labels": ["TRADITIONAL_PRACTICE", "CONTEMPORARY_SPIRITUAL_INTERPRETATION"],
+      "source_ids": ["R01", "R02", "M05", "M06"],
+      "related_categories": ["C02", "C27"]
+    },
+    {
+      "id": "LC08",
+      "title": "Chakras And Subtle-Energy Content",
+      "summary": "Classical subtle-body traditions are complex. The familiar seven-colour chakra system is a modern synthesis, so the app must attribute it clearly and avoid medical or frequency claims.",
+      "labels": ["TRADITIONAL_PRACTICE", "CONTEMPORARY_SPIRITUAL_INTERPRETATION"],
+      "source_ids": ["DIM06", "DIM11-A6"],
+      "related_categories": ["C24"]
+    },
+    {
+      "id": "LC09",
+      "title": "Prayer Is Not Medical Treatment",
+      "summary": "Prayer and meditation can support reflection and steadiness, but the app must not claim to diagnose, cure or replace professional care.",
+      "labels": ["SCIENTIFIC_EVIDENCE"],
+      "source_ids": ["DIM10-001", "DIM10-004"],
+      "related_categories": ["C09", "C20", "C05"]
+    },
+    {
+      "id": "LC10",
+      "title": "Modern Gnosticism And Technology",
+      "summary": "Modern writers sometimes use Gnostic patterns to interpret technology, media and alienation. This is useful cultural interpretation, not evidence about ancient communities.",
+      "labels": ["CONTEMPORARY_SPIRITUAL_INTERPRETATION"],
+      "source_ids": ["DIM12-004"],
+      "related_categories": ["C03", "C19", "C25"]
+    }
+  ]
+}

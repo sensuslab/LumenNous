@@ -1,0 +1,110 @@
+{
+  "version": "2026-07-22",
+  "design_note": "Prompts are for silent holding. The app should not require saving, journaling or mood tracking.",
+  "prompts_by_category": {
+    "C01": [
+      "What is the simplest anchor available to you right now: breath, sound, touch or sight?",
+      "What can wait until your body has had one quieter minute?"
+    ],
+    "C02": [
+      "Where do you feel distance from Source, and what longing remains alive there?",
+      "What name for the Divine feels honest today?"
+    ],
+    "C03": [
+      "What do you know quietly that you have been trying to prove loudly?",
+      "What would inner knowing feel like if it did not need certainty?"
+    ],
+    "C04": [
+      "What value can guide the next step before the whole answer is clear?",
+      "What pressure can be set aside so wisdom can speak plainly?"
+    ],
+    "C05": [
+      "What ordinary boundary would help you feel more grounded today?",
+      "What is real and near enough to notice in this room?"
+    ],
+    "C06": [
+      "What burden has already said what it needed to say?",
+      "What would release look like if it did not shame what you have carried?"
+    ],
+    "C07": [
+      "Where are you treating rest as something that must be earned?",
+      "What part of you needs restoration rather than more effort?"
+    ],
+    "C08": [
+      "What small brave action is actually yours to take?",
+      "What kind of courage fits this moment without becoming force?"
+    ],
+    "C09": [
+      "What kind of accompaniment would feel kind today?",
+      "Where can you ask for support without making your suffering your fault?"
+    ],
+    "C10": [
+      "What part of the loss needs to be spoken without being solved?",
+      "If comfort does not come today, what would help you be less alone?"
+    ],
+    "C11": [
+      "What are you ready to release, and what is not ready yet?",
+      "What boundary might be wiser than reconciliation right now?"
+    ],
+    "C12": [
+      "Where can love become one practical act rather than a feeling you force?",
+      "What dignity can you recognise in yourself and the other person?"
+    ],
+    "C13": [
+      "Who or what are you carrying in care today?",
+      "What concern can be held without pretending you control the outcome?"
+    ],
+    "C14": [
+      "What keeps returning as a quiet call?",
+      "What next step would honour purpose without demanding certainty?"
+    ],
+    "C15": [
+      "What wants to be made if it does not have to be impressive?",
+      "Where might creative work become participation rather than performance?"
+    ],
+    "C16": [
+      "What is enough for today, even if not everything is resolved?",
+      "What does gratitude look like without denying scarcity or fear?"
+    ],
+    "C17": [
+      "What would you say to yourself if worth did not need defending?",
+      "What self-critical thought can be held more gently?"
+    ],
+    "C18": [
+      "What is ending, and what deserves to be honoured before you move on?",
+      "What can accompany you across this threshold?"
+    ],
+    "C19": [
+      "What injustice is asking for a grounded, ethical response?",
+      "What action is yours, and what outcome is not yours to command?"
+    ],
+    "C20": [
+      "What unfinished thing can be left until morning?",
+      "What would help your body know the day is closing?"
+    ],
+    "C21": [
+      "What quality do you want to carry into the first part of the day?",
+      "What is one small act that would make this morning more faithful to your values?"
+    ],
+    "C23": [
+      "What pattern are you willing to see without naming yourself as broken?",
+      "What hidden part of you needs compassion before analysis?"
+    ],
+    "C24": [
+      "What does your body notice when you attend without trying to interpret?",
+      "Can this be symbolic attention rather than a claim you must prove?"
+    ],
+    "C25": [
+      "What becomes smaller when you remember the wideness of the world?",
+      "How can awe return you to care rather than escape?"
+    ],
+    "C26": [
+      "What inheritance are you grateful for, and what inheritance needs transforming?",
+      "Who helped make your life possible in ordinary, human ways?"
+    ],
+    "C27": [
+      "What joy can be received without needing to possess it?",
+      "What praise feels honest today?"
+    ]
+  }
+}

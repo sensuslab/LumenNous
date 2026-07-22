@@ -1,0 +1,97 @@
+{
+  "version": "2026-07-22",
+  "source_file": "Research/research/prayer_engine_dim09.md",
+  "forms": [
+    {
+      "id": "F1",
+      "name": "Identity affirmations",
+      "use_when": ["identity threat", "feedback", "confidence"],
+      "prefer_pattern": "I am someone who keeps showing up for {value/person/cause}.",
+      "avoid": ["grandiose self-praise", "claims the user may strongly disbelieve"],
+      "labels": ["SCIENTIFIC_EVIDENCE", "THEOLOGICAL_INTERPRETATION"]
+    },
+    {
+      "id": "F2",
+      "name": "Intention statements",
+      "use_when": ["morning", "transition", "decision"],
+      "prefer_pattern": "Today I move toward {value} in {situation}.",
+      "avoid": ["outcome certainty", "positive fantasy without action"],
+      "labels": ["TRADITIONAL_PRACTICE", "SCIENTIFIC_EVIDENCE"]
+    },
+    {
+      "id": "F3",
+      "name": "Permission statements",
+      "use_when": ["grief", "burnout", "shame", "overwhelm"],
+      "prefer_pattern": "I may {need}; {need} is not earned.",
+      "avoid": ["passivity framed as virtue", "permission to avoid necessary help"],
+      "labels": ["SCIENTIFIC_EVIDENCE", "THEOLOGICAL_INTERPRETATION"]
+    },
+    {
+      "id": "F4",
+      "name": "Values statements",
+      "use_when": ["stress", "threat", "hard conversations", "choices"],
+      "prefer_pattern": "{Value} matters more to me than {outcome}.",
+      "avoid": ["socially desirable but untrue values", "abstract moralising"],
+      "labels": ["SCIENTIFIC_EVIDENCE"]
+    },
+    {
+      "id": "F5",
+      "name": "Grounding statements",
+      "use_when": ["acute anxiety", "pre-prayer settling", "sleep preparation"],
+      "prefer_pattern": "This is {moment}; I am here; that is enough for this minute.",
+      "avoid": ["complete-safety claims", "denying fear"],
+      "labels": ["SCIENTIFIC_EVIDENCE"]
+    },
+    {
+      "id": "F6",
+      "name": "Compassionate reframing",
+      "use_when": ["failure", "self-criticism", "low self-esteem"],
+      "prefer_pattern": "This is hard, and struggling is human - not proof that I am failing.",
+      "avoid": ["premature silver lining", "God's-plan shortcuts"],
+      "labels": ["SCIENTIFIC_EVIDENCE"]
+    },
+    {
+      "id": "F7",
+      "name": "Devotional declarations",
+      "use_when": ["explicit theistic register", "worship", "connection to Source"],
+      "prefer_pattern": "I choose trust again, with my questions still in my hands.",
+      "avoid": ["decree-and-declare outcomes", "faith-shaming"],
+      "labels": ["TRADITIONAL_PRACTICE", "THEOLOGICAL_INTERPRETATION"]
+    },
+    {
+      "id": "F8",
+      "name": "Commitments to action",
+      "use_when": ["habit building", "repair", "ethical action"],
+      "prefer_pattern": "When {cue} happens, I will {small controllable action}.",
+      "avoid": ["results outside user control", "guilt-heavy vows"],
+      "labels": ["SCIENTIFIC_EVIDENCE"]
+    },
+    {
+      "id": "F9",
+      "name": "Statements of trust",
+      "use_when": ["waiting", "uncertainty", "after petition"],
+      "prefer_pattern": "I do not control {outcome}; I can do {action}, and let the rest be.",
+      "avoid": ["fatalism", "trust used to skip action or safety"],
+      "labels": ["SCIENTIFIC_EVIDENCE", "THEOLOGICAL_INTERPRETATION"]
+    },
+    {
+      "id": "F10",
+      "name": "Statements of release",
+      "use_when": ["rumination", "resentment", "evening", "transition"],
+      "prefer_pattern": "I set down {concern} for tonight; I can pick it up tomorrow if needed.",
+      "avoid": ["premature closure", "releasing legitimate grievances too soon"],
+      "labels": ["SCIENTIFIC_EVIDENCE", "TRADITIONAL_PRACTICE"]
+    }
+  ],
+  "hard_blocks": [
+    "outcome guarantees",
+    "medical or mental-health cure claims",
+    "financial or prosperity promises",
+    "victim-blame or karma blame",
+    "suppression commands",
+    "doubt-forbidding language",
+    "magical causation over other people",
+    "unsafe forgiveness pressure",
+    "prayer as substitute for professional care"
+  ]
+}

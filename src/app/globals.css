@@ -1,0 +1,481 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   LumenNous — Nocturne design language (globals)
+   Dark-only. Tokens from design.md §2 are the single source of truth:
+   defined once as CSS custom properties on :root, mirrored into Tailwind
+   v4 via `@theme inline` so utilities like `bg-bg-1` / `text-ink-muted`
+   / `border-line` / `font-serif` resolve to the same values.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* 2.1 — Foundations */
+  --bg-0: #06080f;
+  --bg-1: #0a0e1a;
+  --bg-2: #0e1424;
+  --bg-3: #131a2e;
+  --bg-player: #05070d;
+
+  /* 2.2 — Ink (text) */
+  --ink-strong: #f4f0e6;
+  --ink: #e6e1d3;
+  --ink-muted: #a7a4b8;
+  --ink-faint: #8b88a0;
+  --ink-ghost: #6e6c82;
+
+  /* 2.3 — Accents */
+  --gold: #d9ba85;
+  --gold-strong: #e8d0a4;
+  --gold-deep: #a8894f;
+  --violet: #a79be8;
+  --violet-deep: #6c5bb7;
+  --blue: #8fb0ea;
+  --pearl-fill: #eae4d4;
+  --pearl-fill-hover: #f4eee0;
+
+  /* 2.4 — Semantic */
+  --ok: #9bc4a8;
+  --warn: #e5c07b;
+  --safety: #e8b4a0;
+  --danger-quiet: #c98a8a;
+
+  /* 2.5 — Lines & glass */
+  --line-subtle: rgba(230, 225, 211, 0.07);
+  --line: rgba(230, 225, 211, 0.12);
+  --line-strong: rgba(217, 186, 133, 0.35);
+  --glass-bg: linear-gradient(160deg, rgba(148, 163, 216, 0.07), rgba(148, 163, 216, 0.03));
+  --glass-blur: blur(18px) saturate(140%);
+  --glass-bg-solid: #10162a;
+
+  /* 2.8 — Spacing (4px base) */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.25rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+  --s-10: 2.5rem;
+  --s-12: 3rem;
+  --s-16: 4rem;
+  --s-20: 5rem;
+  --s-24: 6rem;
+  --s-32: 8rem;
+
+  /* 2.9 — Radii (nothing exceeds 8px except pills/circles) */
+  --r-xs: 2px;
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-pill: 999px;
+
+  /* 2.10 — Elevation: the only two shadows in the system */
+  --elev-sheet: 0 -8px 32px rgba(3, 5, 10, 0.5);
+  --elev-pop: 0 4px 16px rgba(3, 5, 10, 0.4);
+
+  /* 4.1 — Motion */
+  --dur-micro: 120ms;
+  --dur-std: 200ms;
+  --dur-enter: 320ms;
+  --dur-large: 480ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-std: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-breath: cubic-bezier(0.37, 0, 0.63, 1);
+
+  /* Chrome metrics */
+  --nav-h: 64px;
+  --header-h: 56px;
+}
+
+/* Mirror tokens into Tailwind's theme (`inline` keeps the var() reference
+   so [data-stim]/media-query overrides keep working everywhere). */
+@theme inline {
+  --color-bg-0: var(--bg-0);
+  --color-bg-1: var(--bg-1);
+  --color-bg-2: var(--bg-2);
+  --color-bg-3: var(--bg-3);
+  --color-bg-player: var(--bg-player);
+
+  --color-ink-strong: var(--ink-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-ink-ghost: var(--ink-ghost);
+
+  --color-gold: var(--gold);
+  --color-gold-strong: var(--gold-strong);
+  --color-gold-deep: var(--gold-deep);
+  --color-violet: var(--violet);
+  --color-violet-deep: var(--violet-deep);
+  --color-blue: var(--blue);
+  --color-pearl-fill: var(--pearl-fill);
+  --color-pearl-fill-hover: var(--pearl-fill-hover);
+
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-safety: var(--safety);
+  --color-danger-quiet: var(--danger-quiet);
+
+  --color-line-subtle: var(--line-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  --radius-xs: var(--r-xs);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-pill: var(--r-pill);
+
+  --shadow-sheet: var(--elev-sheet);
+  --shadow-pop: var(--elev-pop);
+
+  --ease-out: var(--ease-out);
+  --ease-std: var(--ease-std);
+  --ease-breath: var(--ease-breath);
+
+  --animate-twinkle: twinkle 6s var(--ease-breath) infinite;
+  --animate-twinkle-slow: twinkle 8s var(--ease-breath) infinite;
+  --animate-orbit: orbit-rotate 90s linear infinite;
+  --animate-orbit-slow: orbit-rotate 140s linear infinite;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+html {
+  font-size: 100%; /* OS text scaling works up to 200% (design.md §2.7) */
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100dvh;
+  /* 2.1 — page background recipe (zenith violet → faint gold nadir → ink) */
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(108, 91, 183, 0.16), transparent 55%),
+    radial-gradient(90% 60% at 50% 110%, rgba(217, 186, 133, 0.05), transparent 60%),
+    linear-gradient(180deg, #0a0e1a 0%, #06080f 100%);
+  background-attachment: fixed;
+  background-color: var(--bg-1);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.625;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  color: var(--ink-strong);
+  text-wrap: balance;
+}
+
+::selection {
+  background: rgba(217, 186, 133, 0.24);
+  color: var(--ink-strong);
+}
+
+/* 5.2 — Focus: 2px gold ring on every interactive element.
+   Violet inside Create surfaces via [data-accent="violet"]. */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+[data-accent="violet"] :focus-visible,
+.focus-violet:focus-visible {
+  outline-color: var(--violet);
+}
+
+/* Numeric durations/timers use tabular figures (design.md §2.7) */
+.tnum {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Type scale (design.md §2.7) — component classes, mobile-first fluid sizes
+   -------------------------------------------------------------------------- */
+
+.t-display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2.5rem, 7vw, 3.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ink-strong);
+}
+.t-h1 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 5.5vw, 2.75rem);
+  line-height: 1.2;
+  color: var(--ink-strong);
+}
+.t-h2 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.625rem, 4.5vw, 2rem);
+  line-height: 1.25;
+  color: var(--ink-strong);
+}
+.t-h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 1.25rem;
+  line-height: 1.35;
+  color: var(--ink-strong);
+}
+.t-prayer {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.375rem, 4.2vw, 1.625rem);
+  line-height: 1.65;
+  letter-spacing: 0.005em;
+  color: var(--ink-strong);
+}
+.t-prayer-sm {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--ink-strong);
+}
+.t-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.625;
+  color: var(--ink);
+}
+.t-body-sm {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+.t-label {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+.t-eyebrow {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+.t-meta {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* Prayer measure: 34ch mobile / 48ch desktop; prose 68ch (§2.7) */
+.measure-prayer { max-width: 34ch; }
+@media (min-width: 768px) { .measure-prayer { max-width: 48ch; } }
+.measure-prose { max-width: 68ch; }
+.measure-ui { max-width: 60ch; }
+
+/* --------------------------------------------------------------------------
+   Glass (design.md §2.5) with no-backdrop + low-stimulation fallbacks
+   -------------------------------------------------------------------------- */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--line-subtle);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: rgba(16, 22, 42, 0.92);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: var(--glass-bg-solid);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+[data-stim="low"] .glass {
+  background: var(--glass-bg-solid);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* --------------------------------------------------------------------------
+   Celestial utilities (design.md §3)
+   -------------------------------------------------------------------------- */
+
+/* 3.4 — Grain overlay: static feTurbulence tile, never animates */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+}
+[data-stim="low"] .grain {
+  display: none;
+}
+
+/* 3.3 — Horizon glow (page-top ambience); violet default */
+.horizon {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 42vh;
+  pointer-events: none;
+  background: radial-gradient(80% 100% at 50% 0%, rgba(108, 91, 183, 0.14), transparent 70%);
+}
+.horizon--gold {
+  background: radial-gradient(80% 100% at 50% 0%, rgba(217, 186, 133, 0.08), transparent 70%);
+}
+.horizon--blue {
+  background: radial-gradient(80% 100% at 50% 0%, rgba(143, 176, 234, 0.1), transparent 70%);
+}
+[data-stim="low"] .horizon {
+  opacity: 0.4;
+}
+
+/* 3.1 — Starfield layers (positions are generated inline by <Starfield/>) */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.starfield__layer {
+  position: absolute;
+  inset: -12%; /* bleed so scroll parallax never reveals edges */
+}
+.starfield__layer > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border-radius: 9999px;
+}
+[data-stim="low"] .starfield {
+  opacity: 0.5;
+}
+.starfield[data-density="low"] {
+  opacity: 0.6;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.85; }
+}
+@keyframes orbit-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* --------------------------------------------------------------------------
+   Low-stimulation mode additions (design.md §4.3):
+   glass → solid (above), grain hidden (above), horizon 40% (above),
+   starfield 50% (above), accent glows/blooms removed (below).
+   -------------------------------------------------------------------------- */
+[data-stim="low"] .bloom,
+[data-stim="low"] .glow {
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+/* prefers-contrast: more → raise the quietest hairline (design.md §4.3) */
+@media (prefers-contrast: more) {
+  :root {
+    --line-subtle: rgba(230, 225, 211, 0.16);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion (design.md §4.3) — global override + functional
+   replacements are handled per-component (static starfield, parked orbits).
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+html[data-stim="low"],
+[data-stim="low"] *,
+[data-stim="low"] *::before,
+[data-stim="low"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* --------------------------------------------------------------------------
+   Shell pieces
+   -------------------------------------------------------------------------- */
+
+/* Skip link (WCAG 2.2 §5.10) — first focusable element in the DOM */
+.skip-link {
+  position: fixed;
+  top: var(--s-3);
+  left: var(--s-3);
+  z-index: 100;
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-sm);
+  background: var(--bg-3);
+  border: 1px solid var(--line-strong);
+  color: var(--gold);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.8125rem;
+  transform: translateY(-200%);
+  transition: transform var(--dur-std) var(--ease-out);
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* Visually hidden but available to assistive tech */
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Thin, quiet scrollbar — dark only */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(230, 225, 211, 0.14) transparent;
+}

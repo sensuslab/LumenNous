@@ -1,0 +1,513 @@
+/**
+ * LumenNous typed content schemas (Zod).
+ *
+ * Every content record in `src/data/` is validated against these schemas at
+ * module load, so malformed editorial content fails fast at build/test time
+ * rather than at runtime in the UI. Engine schemas guard the on-device
+ * composition boundary.
+ *
+ * Duration unit conventions (documented per field):
+ *   - Prayer.practiceDuration ....... whole minutes
+ *   - Practice.durationOptions ...... whole minutes
+ *   - PracticeStep.seconds .......... seconds
+ *   - AudioItem.duration ............ seconds
+ *   - Playlist.duration ............. whole minutes (approximate total)
+ *
+ * URL conventions: curated links may be canonical pages or platform search
+ * URLs; `""` is allowed wherever a verified URL is not yet available (per
+ * editorial policy: never fabricate a precise URL or platform ID).
+ */
+
+import { z } from "zod";
+
+/* ------------------------------------------------------------------ */
+/* Shared primitives                                                    */
+/* ------------------------------------------------------------------ */
+
+const idSchema = z.string().min(1).max(120);
+
+/** ISO calendar date, YYYY-MM-DD (used for `lastVerified` editorial metadata). */
+const isoDateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "expected YYYY-MM-DD");
+
+/** ISO datetime used for local composition metadata. */
+const isoDateTimeSchema = z
+  .string()
+  .refine((value) => !Number.isNaN(Date.parse(value)), {
+    message: "expected an ISO-8601 datetime string",
+  });
+
+/** http(s) URL, or "" when no verified URL exists yet. Never fabricate. */
+const urlOrEmptySchema = z
+  .string()
+  .max(2000)
+  .refine((value) => value === "" || /^https?:\/\/\S+$/.test(value), {
+    message: "must be an http(s) URL or an empty string",
+  });
+
+const nonEmpty = (label: string, max = 20000) =>
+  z.string().min(1, `${label} must not be empty`).max(max);
+
+/* ------------------------------------------------------------------ */
+/* Enums                                                                */
+/* ------------------------------------------------------------------ */
+
+/** Suitability windows set by content administrators (daily selection logic). */
+export const TimeOfDaySchema = z.enum([
+  "morning",
+  "evening",
+  "any",
+  "seasonal-aware",
+]);
+export type TimeOfDay = z.infer<typeof TimeOfDaySchema>;
+
+/** All seed content ships as "draft" pending editorial review (see brief). */
+export const EditorialStatusSchema = z.enum(["draft", "published", "review"]);
+export type EditorialStatus = z.infer<typeof EditorialStatusSchema>;
+
+/**
+ * Claim classification — how a statement/tradition should be framed.
+ * Used by sources, teachings and (as evidenceClassification) audio items.
+ */
+export const ClaimClassificationSchema = z.enum([
+  "historical-teaching",
+  "modern-interpretation",
+  "symbolic",
+  "preliminary-research",
+  "no-established-clinical-evidence",
+  "experiential-claim",
+  "traditional-symbolic-use",
+]);
+export type ClaimClassification = z.infer<typeof ClaimClassificationSchema>;
+
+/**
+ * Evidence classification for audio items — the SAME value set as
+ * claimClassification (per brief FREQUENCY CLAIMS section). Frequency-based
+ * audio (432 Hz / 528 Hz / Solfeggio / binaural / chakra tones) MUST carry
+ * "experiential-claim" or "no-established-clinical-evidence".
+ */
+export const EvidenceClassificationSchema = ClaimClassificationSchema;
+export type EvidenceClassification = z.infer<typeof EvidenceClassificationSchema>;
+
+/** Access labelling for external media (brief: label free/subscription/account-dependent). */
+export const AccessTypeSchema = z.enum([
+  "free",
+  "subscription",
+  "account-dependent",
+]);
+export type AccessType = z.infer<typeof AccessTypeSchema>;
+
+export const AffirmationTypeSchema = z.enum([
+  "grounding",
+  "devotional",
+  "contemplative",
+  "releasing",
+  "resilience",
+  "gratitude",
+]);
+export type AffirmationType = z.infer<typeof AffirmationTypeSchema>;
+
+export const PracticeTypeSchema = z.enum([
+  "meditation",
+  "breath",
+  "visualisation",
+  "contemplation",
+  "sequence",
+]);
+export type PracticeType = z.infer<typeof PracticeTypeSchema>;
+
+export const SourceTypeSchema = z.enum([
+  "ancient-text",
+  "scripture",
+  "translation",
+  "academic-book",
+  "academic-article",
+  "reference-work",
+  "health-resource",
+  "modern-spiritual",
+]);
+export type SourceType = z.infer<typeof SourceTypeSchema>;
+
+/**
+ * Tradition labels distinguish historical teaching from modern
+ * interpretation and original writing (brief principle 8).
+ */
+export const TraditionLabelSchema = z.enum([
+  "historical-teaching",
+  "modern-interpretation",
+  "symbolic-language",
+  "shared-tradition",
+  "original-composition",
+]);
+export type TraditionLabel = z.infer<typeof TraditionLabelSchema>;
+
+/** Category-level flags that trigger extra care in copy and safety handling. */
+export const SafetyFlagSchema = z.enum([
+  "grief-sensitive",
+  "mental-health-adjacent",
+  "medical-adjacent",
+  "financial-adjacent",
+  "relationship-adjacent",
+  "abuse-adjacent",
+  "none",
+]);
+export type SafetyFlag = z.infer<typeof SafetyFlagSchema>;
+
+/**
+ * Theme accent keys map to design tokens owned by the UI layer
+ * (deep midnight base; pearl / gold / violet / luminous blue accents).
+ */
+export const ThemeAccentSchema = z.enum([
+  "pearl",
+  "gold",
+  "violet",
+  "azure",
+  "rose",
+  "sage",
+  "amber",
+  "indigo",
+  "teal",
+  "ember",
+  "moonlight",
+  "terra",
+]);
+export type ThemeAccent = z.infer<typeof ThemeAccentSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Category                                                             */
+/* ------------------------------------------------------------------ */
+
+export const CategorySchema = z.object({
+  id: idSchema,
+  slug: z
+    .string()
+    .min(1)
+    .max(80)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be kebab-case"),
+  name: nonEmpty("name", 120),
+  shortDescription: nonEmpty("shortDescription", 240),
+  longDescription: nonEmpty("longDescription", 4000),
+  /** Lucide icon name (string), resolved by the UI layer. */
+  icon: nonEmpty("icon", 60),
+  /** Theme accent key (design-token lookup by the UI layer). */
+  theme: ThemeAccentSchema,
+  intentions: z.array(nonEmpty("intention", 120)).min(1).max(12),
+  relatedCategoryIds: z.array(idSchema).max(12),
+  safetyFlags: z.array(SafetyFlagSchema).min(1),
+  isActive: z.boolean(),
+});
+export type Category = z.infer<typeof CategorySchema>;
+
+/* ------------------------------------------------------------------ */
+/* Prayer                                                               */
+/* ------------------------------------------------------------------ */
+
+export const PrayerSchema = z.object({
+  id: idSchema,
+  title: nonEmpty("title", 160),
+  categoryIds: z.array(idSchema).min(1),
+  /**
+   * Distinguishes historical teaching from modern interpretation and
+   * original composition (brief principle 8). Prayers are original writing
+   * that may DRAW ON historical traditions — label accordingly.
+   */
+  traditionLabels: z.array(TraditionLabelSchema).min(1),
+  /** Full assembled text (opening + body + closing). */
+  content: nonEmpty("content"),
+  opening: nonEmpty("opening", 2000),
+  body: nonEmpty("body"),
+  closing: nonEmpty("closing", 2000),
+  /** Short affirmation paired with the prayer. No guaranteed outcomes. */
+  affirmation: nonEmpty("affirmation", 400),
+  /** Estimated practice length, whole minutes. */
+  practiceDuration: z.number().int().min(1).max(120),
+  /** 3–6 gentle practice steps. */
+  practiceSteps: z.array(nonEmpty("practice step", 600)).min(3).max(6),
+  reflectionPromptIds: z.array(idSchema),
+  sourceIds: z.array(idSchema),
+  audioIds: z.array(idSchema),
+  tags: z.array(nonEmpty("tag", 60)).max(12),
+  timeOfDay: TimeOfDaySchema,
+  /**
+   * When timeOfDay is "seasonal-aware", the calendar months (1–12) in which
+   * this item is in season. Omit for non-seasonal items.
+   */
+  seasonalMonths: z.array(z.number().int().min(1).max(12)).min(1).max(12).optional(),
+  editorialStatus: EditorialStatusSchema,
+  /** Free-text care note; "" when none. Never medical advice. */
+  safetyNotes: z.string().max(2000),
+});
+export type Prayer = z.infer<typeof PrayerSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Affirmation                                                          */
+/* ------------------------------------------------------------------ */
+
+export const AffirmationSchema = z.object({
+  id: idSchema,
+  text: nonEmpty("text", 400),
+  categoryIds: z.array(idSchema).min(1),
+  affirmationType: AffirmationTypeSchema,
+  sourceIds: z.array(idSchema),
+  tags: z.array(nonEmpty("tag", 60)).max(12),
+  editorialStatus: EditorialStatusSchema,
+});
+export type Affirmation = z.infer<typeof AffirmationSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Practice (guided contemplative practice)                             */
+/* ------------------------------------------------------------------ */
+
+export const PracticeStepSchema = z.object({
+  title: nonEmpty("step title", 120),
+  instruction: nonEmpty("step instruction", 1200),
+  /** Suggested time on this step, seconds. */
+  seconds: z.number().int().min(5).max(3600),
+});
+export type PracticeStep = z.infer<typeof PracticeStepSchema>;
+
+export const PracticeSchema = z.object({
+  id: idSchema,
+  slug: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be kebab-case"),
+  title: nonEmpty("title", 160),
+  practiceType: PracticeTypeSchema,
+  categoryIds: z.array(idSchema).min(1),
+  /** Selectable durations, whole minutes (e.g. [3, 5, 10]). */
+  durationOptions: z.array(z.number().int().min(1).max(120)).min(1).max(6),
+  preparation: nonEmpty("preparation", 2000),
+  steps: z.array(PracticeStepSchema).min(2).max(10),
+  closing: nonEmpty("closing", 2000),
+  /** Alternatives to audio-only instruction, posture options, etc. */
+  accessibilityNotes: nonEmpty("accessibilityNotes", 2000),
+  /** Care note; "" when none. Breath work must note dizziness guidance. */
+  safetyNotes: z.string().max(2000),
+  sourceIds: z.array(idSchema),
+  audioIds: z.array(idSchema),
+  editorialStatus: EditorialStatusSchema,
+});
+export type Practice = z.infer<typeof PracticeSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Source (references — real, verifiable works only)                    */
+/* ------------------------------------------------------------------ */
+
+export const SourceSchema = z.object({
+  id: idSchema,
+  title: nonEmpty("title", 300),
+  /** Author/editor; "" for anonymous or traditional works. */
+  author: z.string().max(300),
+  /** Publisher, institution or hosting body; "" when not applicable. */
+  institution: z.string().max(300),
+  /** Publication year of the cited edition; null for ancient/traditional works. */
+  year: z.number().int().min(1).max(2100).nullable(),
+  sourceType: SourceTypeSchema,
+  /** Tradition or field, e.g. "Gnostic traditions", "Public health (NHS)". */
+  tradition: nonEmpty("tradition", 200),
+  claimClassification: ClaimClassificationSchema,
+  /** Canonical reference URL, or "" when unsure. NEVER fabricate. */
+  url: urlOrEmptySchema,
+  citation: nonEmpty("citation", 1000),
+  copyrightNotes: z.string().max(1000),
+  lastVerified: isoDateSchema,
+});
+export type Source = z.infer<typeof SourceSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Audio item (curated external listening)                              */
+/* ------------------------------------------------------------------ */
+
+export const AudioPlatformSchema = z.enum([
+  "youtube",
+  "spotify",
+  "apple-music",
+  "web",
+]);
+export type AudioPlatform = z.infer<typeof AudioPlatformSchema>;
+
+export const AudioItemSchema = z.object({
+  id: idSchema,
+  title: nonEmpty("title", 300),
+  creator: nonEmpty("creator", 300),
+  platform: AudioPlatformSchema,
+  /** Precise platform ID only when verified; "" when unknown (never fabricate). */
+  platformId: z.string().max(200),
+  url: urlOrEmptySchema,
+  /** Consent-gated iframe embed URL where applicable; "" when not available. */
+  embedUrl: urlOrEmptySchema,
+  /** Approximate duration, seconds; 0 when unknown/varies. */
+  duration: z.number().int().min(0).max(86400),
+  language: nonEmpty("language", 60),
+  genre: nonEmpty("genre", 120),
+  intendedUses: z.array(nonEmpty("intended use", 120)).min(1).max(8),
+  evidenceClassification: EvidenceClassificationSchema,
+  accessType: AccessTypeSchema,
+  rightsNotes: z.string().max(1000),
+  lastVerified: isoDateSchema,
+});
+export type AudioItem = z.infer<typeof AudioItemSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Playlist (listening grouping)                                        */
+/* ------------------------------------------------------------------ */
+
+export const ExternalLinkSchema = z.object({
+  label: nonEmpty("label", 160),
+  url: urlOrEmptySchema,
+});
+export type ExternalLink = z.infer<typeof ExternalLinkSchema>;
+
+export const PlaylistSchema = z.object({
+  id: idSchema,
+  slug: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be kebab-case"),
+  title: nonEmpty("title", 160),
+  description: nonEmpty("description", 2000),
+  intendedUse: nonEmpty("intendedUse", 240),
+  /** Approximate total duration, whole minutes. */
+  duration: z.number().int().min(1).max(1440),
+  itemIds: z.array(idSchema).min(1),
+  externalLinks: z.array(ExternalLinkSchema).max(12),
+  /** Cover image path/URL; "" until artwork is commissioned. */
+  coverImage: z.string().max(500),
+  editorialStatus: EditorialStatusSchema,
+});
+export type Playlist = z.infer<typeof PlaylistSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Teaching (learn guide)                                               */
+/* ------------------------------------------------------------------ */
+
+export const FurtherReadingSchema = z.object({
+  title: nonEmpty("title", 300),
+  author: z.string().max(300),
+  url: urlOrEmptySchema,
+});
+export type FurtherReading = z.infer<typeof FurtherReadingSchema>;
+
+export const TeachingSchema = z.object({
+  id: idSchema,
+  slug: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be kebab-case"),
+  title: nonEmpty("title", 200),
+  /** One-sentence overview for cards and listings. */
+  summary: nonEmpty("summary", 400),
+  /** Guide body, markdown, 250–450 words (checked editorially, not by regex). */
+  body: nonEmpty("body"),
+  /** Tradition / evidence classification shown with the guide. */
+  classification: ClaimClassificationSchema,
+  relatedCategoryIds: z.array(idSchema).min(1),
+  sourceIds: z.array(idSchema).min(1),
+  furtherReading: z.array(FurtherReadingSchema).max(10),
+  tags: z.array(nonEmpty("tag", 60)).max(12),
+  editorialStatus: EditorialStatusSchema,
+});
+export type Teaching = z.infer<typeof TeachingSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Reflection prompt                                                    */
+/* ------------------------------------------------------------------ */
+
+export const ReflectionPromptSchema = z.object({
+  id: idSchema,
+  text: nonEmpty("text", 600),
+  categoryIds: z.array(idSchema).min(1),
+  tags: z.array(nonEmpty("tag", 60)).max(12),
+  editorialStatus: EditorialStatusSchema,
+});
+export type ReflectionPrompt = z.infer<typeof ReflectionPromptSchema>;
+
+/* ------------------------------------------------------------------ */
+/* On-device Engine request / result                                    */
+/* ------------------------------------------------------------------ */
+
+export const EngineOutputTypeSchema = z.enum([
+  "prayer",
+  "affirmation",
+  "meditation",
+  "combined-practice",
+]);
+export type EngineOutputType = z.infer<typeof EngineOutputTypeSchema>;
+
+export const EngineDurationSchema = z.enum([
+  "brief",
+  "five-minutes",
+  "ten-minutes",
+  "extended",
+]);
+export type EngineDuration = z.infer<typeof EngineDurationSchema>;
+
+export const EngineToneSchema = z.enum([
+  "gentle",
+  "direct",
+  "contemplative",
+  "devotional",
+  "grounding",
+]);
+export type EngineTone = z.infer<typeof EngineToneSchema>;
+
+export const EngineLanguagePreferenceSchema = z.enum([
+  "creator",
+  "source",
+  "divine",
+  "gnostic-terminology",
+  "neutral",
+]);
+export type EngineLanguagePreference = z.infer<typeof EngineLanguagePreferenceSchema>;
+
+/**
+ * A composition request stays in the browser. `userNeed` may be empty when
+ * the user explicitly chooses a category; it is never included in history.
+ */
+export const EngineRequestSchema = z.object({
+  userNeed: z.string().max(600).default(""),
+  categoryId: idSchema,
+  outputType: EngineOutputTypeSchema,
+  duration: EngineDurationSchema,
+  tone: EngineToneSchema,
+  languagePreference: EngineLanguagePreferenceSchema,
+  avoidances: z.array(nonEmpty("avoidance", 120)).max(20).default([]),
+});
+export type EngineRequest = z.infer<typeof EngineRequestSchema>;
+
+export const EngineRecipeSchema = z.object({
+  prayerId: idSchema.optional(),
+  affirmationId: idSchema.optional(),
+  practiceId: idSchema.optional(),
+  promptIds: z.array(idSchema).max(4),
+  cycle: z.number().int().min(1),
+});
+export type EngineRecipe = z.infer<typeof EngineRecipeSchema>;
+
+export const EngineResultSchema = z.object({
+  title: nonEmpty("title", 160),
+  categoryId: idSchema,
+  category: nonEmpty("category", 120),
+  outputType: EngineOutputTypeSchema,
+  opening: z.string().max(2000),
+  prayer: z.string().max(20000),
+  affirmation: z.string().max(400),
+  practiceDuration: z.number().int().min(0).max(120),
+  practiceSteps: z.array(nonEmpty("practice step", 600)).max(12),
+  reflectionPrompts: z.array(nonEmpty("reflection prompt", 600)).max(6),
+  closing: z.string().max(2000),
+  sourceIds: z.array(idSchema).max(12),
+  traditionLabels: z.array(TraditionLabelSchema),
+  audioRecommendationIds: z.array(idSchema).max(6),
+  safetyNote: z.string().max(2000),
+  safetyLevel: z.enum(["none", "distress", "escalation-risk", "crisis"]),
+  assembledAt: isoDateTimeSchema,
+  fingerprint: idSchema,
+  recipe: EngineRecipeSchema,
+});
+export type EngineResult = z.infer<typeof EngineResultSchema>;

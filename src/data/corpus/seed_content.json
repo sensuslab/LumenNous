@@ -1,0 +1,118 @@
+{
+  "version": "2026-07-22",
+  "notes": "Original seed content derived from the research corpus. Editorial review still required before production.",
+  "prayers": [
+    {
+      "id": "PR-C01-001",
+      "category": "C01",
+      "title": "Grounding & Stillness",
+      "length": "brief",
+      "text": "Source of life, meet me in this ordinary room.\nLet my attention come back from every direction.\nMy feet are here. My breath is here. This moment is enough to begin.\nHold what feels scattered without forcing it to become calm.\nLet me return to the next small thing with steadiness.\nAmen.",
+      "labels": ["CREATOR_FRAMEWORK"],
+      "safety": ["offer non-breath anchor"]
+    },
+    {
+      "id": "PR-C02-001",
+      "category": "C02",
+      "title": "Connection To Source",
+      "length": "standard",
+      "text": "Creator and Source, nearer than my searching,\nI turn toward You without needing perfect words.\nWhere I feel distance, let there be room for honest longing.\nWhere I feel silence, let it become a place of listening rather than proof of absence.\nGather the scattered parts of me into the fullness from which they came.\nLet trust rise gently, without pretending all questions are answered.\nI rest before You now.\nAmen.",
+      "labels": ["THEOLOGICAL_INTERPRETATION", "CREATOR_FRAMEWORK"],
+      "safety": ["no experiential guarantees"]
+    },
+    {
+      "id": "PR-C04-001",
+      "category": "C04",
+      "title": "Enough Light",
+      "length": "brief",
+      "text": "Source of wisdom, I do not ask to control the future.\nI ask for enough light for the next faithful step.\nQuiet the pressure to know everything at once.\nLet my values speak more clearly than my fear.\nHelp me choose what is honest, kind and possible today.\nAmen.",
+      "labels": ["CREATOR_FRAMEWORK"],
+      "safety": ["no divination language"]
+    },
+    {
+      "id": "PR-C05-001",
+      "category": "C05",
+      "title": "Refuge And Boundaries",
+      "length": "standard",
+      "text": "Source of refuge, bring me back to what is real and near.\nLet my body remember the ground beneath me.\nLet my attention return to this room, this breath, this moment.\nGive me calm boundaries: what is mine to carry, what is mine to set down, and where I may seek help.\nMay I move with steadiness and ordinary wisdom.\nAmen.",
+      "labels": ["CREATOR_FRAMEWORK"],
+      "safety": ["paranoia-risk protocol", "no attack framing"]
+    },
+    {
+      "id": "PR-C10-001",
+      "category": "C10",
+      "title": "Lament Without A Clean Ending",
+      "length": "standard",
+      "text": "Source of mercy, I come without a clean ending.\nThis loss is heavy, and I will not pretend it is light.\nReceive the ache, the anger, the silence, the memories that arrive without asking.\nIf comfort comes, let it come gently.\nIf it does not come today, stay with me in the dark.\nLet love remain love, even here.\nHold me as I carry only the next breath.\nAmen.",
+      "labels": ["THEOLOGICAL_INTERPRETATION"],
+      "safety": ["lament first", "no forced consolation"]
+    },
+    {
+      "id": "PR-C20-001",
+      "category": "C20",
+      "title": "Set This Day Down",
+      "length": "night",
+      "text": "Creator of the night, I set this day down.\nWhat I finished, I release.\nWhat remains unfinished, I leave for another hour.\nLet my body soften without being commanded.\nLet my thoughts pass like distant sound.\nKeep me in quiet until morning, and return me gently to the world.\nAmen.",
+      "labels": ["TRADITIONAL_PRACTICE", "CREATOR_FRAMEWORK"],
+      "safety": ["rest preparation only"]
+    }
+  ],
+  "affirmations": [
+    {"id": "AF-C01-001", "category": "C01", "form": "F5_grounding", "text": "Right now, I can return to one breath or one sound."},
+    {"id": "AF-C01-002", "category": "C01", "form": "F3_permission", "text": "I do not have to feel peaceful to begin."},
+    {"id": "AF-C10-001", "category": "C10", "form": "F3_permission", "text": "Grief is allowed to take the space it needs."},
+    {"id": "AF-C04-001", "category": "C04", "form": "F4_values", "text": "What matters most is still available in this next small choice."},
+    {"id": "AF-C17-001", "category": "C17", "form": "F6_compassionate_reframing", "text": "This is hard, and struggling is not proof that I am failing."},
+    {"id": "AF-C20-001", "category": "C20", "form": "F10_release", "text": "I set this down for tonight."},
+    {"id": "AF-C16-001", "category": "C16", "form": "F9_trust", "text": "I can do what is mine and release what is not."},
+    {"id": "AF-C21-001", "category": "C21", "form": "F8_commitment_to_action", "text": "When I feel scattered, I will pause for three breaths or one sound."}
+  ],
+  "practices": [
+    {
+      "id": "GP-001",
+      "name": "Three-Minute Grounding",
+      "categories": ["C01", "C05"],
+      "duration_min": 3,
+      "steps": [
+        "Look around and name, silently, three things you can see.",
+        "Choose an anchor: breath, sound, touch or an object in the room.",
+        "Rest attention there for five slow cycles.",
+        "When the mind leaves, return without scolding yourself.",
+        "Close with: I am here, and this is enough for now."
+      ],
+      "labels": ["SCIENTIFIC_EVIDENCE"],
+      "safety": ["eyes-open option", "non-breath anchor"]
+    },
+    {
+      "id": "GP-002",
+      "name": "Five-Minute Breath Prayer",
+      "categories": ["C01", "C02", "C20"],
+      "duration_min": 5,
+      "steps": [
+        "Choose a phrase with two halves, such as Source of life / hold me gently.",
+        "Let the first half meet the inhale and the second half meet the exhale.",
+        "Keep the breath natural; do not force it to slow.",
+        "If breath focus is uncomfortable, use the phrase with ambient sound instead.",
+        "Close by noticing the room and one next action."
+      ],
+      "labels": ["TRADITIONAL_PRACTICE", "SCIENTIFIC_EVIDENCE"],
+      "safety": ["no breath retention", "non-breath option"]
+    },
+    {
+      "id": "GP-003",
+      "name": "Ten-Minute Lament Practice",
+      "categories": ["C10", "C06"],
+      "duration_min": 10,
+      "steps": [
+        "Ground with sound, touch or breath for one minute.",
+        "Name the grief or complaint plainly.",
+        "Let there be silence without fixing it.",
+        "Ask for what is needed today, not for the whole future to resolve.",
+        "Choose whether to add a trust line; do not force it.",
+        "Close by feeling the ground and naming one form of support available now."
+      ],
+      "labels": ["PRIMARY_TEXT", "TRADITIONAL_PRACTICE"],
+      "safety": ["acute grief signposting", "no forced gratitude"]
+    }
+  ]
+}

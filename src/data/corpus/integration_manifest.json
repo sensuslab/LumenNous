@@ -1,0 +1,52 @@
+{
+  "version": "2026-07-22",
+  "purpose": "Map LumenNous product features to usable corpus assets and original research sources.",
+  "proposal_attachment": "/Users/ethanjfarrell/.codex/attachments/cc6448a8-189c-4298-9184-180b471d96ec/pasted-text.txt",
+  "canonical_schema": "Research/prayer_engine/08_app_schema.json",
+  "source_register": "Research/prayer_engine/02_source_register.csv",
+  "media_catalogue": "Research/prayer_engine/05_media_catalogue.csv",
+  "feature_map": [
+    {
+      "feature": "Daily Prayer",
+      "use": ["data/app_taxonomy.json", "seed_content/prayers_affirmations_practices.md", "data/seed_content.json"],
+      "original_sources": ["Research/prayer_engine/03_category_matrix.md", "Research/prayer_engine/04_technique_catalogue.md"]
+    },
+    {
+      "feature": "Affirmation Engine",
+      "use": ["guides/ai_generation_framework.md", "data/affirmation_forms.json", "data/seed_content.json"],
+      "original_sources": ["Research/research/prayer_engine_dim09.md"]
+    },
+    {
+      "feature": "Guided Practices",
+      "use": ["data/seed_content.json", "data/reflection_prompts.json", "guides/editorial_and_safety_framework.md"],
+      "original_sources": ["Research/research/prayer_engine_dim10.md", "Research/prayer_engine/04_technique_catalogue.md"]
+    },
+    {
+      "feature": "Learn and Explore",
+      "use": ["data/learning_cards.json"],
+      "original_sources": ["Research/prayer_engine/07_reading_library.md", "Research/prayer_engine/01_executive_synthesis.md"]
+    },
+    {
+      "feature": "Music and Sacred Audio",
+      "use": ["Research/prayer_engine/05_media_catalogue.csv", "Research/prayer_engine/06_playlist_blueprints.md"],
+      "original_sources": ["Research/research/prayer_engine_dim07.md", "Research/research/prayer_engine_dim11.md"]
+    },
+    {
+      "feature": "Create Engine",
+      "use": ["guides/ai_generation_framework.md", "guides/editorial_and_safety_framework.md"],
+      "original_sources": ["Research/research/prayer_engine_dim08.md", "Research/research/prayer_engine_dim09.md", "Research/research/prayer_engine_dim10.md"]
+    },
+    {
+      "feature": "Responsible Spiritual Support",
+      "use": ["guides/editorial_and_safety_framework.md"],
+      "original_sources": ["Research/research/prayer_engine_cross_verification.md", "Research/research/prayer_engine_dim10.md", "Research/research/prayer_engine_dim12.md"]
+    }
+  ],
+  "blocked_until_review": [
+    "Media items marked PENDING VERIFICATION",
+    "Subtle-energy contemplation launch copy",
+    "Ancestral remembrance launch copy",
+    "Any reproduced Gnostic translation longer than brief excerpts",
+    "Any health, healing, sleep or distress-support claims"
+  ]
+}
