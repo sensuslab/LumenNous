@@ -31,7 +31,9 @@ const TABS: ReadonlyArray<{ href: string; label: string; icon: IconName }> = [
 function activeIndexFor(pathname: string): number {
   const ownedPath = pathname.startsWith("/practice/")
     ? "/explore"
-    : pathname;
+    : pathname.startsWith("/sessions")
+      ? "/create"
+      : pathname;
   const idx = TABS.findIndex((t) =>
     t.href === "/" ? ownedPath === "/" : ownedPath.startsWith(t.href),
   );

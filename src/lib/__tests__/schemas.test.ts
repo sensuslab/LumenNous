@@ -17,10 +17,11 @@ describe("validateContent()", () => {
     expect(report.counts.affirmations).toBeGreaterThanOrEqual(96);
     expect(report.counts.practices).toBeGreaterThanOrEqual(47);
     expect(report.counts.reflectionPrompts).toBeGreaterThanOrEqual(140);
-    expect(report.counts.sources).toBeGreaterThanOrEqual(20);
+    expect(report.counts.sources).toBeGreaterThanOrEqual(30);
     expect(report.counts.audioItems).toBeGreaterThanOrEqual(12);
     expect(report.counts.playlists).toBe(10);
-    expect(report.counts.teachings).toBe(14);
+    expect(report.counts.teachings).toBe(16);
+    expect(report.counts.sessions).toBe(5);
   });
 });
 

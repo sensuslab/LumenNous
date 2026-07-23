@@ -30,6 +30,9 @@ import {
   reflectionPrompts,
   sourceById,
   sources,
+  sessionBySlug,
+  sessionByVariant,
+  sessionTemplates,
   teachingBySlug,
   teachings,
   validateContent,
@@ -43,6 +46,8 @@ import type {
   Prayer,
   ReflectionPrompt,
   Source,
+  SessionTemplate,
+  SessionVariant,
   Teaching,
 } from "./schemas";
 
@@ -230,6 +235,20 @@ export function getTeachingBySlug(slug: string): Teaching | undefined {
 
 export function listTeachings(): Teaching[] {
   return teachings;
+}
+
+export function listSessionTemplates(): readonly SessionTemplate[] {
+  return sessionTemplates;
+}
+
+export function getSessionBySlug(slug: string): SessionTemplate | undefined {
+  return sessionBySlug.get(slug);
+}
+
+export function getSessionByVariant(
+  variant: SessionVariant,
+): SessionTemplate | undefined {
+  return sessionByVariant.get(variant);
 }
 
 /* ------------------------------------------------------------------ */

@@ -17,7 +17,8 @@ is disabled by default and is not required by the local Engine.
 - Zod validation for content and Engine contracts
 - Vitest unit tests
 - Installable PWA shell with offline routes
-- Complete 88-entry research music register with gated YouTube embeds
+- Versioned three-minute Embodied Coherence Prayer method with five daily variants
+- Complete 153-entry music audit register with an eight-item reviewed public allowlist
 - No database, account or analytics
 
 ## Run locally
@@ -48,8 +49,10 @@ npm start
 | `/explore` | Browse the 26 active needs and intentions |
 | `/explore/[slug]` | Category library with prayers, practices and prompts |
 | `/practice/[slug]` | Timed, accessible practice player |
-| `/create` | Compose a tailored prayer, affirmation or meditation on device |
-| `/listen` | Search the complete music register, explore pitch labels and play approved embeds |
+| `/create` | Compose a tailored prayer, affirmation, meditation or coherence prayer on device |
+| `/sessions` | Review the five-stage method and choose a daily session variant |
+| `/sessions/[slug]` | Timed three-minute coherence prayer with optional reviewed listening |
+| `/listen` | Browse and play the eight reviewed contemplative-listening selections |
 | `/listen/[slug]` | Playlist detail |
 | `/learn` | Browse short teachings and method notes |
 | `/learn/[slug]` | Teaching detail |
@@ -70,7 +73,8 @@ browser:
 4. Filter for output type, duration, tone, language and exact avoidances.
 5. Draw compatible content IDs from per-context shuffle bags.
 6. Assemble and validate a recipe from prayers, affirmations, practices and
-   reflection prompts.
+   reflection prompts. Coherence output keeps the reviewed five-stage order
+   and fixed three-minute core instead of scaling an unrelated meditation.
 7. Store only IDs, cycle counters and recent fingerprints in local storage.
 
 Every item is used once before its bag refills, and a refill cannot begin with
@@ -93,9 +97,17 @@ into the library. Taxonomy profiles currently power local request
 classification.
 
 The music register is imported from
-`../Music/Research/corpus/media_research/youtube_audio_register.csv` with
-`npm run music:import`. All records remain searchable; source readiness and
-embed decisions control which records can create an in-app player.
+`Music/Research/corpus/media_research/youtube_audio_register_expanded.csv` with
+`npm run music:import`. All 153 records remain in the deterministic audit
+snapshot; only the explicit, conservative eight-item allowlist in
+`src/data/music-selections.ts` reaches the public listening screen.
+
+The Quantum Prayer source methodology is implemented as
+`quantum-prayer-v1`. Its practical sequence—breath regulation, body awareness,
+gentle emotional evocation, a threefold intention and non-gripping
+release—is preserved. The app treats quantum language as contemplative
+metaphor, not evidence that thought controls physical events or guarantees
+healing, relationships or material outcomes.
 
 `src/data/index.ts` validates content at import time. Duplicate IDs, broken
 references, missing category coverage, unsupported evidence labels and invalid
@@ -160,4 +172,8 @@ docker run -p 3000:3000 lumennous
 See [docs/LUMENNOUS_PRODUCT_PLAN.md](docs/LUMENNOUS_PRODUCT_PLAN.md) for the
 route map, design strategy, Engine specification and staged roadmap.
 See [docs/MUSIC_INTEGRATION.md](docs/MUSIC_INTEGRATION.md) for playback,
-pitch-map and high-fidelity audio strategy.
+review policy and high-fidelity audio strategy.
+See
+[docs/QUANTUM_PRAYER_MUSIC_ALIGNMENT.md](docs/QUANTUM_PRAYER_MUSIC_ALIGNMENT.md)
+for the source-method review, scientific boundary, catalogue audit and
+session-to-sound decisions.

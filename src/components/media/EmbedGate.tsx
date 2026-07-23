@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, type JSX } from "react";
+import { useEffect, useId, useState, type JSX } from "react";
+import {
+  MEDIA_EMBED_OPEN_EVENT,
+  SESSION_MEDIA_STOP_EVENT,
+  type MediaEmbedOpenDetail,
+} from "@/lib/media-events";
 import { Icon } from "@/components/ui/Icon";
 
 /**
@@ -15,14 +20,46 @@ export function EmbedGate({
   title,
   platform,
   className = "",
+  exclusiveGroup = "media-embed",
 }: {
   embedUrl: string;
   externalUrl: string;
   title: string;
   platform: string;
   className?: string;
+  exclusiveGroup?: string;
 }): JSX.Element {
   const [allowed, setAllowed] = useState(false);
+  const gateId = useId();
+
+  useEffect(() => {
+    function handleEmbedOpen(event: Event): void {
+      const detail = (event as CustomEvent<MediaEmbedOpenDetail>).detail;
+      if (
+        detail?.group === exclusiveGroup &&
+        detail.id !== gateId
+      ) {
+        setAllowed(false);
+      }
+    }
+
+    function handleSessionMediaStop(): void {
+      setAllowed(false);
+    }
+
+    window.addEventListener(MEDIA_EMBED_OPEN_EVENT, handleEmbedOpen);
+    window.addEventListener(
+      SESSION_MEDIA_STOP_EVENT,
+      handleSessionMediaStop,
+    );
+    return () => {
+      window.removeEventListener(MEDIA_EMBED_OPEN_EVENT, handleEmbedOpen);
+      window.removeEventListener(
+        SESSION_MEDIA_STOP_EVENT,
+        handleSessionMediaStop,
+      );
+    };
+  }, [exclusiveGroup, gateId]);
 
   if (!allowed) {
     return (
@@ -36,7 +73,17 @@ export function EmbedGate({
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            onClick={() => setAllowed(true)}
+            onClick={() => {
+              window.dispatchEvent(
+                new CustomEvent<MediaEmbedOpenDetail>(
+                  MEDIA_EMBED_OPEN_EVENT,
+                  {
+                    detail: { group: exclusiveGroup, id: gateId },
+                  },
+                ),
+              );
+              setAllowed(true);
+            }}
             className="glass inline-flex min-h-11 items-center gap-2 rounded-sm px-4 py-2 font-sans text-sm font-semibold text-ink-strong transition-colors duration-200 ease-std hover:border-line"
           >
             <Icon name="play" className="h-4 w-4" aria-hidden="true" />

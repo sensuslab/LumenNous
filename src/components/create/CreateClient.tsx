@@ -12,6 +12,8 @@ import type {
   Source,
 } from "@/lib/schemas";
 import { composeWithEngine, type EngineLibrary } from "@/lib/engine";
+import { getCoherenceSessionForCategory } from "@/data/session-templates";
+import { avoidsBreathFocus } from "@/lib/coherence";
 import { CreateRequestForm } from "./CreateRequestForm";
 import { EngineResultCard } from "./EngineResultCard";
 import { EngineSafetyNotice } from "./EngineSafetyNotice";
@@ -85,11 +87,23 @@ export function CreateClient(props: CreateLibraryProps): JSX.Element {
     const sources = state.result.sourceIds
       .map((id) => props.sourcesById[id])
       .filter((source): source is Source => source !== undefined);
+    const coherenceSession = getCoherenceSessionForCategory(
+      state.result.categoryId,
+    );
+    const coherenceUsesGrounding =
+      lastRequest !== null && avoidsBreathFocus(lastRequest.avoidances);
     return (
       <EngineResultCard
         result={state.result}
         sources={sources}
         categorySlug={category?.slug ?? "grounding-and-stillness"}
+        coherenceSessionHref={
+          state.result.outputType === "combined-practice" && coherenceSession
+            ? `/sessions/${coherenceSession.slug}${
+                coherenceUsesGrounding ? "?regulation=grounding" : ""
+              }`
+            : null
+        }
         onCreateAnother={() => {
           if (lastRequest) compose(lastRequest);
         }}

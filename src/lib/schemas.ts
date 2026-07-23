@@ -75,6 +75,7 @@ export const ClaimClassificationSchema = z.enum([
   "modern-interpretation",
   "symbolic",
   "preliminary-research",
+  "research-synthesis",
   "no-established-clinical-evidence",
   "experiential-claim",
   "traditional-symbolic-use",
@@ -116,6 +117,28 @@ export const PracticeTypeSchema = z.enum([
   "sequence",
 ]);
 export type PracticeType = z.infer<typeof PracticeTypeSchema>;
+
+/**
+ * The five functional stages in the reviewed Quantum Prayer methodology.
+ * Names describe contemplative actions rather than making a physics claim.
+ */
+export const QuantumPrayerStageIdSchema = z.enum([
+  "regulate",
+  "embody",
+  "evoke",
+  "articulate",
+  "release",
+]);
+export type QuantumPrayerStageId = z.infer<typeof QuantumPrayerStageIdSchema>;
+
+export const SessionVariantSchema = z.enum([
+  "morning-setting",
+  "midday-recenter",
+  "evening-integration",
+  "challenge-reset",
+  "before-sleep",
+]);
+export type SessionVariant = z.infer<typeof SessionVariantSchema>;
 
 export const SourceTypeSchema = z.enum([
   "ancient-text",
@@ -291,6 +314,164 @@ export const PracticeSchema = z.object({
   editorialStatus: EditorialStatusSchema,
 });
 export type Practice = z.infer<typeof PracticeSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Embodied coherence prayer method and sessions                       */
+/* ------------------------------------------------------------------ */
+
+export const QuantumPrayerMethodStageSchema = z.object({
+  id: QuantumPrayerStageIdSchema,
+  title: nonEmpty("method stage title", 120),
+  seconds: z.number().int().min(5).max(600),
+  purpose: nonEmpty("method stage purpose", 500),
+  breathPattern: z
+    .object({
+      inhaleCounts: z.number().int().min(1).max(20),
+      holdCounts: z.number().int().min(0).max(20),
+      exhaleCounts: z.number().int().min(1).max(30),
+    })
+    .optional(),
+  repetitions: z.number().int().min(1).max(12).optional(),
+  optional: z.boolean().default(false),
+});
+export type QuantumPrayerMethodStage = z.infer<
+  typeof QuantumPrayerMethodStageSchema
+>;
+
+const CORE_QUANTUM_STAGE_ORDER = [
+  "regulate",
+  "embody",
+  "evoke",
+  "articulate",
+  "release",
+] as const;
+const CORE_QUANTUM_STAGE_SECONDS = [60, 30, 30, 30, 30] as const;
+
+export const QuantumPrayerMethodSchema = z
+  .object({
+    id: z.literal("quantum-prayer-v1"),
+    version: z.literal("1.0"),
+    title: nonEmpty("method title", 160),
+    summary: nonEmpty("method summary", 1000),
+    stages: z.array(QuantumPrayerMethodStageSchema).length(5),
+    intendedOutcomes: z.array(nonEmpty("intended outcome", 240)).min(3).max(8),
+    evidenceBoundary: nonEmpty("evidence boundary", 2000),
+    sourceIds: z.array(idSchema).min(1).max(12),
+  })
+  .superRefine((method, ctx) => {
+    method.stages.forEach((stage, index) => {
+      if (stage.id !== CORE_QUANTUM_STAGE_ORDER[index]) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["stages", index, "id"],
+          message: `expected ${CORE_QUANTUM_STAGE_ORDER[index]}`,
+        });
+      }
+      if (stage.seconds !== CORE_QUANTUM_STAGE_SECONDS[index]) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["stages", index, "seconds"],
+          message: `expected ${CORE_QUANTUM_STAGE_SECONDS[index]} seconds`,
+        });
+      }
+    });
+    const regulate = method.stages[0];
+    if (
+      regulate?.breathPattern?.inhaleCounts !== 4 ||
+      regulate.breathPattern.holdCounts !== 2 ||
+      regulate.breathPattern.exhaleCounts !== 6
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["stages", 0, "breathPattern"],
+        message: "the source protocol uses a 4–2–6 breathing option",
+      });
+    }
+    if (method.stages[3]?.repetitions !== 3) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["stages", 3, "repetitions"],
+        message: "the intention statement is repeated three times",
+      });
+    }
+    if (!method.stages[2]?.optional) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["stages", 2, "optional"],
+        message: "emotional evocation must remain optional",
+      });
+    }
+  });
+export type QuantumPrayerMethod = z.infer<typeof QuantumPrayerMethodSchema>;
+
+export const SessionStageSchema = z.object({
+  id: QuantumPrayerStageIdSchema,
+  title: nonEmpty("session stage title", 120),
+  seconds: z.number().int().min(5).max(600),
+  instruction: nonEmpty("session stage instruction", 2000),
+  prompt: nonEmpty("session stage prompt", 1000),
+  repetitions: z.number().int().min(1).max(12).optional(),
+  skippable: z.boolean().default(false),
+});
+export type SessionStage = z.infer<typeof SessionStageSchema>;
+
+export const SessionTemplateSchema = z
+  .object({
+    id: idSchema,
+    slug: z
+      .string()
+      .min(1)
+      .max(100)
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be kebab-case"),
+    methodologyId: z.literal("quantum-prayer-v1"),
+    variant: SessionVariantSchema,
+    title: nonEmpty("session title", 160),
+    summary: nonEmpty("session summary", 500),
+    categoryIds: z.array(idSchema).min(1).max(8),
+    opening: nonEmpty("session opening", 2000),
+    stages: z.array(SessionStageSchema).length(5),
+    closing: nonEmpty("session closing", 2000),
+    audioTrackIds: z.array(idSchema).max(4),
+    soundPurpose: nonEmpty("sound purpose", 1000),
+    soundSetup: nonEmpty("sound setup", 1000),
+    sourceIds: z.array(idSchema).min(1).max(12),
+    accessibilityNotes: nonEmpty("session accessibility notes", 2000),
+    safetyNotes: nonEmpty("session safety notes", 2000),
+    editorialStatus: EditorialStatusSchema,
+  })
+  .superRefine((session, ctx) => {
+    session.stages.forEach((stage, index) => {
+      if (stage.id !== CORE_QUANTUM_STAGE_ORDER[index]) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["stages", index, "id"],
+          message: `expected ${CORE_QUANTUM_STAGE_ORDER[index]}`,
+        });
+      }
+      if (stage.seconds !== CORE_QUANTUM_STAGE_SECONDS[index]) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["stages", index, "seconds"],
+          message: `expected ${CORE_QUANTUM_STAGE_SECONDS[index]} seconds`,
+        });
+      }
+    });
+    if (session.stages[3]?.repetitions !== 3) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["stages", 3, "repetitions"],
+        message: "the intention statement is repeated three times",
+      });
+    }
+    if (!session.stages[2]?.skippable) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["stages", 2, "skippable"],
+        message: "emotional evocation must be skippable",
+      });
+    }
+  });
+export type SessionTemplate = z.infer<typeof SessionTemplateSchema>;
 
 /* ------------------------------------------------------------------ */
 /* Source (references — real, verifiable works only)                    */

@@ -15,7 +15,12 @@ const OUTPUT_TYPES: Array<{
   { id: "prayer", label: "Prayer", hint: "Words to receive", icon: "book-open" },
   { id: "affirmation", label: "Affirmation", hint: "One line to carry", icon: "spark" },
   { id: "meditation", label: "Meditation", hint: "Quiet steps", icon: "breath" },
-  { id: "combined-practice", label: "Combined", hint: "Prayer and practice", icon: "infinity" },
+  {
+    id: "combined-practice",
+    label: "Coherence",
+    hint: "Prayer in five stages",
+    icon: "infinity",
+  },
 ];
 
 const DURATIONS: Array<{ id: EngineRequest["duration"]; label: string }> = [
@@ -206,23 +211,52 @@ export function CreateRequestForm({
           </div>
         </fieldset>
 
-        <fieldset className="mt-6 border-t border-line pt-5">
-          <legend className="t-label mb-3 font-sans text-ink-strong">Length</legend>
-          <div role="radiogroup" aria-label="Choose a length" className="flex flex-wrap gap-2">
-            {DURATIONS.map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                role="radio"
-                aria-checked={duration === option.id}
-                onClick={() => setDuration(option.id)}
-                className="inline-flex min-h-11 items-center rounded-pill focus-visible:outline-none"
-              >
-                <Chip kind="filter" tone="violet" selected={duration === option.id}>{option.label}</Chip>
-              </button>
-            ))}
-          </div>
-        </fieldset>
+        {outputType !== "combined-practice" ? (
+          <fieldset className="mt-6 border-t border-line pt-5">
+            <legend className="t-label mb-3 font-sans text-ink-strong">
+              Length
+            </legend>
+            <div
+              role="radiogroup"
+              aria-label="Choose a length"
+              className="flex flex-wrap gap-2"
+            >
+              {DURATIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={duration === option.id}
+                  onClick={() => setDuration(option.id)}
+                  className="inline-flex min-h-11 items-center rounded-pill focus-visible:outline-none"
+                >
+                  <Chip
+                    kind="filter"
+                    tone="violet"
+                    selected={duration === option.id}
+                  >
+                    {option.label}
+                  </Chip>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        ) : null}
+
+        {outputType === "combined-practice" ? (
+          <p className="t-body-sm mt-4 rounded-sm border border-[rgba(167,155,232,0.3)] bg-[rgba(167,155,232,0.055)] p-3 text-ink-muted">
+            Coherence uses a fixed three-minute core: regulate, embody, gently
+            evoke, speak one prayer three times, then release the outcome.
+            If you leave out breath focus, the first minute uses visual and
+            contact-point grounding instead.{" "}
+            <Link
+              href="/sessions"
+              className="font-medium text-violet underline-offset-4 hover:underline"
+            >
+              Review the method
+            </Link>
+          </p>
+        ) : null}
 
         <details className="mt-5 border-t border-line pt-4">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between font-sans text-[0.9375rem] font-medium text-ink-strong">
@@ -230,20 +264,27 @@ export function CreateRequestForm({
             <Icon name="chevron-down" className="h-4 w-4 text-ink-muted" aria-hidden="true" />
           </summary>
           <div className="mt-4 space-y-5 border-t border-line pt-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label className="t-label font-sans text-ink-strong">
-              Tone
-              <select value={tone} onChange={(event) => setTone(event.target.value as EngineRequest["tone"])} className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none">
-                {TONES.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
-              </select>
-            </label>
-            <label className="t-label font-sans text-ink-strong">
-              Sacred language
-              <select value={languagePreference} onChange={(event) => setLanguagePreference(event.target.value as EngineRequest["languagePreference"])} className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none">
-                {LANGUAGES.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
-              </select>
-            </label>
-          </div>
+          {outputType !== "combined-practice" ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label className="t-label font-sans text-ink-strong">
+                Tone
+                <select value={tone} onChange={(event) => setTone(event.target.value as EngineRequest["tone"])} className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none">
+                  {TONES.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
+                </select>
+              </label>
+              <label className="t-label font-sans text-ink-strong">
+                Sacred language
+                <select value={languagePreference} onChange={(event) => setLanguagePreference(event.target.value as EngineRequest["languagePreference"])} className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none">
+                  {LANGUAGES.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
+                </select>
+              </label>
+            </div>
+          ) : (
+            <p className="t-body-sm text-ink-muted">
+              Coherence uses reviewed fixed wording, so tone and
+              sacred-language selectors do not apply to this form.
+            </p>
+          )}
 
           <fieldset>
             <legend className="t-label font-sans text-ink-strong">Leave out</legend>

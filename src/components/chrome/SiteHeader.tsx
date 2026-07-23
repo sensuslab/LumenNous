@@ -22,6 +22,8 @@ function parentFor(pathname: string): string {
   if (pathname.startsWith("/practice/")) return "/explore";
   if (pathname.startsWith("/listen/")) return "/listen";
   if (pathname.startsWith("/learn/")) return "/learn";
+  if (pathname.startsWith("/sessions/")) return "/sessions";
+  if (pathname === "/sessions") return "/create";
   if (pathname === "/saved" || pathname === "/about" || pathname === "/privacy") return "/";
   return "/";
 }

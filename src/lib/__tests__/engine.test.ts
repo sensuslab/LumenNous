@@ -6,6 +6,8 @@ import {
   prayers,
   reflectionPrompts,
 } from "../../data";
+import { getCoherenceSessionForCategory } from "@/data/session-templates";
+import { GROUNDING_REGULATION_INSTRUCTION } from "@/lib/coherence";
 import {
   classifyCategoryId,
   composeWithEngine,
@@ -90,9 +92,95 @@ describe("composeWithEngine", () => {
       library,
       { history, random: () => 0.5 },
     );
-    expect(combined.prayer.length).toBeGreaterThan(0);
-    expect(combined.affirmation.length).toBeGreaterThan(0);
-    expect(combined.practiceSteps.length).toBeGreaterThan(1);
+    expect(combined.prayer).toBe("");
+    expect(combined.affirmation).toBe("");
+    expect(combined.practiceSteps).toHaveLength(5);
+    expect(combined.practiceDuration).toBe(3);
+  });
+
+  it("preserves prayer boundaries and prayer-native steps", () => {
+    const prayerOnly = composeWithEngine(baseRequest, library, {
+      history: createMemoryEngineHistory(),
+      random: () => 0.5,
+    });
+    const selectedPrayer = prayers.find(
+      (prayer) => prayer.id === prayerOnly.recipe.prayerId,
+    );
+    expect(selectedPrayer).toBeDefined();
+    expect(prayerOnly.opening).toBe(selectedPrayer?.opening);
+    expect(prayerOnly.closing).toBe(selectedPrayer?.closing);
+    expect(prayerOnly.practiceSteps).toEqual(selectedPrayer?.practiceSteps);
+
+    const combined = composeWithEngine(
+      { ...baseRequest, outputType: "combined-practice" },
+      library,
+      { history: createMemoryEngineHistory(), random: () => 0.5 },
+    );
+    const selectedSession = getCoherenceSessionForCategory(
+      combined.categoryId,
+    );
+    expect(combined.recipe.prayerId).toBeUndefined();
+    expect(combined.opening).toBe(selectedSession.opening);
+    expect(combined.closing).toBe(selectedSession.closing);
+    expect(combined.recipe.practiceId).toMatch(/^session-/);
+    expect(combined.practiceSteps).toEqual(
+      selectedSession.stages.map((stage) => stage.instruction),
+    );
+    expect(selectedSession.stages[3]?.repetitions).toBe(3);
+    expect(combined.safetyNote).toBe(selectedSession.safetyNotes);
+    expect(combined.audioRecommendationIds).toEqual(
+      expect.arrayContaining(selectedSession.audioTrackIds),
+    );
+  });
+
+  it("routes sleep to Before Sleep instead of the earlier evening match", () => {
+    const result = composeWithEngine(
+      {
+        ...baseRequest,
+        categoryId: "sleep-and-rest",
+        outputType: "combined-practice",
+      },
+      library,
+      { history: createMemoryEngineHistory(), random: () => 0.5 },
+    );
+
+    expect(result.recipe.practiceId).toBe("session-before-sleep");
+    expect(getCoherenceSessionForCategory("sleep-and-rest").slug).toBe(
+      "before-sleep",
+    );
+  });
+
+  it("replaces breath focus with grounded orientation when requested", () => {
+    const result = composeWithEngine(
+      {
+        ...baseRequest,
+        outputType: "combined-practice",
+        avoidances: ["breath"],
+      },
+      library,
+      { history: createMemoryEngineHistory(), random: () => 0.5 },
+    );
+
+    expect(result.practiceSteps[0]).toBe(
+      GROUNDING_REGULATION_INSTRUCTION,
+    );
+    expect(result.practiceSteps.join(" ")).not.toMatch(/\bbreath/i);
+    expect(result.safetyNote).toMatch(/visual and contact-point grounding/i);
+  });
+
+  it("fails closed when fixed coherence wording conflicts with another avoidance", () => {
+    expect(() =>
+      composeWithEngine(
+        {
+          ...baseRequest,
+          categoryId: "morning-orientation",
+          outputType: "combined-practice",
+          avoidances: ["Creator"],
+        },
+        library,
+        { history: createMemoryEngineHistory(), random: () => 0.5 },
+      ),
+    ).toThrow(/reviewed coherence wording conflicts/i);
   });
 
   it("uses an exact practice duration when the category provides one", () => {

@@ -4,7 +4,6 @@ import type { Prayer } from "@/lib/schemas";
 import {
   getAudioById,
   getCategoryById,
-  getPlaylistBySlug,
   getPracticesByCategory,
   listPrayers,
 } from "@/lib/content";
@@ -17,6 +16,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { HorizonGlow } from "@/components/celestial/HorizonGlow";
+import { LocalSessionSuggestion } from "@/components/session/LocalSessionSuggestion";
 
 /**
  * Today — `/` (today.md). The heart of the app: a complete, beautiful prayer
@@ -63,15 +63,12 @@ export default function TodayPage(): JSX.Element {
     ? `This prayer was curated for ${category.name.toLowerCase()} — ${category.shortDescription} It pairs an opening address with a short, unhurried practice, and you are free to take only what serves you.`
     : "A universal, tradition-neutral prayer held in the app for moments when the fuller library is unavailable.";
 
-  /* Companion listening: the daily prayer's first audio id, else the first
-     item of the "Five-Minute Grounding" grouping (today.md §5). */
+  /* Only show an explicitly assigned, reviewed companion. Do not attach a
+     generic fallback track merely because it is popular or calming. */
   const dailyAudio =
-    (daily.audioIds.length > 0 ? getAudioById(daily.audioIds[0] ?? "") : undefined) ??
-    (() => {
-      const grounding = getPlaylistBySlug("five-minute-grounding");
-      const firstId = grounding?.itemIds[0];
-      return firstId ? getAudioById(firstId) : undefined;
-    })();
+    daily.audioIds.length > 0
+      ? getAudioById(daily.audioIds[0] ?? "")
+      : undefined;
 
   /* Secondary pick: before 15:00 offer tonight's item, else tomorrow morning. */
   const hour = now.getHours();
@@ -99,6 +96,10 @@ export default function TodayPage(): JSX.Element {
             whyNote={whyNote}
           />
         </div>
+
+        <Divider className="my-10" />
+
+        <LocalSessionSuggestion />
 
         <Divider className="my-10" />
 

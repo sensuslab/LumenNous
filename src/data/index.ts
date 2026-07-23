@@ -18,7 +18,9 @@ import {
   PlaylistSchema,
   PracticeSchema,
   PrayerSchema,
+  QuantumPrayerMethodSchema,
   ReflectionPromptSchema,
+  SessionTemplateSchema,
   SourceSchema,
   TeachingSchema,
   type Affirmation,
@@ -27,7 +29,9 @@ import {
   type Playlist,
   type Practice,
   type Prayer,
+  type QuantumPrayerMethod,
   type ReflectionPrompt,
+  type SessionTemplate,
   type Source,
   type Teaching,
 } from "../lib/schemas";
@@ -41,6 +45,8 @@ import { sources } from "./sources";
 import { audioItems } from "./audio";
 import { playlists } from "./playlists";
 import { teachings } from "./teachings";
+import { quantumPrayerMethod } from "./quantum-prayer-method";
+import { sessionTemplates } from "./session-templates";
 
 export { categories } from "./categories";
 export { prayers, prayerById } from "./prayers";
@@ -52,6 +58,15 @@ export { audioItems, audioItemById } from "./audio";
 export { playlists, playlistById, playlistBySlug } from "./playlists";
 export { teachings, teachingById, teachingBySlug } from "./teachings";
 export { categoryById, categoryBySlug } from "./categories";
+export {
+  quantumPrayerMethod,
+  QUANTUM_PRAYER_CORE_SECONDS,
+} from "./quantum-prayer-method";
+export {
+  sessionTemplates,
+  sessionBySlug,
+  sessionByVariant,
+} from "./session-templates";
 
 /* ------------------------------------------------------------------ */
 /* Validation                                                          */
@@ -70,6 +85,7 @@ export interface ContentValidationReport {
     audioItems: number;
     playlists: number;
     teachings: number;
+    sessions: number;
   };
 }
 
@@ -140,6 +156,12 @@ export function validateContent(): ContentValidationReport {
   const parsedAudio = AudioItemSchema.array().parse(audioItems) as AudioItem[];
   const parsedPlaylists = PlaylistSchema.array().parse(playlists) as Playlist[];
   const parsedTeachings = TeachingSchema.array().parse(teachings) as Teaching[];
+  const parsedMethod = QuantumPrayerMethodSchema.parse(
+    quantumPrayerMethod,
+  ) as QuantumPrayerMethod;
+  const parsedSessions = SessionTemplateSchema.array().parse(
+    sessionTemplates,
+  ) as SessionTemplate[];
 
   const categoryIds = new Set(parsedCategories.map((c) => c.id));
   const prayerIds = new Set(parsedPrayers.map((p) => p.id));
@@ -149,6 +171,7 @@ export function validateContent(): ContentValidationReport {
   const practiceSlugs = parsedPractices.map((p) => p.slug);
   const playlistSlugs = parsedPlaylists.map((p) => p.slug);
   const teachingSlugs = parsedTeachings.map((t) => t.slug);
+  const sessionSlugs = parsedSessions.map((session) => session.slug);
 
   // 2. Unique ids and slugs.
   checkUnique(errors, "categories", parsedCategories.map((c) => c.id));
@@ -164,6 +187,8 @@ export function validateContent(): ContentValidationReport {
   checkUnique(errors, "playlist slugs", playlistSlugs);
   checkUnique(errors, "teachings", parsedTeachings.map((t) => t.id));
   checkUnique(errors, "teaching slugs", teachingSlugs);
+  checkUnique(errors, "sessions", parsedSessions.map((session) => session.id));
+  checkUnique(errors, "session slugs", sessionSlugs);
 
   // 3. Referential integrity.
   for (const category of parsedCategories) {
@@ -193,6 +218,32 @@ export function validateContent(): ContentValidationReport {
   for (const teaching of parsedTeachings) {
     checkRefs(errors, "teaching", teaching.id, "relatedCategoryIds", teaching.relatedCategoryIds, categoryIds);
     checkRefs(errors, "teaching", teaching.id, "sourceIds", teaching.sourceIds, sourceIds);
+  }
+  checkRefs(
+    errors,
+    "quantum prayer method",
+    parsedMethod.id,
+    "sourceIds",
+    parsedMethod.sourceIds,
+    sourceIds,
+  );
+  for (const session of parsedSessions) {
+    checkRefs(
+      errors,
+      "session",
+      session.id,
+      "categoryIds",
+      session.categoryIds,
+      categoryIds,
+    );
+    checkRefs(
+      errors,
+      "session",
+      session.id,
+      "sourceIds",
+      session.sourceIds,
+      sourceIds,
+    );
   }
 
   // 4. Per-category minimums (seed library standard).
@@ -240,6 +291,7 @@ export function validateContent(): ContentValidationReport {
     ...parsedPrompts.map((r) => ({ kind: "reflection prompt", id: r.id, status: r.editorialStatus })),
     ...parsedPlaylists.map((r) => ({ kind: "playlist", id: r.id, status: r.editorialStatus })),
     ...parsedTeachings.map((r) => ({ kind: "teaching", id: r.id, status: r.editorialStatus })),
+    ...parsedSessions.map((r) => ({ kind: "session", id: r.id, status: r.editorialStatus })),
   ];
   for (const record of allRecords) {
     if (record.status !== "draft") {
@@ -262,6 +314,7 @@ export function validateContent(): ContentValidationReport {
       audioItems: parsedAudio.length,
       playlists: parsedPlaylists.length,
       teachings: parsedTeachings.length,
+      sessions: parsedSessions.length,
     },
   };
 

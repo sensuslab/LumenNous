@@ -12,12 +12,14 @@ export function EngineResultCard({
   result,
   sources,
   categorySlug,
+  coherenceSessionHref,
   onCreateAnother,
   onEditRequest,
 }: {
   result: EngineResult;
   sources: readonly Source[];
   categorySlug: string;
+  coherenceSessionHref: string | null;
   onCreateAnother: () => void;
   onEditRequest: () => void;
 }): JSX.Element {
@@ -131,6 +133,15 @@ export function EngineResultCard({
 
         <div className="mt-5 border-t border-line pt-5">
           <p className="t-eyebrow text-ink-faint">What next</p>
+          {coherenceSessionHref ? (
+            <Link
+              href={coherenceSessionHref}
+              className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[rgba(167,155,232,0.44)] bg-[rgba(167,155,232,0.08)] px-5 font-sans text-sm font-semibold text-ink-strong hover:border-[rgba(167,155,232,0.68)]"
+            >
+              <Icon name="orbit" className="h-4 w-4 text-violet" aria-hidden="true" />
+              Open the timed five-stage session
+            </Link>
+          ) : null}
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             <button
               type="button"

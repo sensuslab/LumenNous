@@ -457,6 +457,113 @@ const raw3: Teaching[] = [
     tags: ["method", "engine", "privacy", "safety"],
     editorialStatus: "draft",
   },
+  {
+    id: "tch-embodied-coherence-prayer",
+    slug: "embodied-coherence-prayer",
+    title: "The embodied coherence prayer method",
+    summary:
+      "A clear guide to the five-stage Quantum Prayer sequence, its intended outcomes, and the boundary between contemplative metaphor and physics.",
+    body: [
+      "## The practical method",
+      "",
+      "The source *Quantum Prayers: Coherence, Consciousness & The Art of Aligned Prayer* brings five familiar contemplative actions into one three-minute sequence. First, **regulate** for sixty seconds with an easy 4–2–6 count: inhale for four, pause for two, exhale for six. The count is optional; natural breathing is always valid. Second, **embody** for thirty seconds by noticing feet, support, posture, shoulders and jaw. Third, **evoke** for thirty seconds by inviting a small, believable trace of the quality being prayed for. Fourth, **articulate** one clear intention for thirty seconds, repeating it three times. Fifth, **release** for thirty seconds with gratitude and without gripping the outcome.",
+      "",
+      "## What we changed, and why",
+      "",
+      "The source asks the practitioner to feel as though the prayer is already answered and to end with certainty that “it is done.” LumenNous makes emotional evocation optional, accepts a faint or neutral feeling, and releases certainty as well as strain. These are deliberate care adaptations. They avoid forced positivity, make room for grief or trauma, and preserve the method’s deeper movement: settle, attend, speak honestly, then let go. A completed session ends with one grounded action where appropriate, not a guarantee about healing, money, appearance, relationships or another person’s choices.",
+      "",
+      "## What “quantum” means here",
+      "",
+      "The PDF presents observer effects, entanglement and quantum probability as literal mechanisms through which prayer changes reality. That conclusion is not established by physics or consciousness research. In this app, **quantum is contemplative metaphor**: language for possibility, participation and mystery. The practical mechanisms are breath pacing, body awareness, attention, meaning, emotional congruence, gratitude and release.",
+      "",
+      "The intended outcome is therefore internal and actionable: a steadier starting state, clearer intention, less urgency and greater readiness to choose wisely. Prayer can accompany care, courage and practical help. It does not replace them, and it does not make suffering a failure of belief.",
+    ].join("\n"),
+    classification: "modern-interpretation",
+    relatedCategoryIds: [
+      "grounding-and-stillness",
+      "clarity-and-discernment",
+      "connection-to-source",
+    ],
+    sourceIds: [
+      "src-quantum-prayers-coherence",
+      "src-slow-breathing-systematic-review",
+      "src-quantum-rng-null-study",
+    ],
+    furtherReading: [
+      {
+        title:
+          "How Breath-Control Can Change Your Life: A Systematic Review",
+        author: "Andrea Zaccaro et al.",
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/",
+      },
+      {
+        title:
+          "Large-scale quantum random-number-generator intention study",
+        author: "",
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC5872141/",
+      },
+    ],
+    tags: ["coherence", "method", "quantum-metaphor", "breath"],
+    editorialStatus: "draft",
+  },
+  {
+    id: "tch-choosing-sound-for-prayer",
+    slug: "choosing-sound-for-prayer",
+    title: "Choosing sound for prayer",
+    summary:
+      "How to choose silence, nature sound, instrumental music or sacred chant by session purpose rather than by advertised healing frequencies.",
+    body: [
+      "## Music-supported prayer is not music therapy",
+      "",
+      "Music therapy is a professional health discipline in which a qualified therapist selects and adapts musical experiences for a person’s assessed needs. Pressing play on a curated YouTube track can still be meaningful, settling or beautiful, but it should be called **reflective listening** or **music-supported practice**. Evidence for a therapeutic programme does not prove that a particular video will produce the same result.",
+      "",
+      "## Match the sound to the task",
+      "",
+      "For grounding, a predictable nature recording or sparse instrumental bed may offer a gentle sensory anchor. For morning orientation, a dawn soundscape can support alertness without urgency. Sacred chant can deepen devotion when its language and tradition genuinely fit; it works best as a distinct opening or closing, not underneath spoken prayer. For evening and rest preparation, steady ocean or rainforest sound may mask an inconsistent environment, but silence is equally complete. During acute stress, discernment or language-heavy work, sound can compete with attention—turning it off is a skilled choice.",
+      "",
+      "Preference, familiarity, lyrics, tempo, dynamics, cultural meaning and baseline arousal often matter more than a label. The evidence for binaural-beat entrainment is heterogeneous. White or pink noise shows a small laboratory-task benefit for some people with ADHD or elevated symptoms, while performance worsened in comparison groups without ADHD; no brown-noise studies were found in that meta-analysis. Singing-bowl findings remain preliminary and heterogeneous. None belongs as a universal default.",
+      "",
+      "## What not to select by",
+      "",
+      "Do not choose a track because it claims 432 Hz is natural, 528 Hz repairs DNA, Solfeggio tones cleanse the body, or chakra frequencies unblock energy. Those mechanisms are not established. LumenNous keeps such records in its audit catalogue for traceability but excludes them from public sessions.",
+      "",
+      "Start one reviewed option before prayer, keep it at the lowest comfortable level, take listening breaks and stop if tinnitus, discomfort, agitation or sensory overload appears. For sleep, prefer speakers and a timer rather than overnight earbuds. Never use a guided session while driving. The best accompaniment is the one that supports attention without becoming the claim.",
+    ].join("\n"),
+    classification: "research-synthesis",
+    relatedCategoryIds: [
+      "grounding-and-stillness",
+      "sleep-and-rest",
+      "connection-to-source",
+    ],
+    sourceIds: [
+      "src-neuroscience-frequency-music",
+      "src-music-listening-anxiety-meta-analysis",
+      "src-natural-sounds-synthesis",
+      "src-binaural-entrainment-review",
+      "src-adhd-coloured-noise-meta-analysis",
+      "src-singing-bowl-systematic-review",
+      "src-who-safe-listening",
+    ],
+    furtherReading: [
+      {
+        title: "Safe listening",
+        author: "World Health Organization",
+        url: "https://www.who.int/news-room/questions-and-answers/item/deafness-and-hearing-loss-safe-listening",
+      },
+      {
+        title: "Natural-sounds systematic review and meta-analysis",
+        author: "Rachel T. Buxton et al.",
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8040792/",
+      },
+      {
+        title: "Binaural-beat entrainment systematic review",
+        author: "",
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/",
+      },
+    ],
+    tags: ["music", "evidence", "safe-listening", "prayer"],
+    editorialStatus: "draft",
+  },
 ];
 
 // Validated at module load — a malformed guide fails the build/tests.

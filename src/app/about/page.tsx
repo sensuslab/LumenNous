@@ -135,10 +135,57 @@ export default function AboutPage(): JSX.Element {
           </ol>
         </section>
 
+        <section aria-labelledby="coherence-method" className="mt-14">
+          <ProseH2 id="coherence-method">
+            The embodied coherence method
+          </ProseH2>
+          <p className="t-body mt-4 max-w-[62ch] text-ink-muted">
+            Our Quantum Prayer sessions preserve a reviewed five-stage
+            sequence from the supplied methodology while making its safety and
+            evidence boundaries explicit.
+          </p>
+          <ol className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-5">
+            {[
+              ["Regulate", "60s", "Easy 4–2–6 counts or natural breath"],
+              ["Embody", "30s", "Support, posture, shoulders and jaw"],
+              ["Evoke", "30s", "A believable quality; always optional"],
+              ["Articulate", "30s", "One intention, spoken three times"],
+              ["Release", "30s", "Gratitude without gripping the result"],
+            ].map(([title, time, body], index) => (
+              <li
+                key={title}
+                className="rounded-sm border border-line-subtle p-3"
+              >
+                <p className="t-meta text-violet">
+                  {index + 1} · {time}
+                </p>
+                <h3 className="t-label mt-1 font-sans text-ink-strong">
+                  {title}
+                </h3>
+                <p className="t-meta mt-2 text-ink-muted">{body}</p>
+              </li>
+            ))}
+          </ol>
+          <p className="t-body-sm mt-5 max-w-[62ch] text-ink-muted">
+            Here, coherence means aligning breath, body, attention, words and
+            action. “Quantum” is contemplative metaphor—not evidence that
+            thought collapses reality, changes probability or controls another
+            person. Emotional evocation may be skipped, the breath count may be
+            dropped, and no session guarantees an external outcome.
+          </p>
+          <Link
+            href="/sessions"
+            className="t-body-sm mt-3 inline-flex min-h-11 items-center font-sans font-medium text-violet underline-offset-4 hover:underline"
+          >
+            Review and begin the five session variants
+          </Link>
+        </section>
+
         <section aria-labelledby="boundaries" className="mt-14">
           <ProseH2 id="boundaries">Boundaries &amp; quiet commitments</ProseH2>
           <ul className="t-body mt-4 max-w-[62ch] space-y-3 text-ink-muted">
             <li>No prayer, practice or piece of music here replaces professional medical or psychological care.</li>
+            <li>Reviewed listening is optional music-supported prayer, not professional music therapy; silence is always a complete choice.</li>
             <li>Nothing promises guaranteed healing, wealth, protection or manifestation — and suffering is never blamed on insufficient belief.</li>
             <li>We never diagnose spiritual attack, possession or contamination, and random library picks are never presented as messages from beyond.</li>
             <li>If you arrive in distress, you will be met with grounding and encouragement toward trusted, human support — not with metaphysical escalation.</li>
