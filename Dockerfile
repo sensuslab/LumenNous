@@ -2,7 +2,9 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install -g npm@12.0.1 \
+  && npm ci \
+  && test -x node_modules/.bin/next
 
 FROM node:20-alpine AS builder
 WORKDIR /app
