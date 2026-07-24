@@ -92,6 +92,7 @@ export function CreateRequestForm({
       .join(", ") ?? "",
   );
   const [error, setError] = useState("");
+  const basedOnWords = categoryId === "not-sure";
 
   function toggleAvoidance(value: string): void {
     setAvoidances((current) =>
@@ -175,7 +176,7 @@ export function CreateRequestForm({
             onChange={(event) => setCategoryId(event.target.value)}
             className="field-surface min-h-12 w-full appearance-none rounded-sm px-3 pr-11 font-sans text-[0.9375rem] text-ink-strong focus-visible:outline-none"
           >
-            <option value="not-sure">Choose for me from what I wrote</option>
+            <option value="not-sure">Based on my words</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>{category.name}</option>
             ))}
@@ -319,7 +320,11 @@ export function CreateRequestForm({
           <div>
             <p className="t-eyebrow text-gold">Ready when you are</p>
             <h2 id="receive-practice-heading" className="t-h3 mt-1 text-ink-strong">Receive your practice</h2>
-            <p className="t-body-sm mt-2 text-ink-muted">Your choices will be sent to the configured AI service for this test build.</p>
+            <p className="t-body-sm mt-2 text-ink-muted">
+              {basedOnWords
+                ? "Your words will shape a custom request to the configured AI service."
+                : "Your selected intention will use the on-board LumenNous library system."}
+            </p>
           </div>
         </header>
 
@@ -327,11 +332,13 @@ export function CreateRequestForm({
           <div className="flex items-start gap-3">
             <Icon name="shield-quiet" className="mt-0.5 h-5 w-5 shrink-0 text-violet" aria-hidden="true" />
             <div>
-              <p className="t-label font-sans text-ink-strong">Server-side AI key</p>
+              <p className="t-label font-sans text-ink-strong">
+                {basedOnWords ? "Server-side AI key" : "On-board composition"}
+              </p>
               <p className="t-body-sm mt-1 text-ink-muted">
-                Your request is sent through the LumenNous server route; the
-                DeepSeek key stays on Render and is never exposed to the
-                browser.
+                {basedOnWords
+                  ? "Your request is sent through the LumenNous server route; the DeepSeek key stays on Render and is never exposed to the browser."
+                  : "No model call is made for a chosen intention; the app assembles from its reviewed local library, as it does when the AI service is off."}
               </p>
               <Link href="/privacy#local-engine" className="t-body-sm mt-2 inline-flex min-h-11 items-center text-ink-muted underline-offset-4 hover:text-ink-strong hover:underline">Read the privacy details</Link>
             </div>
@@ -344,7 +351,9 @@ export function CreateRequestForm({
           className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-sm bg-pearl-fill px-6 font-sans text-[0.9375rem] font-semibold text-bg-1 transition-[transform,background-color] duration-200 ease-std hover:bg-pearl-fill-hover active:scale-[0.98] disabled:cursor-wait disabled:opacity-70"
         >
           {isSubmitting
-            ? "Creating with AI..."
+            ? basedOnWords
+              ? "Creating with AI..."
+              : "Assembling..."
             : `Assemble my ${outputType === "combined-practice" ? "practice" : outputType}`}
         </button>
         {error ? <p role="alert" className="t-body-sm mt-3 text-warn">{error}</p> : null}

@@ -12,7 +12,7 @@ import { HorizonGlow } from "@/components/celestial/HorizonGlow";
 export const metadata: Metadata = {
   title: "Privacy",
   description:
-    "Privacy in plain language: no account, local-only saved items, server-routed AI composition, and no analytics in this build.",
+    "Privacy in plain language: no account, local-only saved items, optional server-routed AI composition, and no analytics in this build.",
 };
 
 const SECTIONS: { id: string; title: string; body: string }[] = [
@@ -29,7 +29,7 @@ const SECTIONS: { id: string; title: string; body: string }[] = [
   {
     id: "local-engine",
     title: "Create and AI",
-    body: "When you create a prayer or meditation in this test build, your request is sent to the configured AI service through the LumenNous server route. Fixed safety responses are handled locally and do not ask the model to improvise. Local history contains only content IDs, shuffle bags and cycle counters so repeated local fallbacks are less repetitive.",
+    body: "When you leave the intention set to 'based on my words' in this test build, your request is sent to the configured AI service through the LumenNous server route. When you choose a specific intention from the dropdown, the on-board library system assembles the result without a model call. Fixed safety responses are handled locally and do not ask the model to improvise. Local history contains only content IDs, shuffle bags and cycle counters so repeated local fallbacks are less repetitive.",
   },
   {
     id: "analytics",
@@ -78,7 +78,7 @@ export default function PrivacyPage(): JSX.Element {
           <ul className="t-body mt-4 space-y-3 text-ink">
             <li>No account. No name, email or location asked for, ever.</li>
             <li>Saved items live only in your browser. We never see them.</li>
-            <li>Create uses the configured AI service in this test build.</li>
+            <li>Create uses AI only for 'based on my words' requests in this test build.</li>
             <li>This build contains no analytics or advertising trackers.</li>
             <li>Delete local data any time from Saved. It was only ever on your device.</li>
           </ul>

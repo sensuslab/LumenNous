@@ -60,6 +60,10 @@ const OUTPUT_LABELS: Record<EngineRequest["outputType"], string> = {
   "combined-practice": "five-stage coherence practice",
 };
 
+function shouldUseAi(request: EngineRequest): boolean {
+  return request.categoryId === "not-sure" && request.userNeed.trim().length > 0;
+}
+
 function extractJsonObject(content: string): unknown {
   const fenced = content.match(/```(?:json)?\s*([\s\S]*?)```/i)?.[1];
   const raw = fenced ?? content;
@@ -73,6 +77,59 @@ function extractJsonObject(content: string): unknown {
 
 function truncate(value: string, maxLength: number): string {
   return value.length <= maxLength ? value : `${value.slice(0, maxLength - 1)}...`;
+}
+
+function createAiRequestBody(
+  request: EngineRequest,
+  localResult: EngineResult,
+): {
+  maxTokens: number;
+  temperature: number;
+  messages: Array<{ role: "system" | "user"; content: string }>;
+} {
+  return {
+    maxTokens: 1600,
+    temperature: 0.55,
+    messages: [
+      {
+        role: "system",
+        content:
+          "You write LumenNous contemplative practices. Return only valid JSON. Do not include markdown. Never diagnose, promise outcomes, claim healing, or invent citations. Keep language grounded, gentle, and spiritually literate.",
+      },
+      {
+        role: "user",
+        content: truncate(
+          JSON.stringify({
+            task: `Generate a ${OUTPUT_LABELS[request.outputType]} based on the user's own words.`,
+            outputShape: {
+              title: "string",
+              opening: "string",
+              prayer: "string",
+              affirmation: "string",
+              practiceSteps: ["string"],
+              reflectionPrompts: ["string"],
+              closing: "string",
+              safetyNote: "string",
+            },
+            request,
+            grounding: {
+              category: localResult.category,
+              categoryId: localResult.categoryId,
+              localTitle: localResult.title,
+              localOpening: localResult.opening,
+              localPrayer: localResult.prayer,
+              localAffirmation: localResult.affirmation,
+              localPracticeSteps: localResult.practiceSteps,
+              localReflectionPrompts: localResult.reflectionPrompts,
+              localClosing: localResult.closing,
+              safetyBoundary: localResult.safetyNote,
+            },
+          }),
+          5800,
+        ),
+      },
+    ],
+  };
 }
 
 export function CreateClient(props: CreateLibraryProps): JSX.Element {
@@ -109,53 +166,15 @@ export function CreateClient(props: CreateLibraryProps): JSX.Element {
         setState({ kind: "result", result: localResult });
         return;
       }
+      if (!shouldUseAi(request)) {
+        setState({ kind: "result", result: localResult });
+        return;
+      }
 
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          maxTokens: 1600,
-          temperature: 0.55,
-          messages: [
-            {
-              role: "system",
-              content:
-                "You write LumenNous contemplative practices. Return only valid JSON. Do not include markdown. Never diagnose, promise outcomes, claim healing, or invent citations. Keep language grounded, gentle, and spiritually literate.",
-            },
-            {
-              role: "user",
-              content: truncate(
-                JSON.stringify({
-                  task: `Generate a ${OUTPUT_LABELS[request.outputType]} for this Create request.`,
-                  outputShape: {
-                    title: "string",
-                    opening: "string",
-                    prayer: "string",
-                    affirmation: "string",
-                    practiceSteps: ["string"],
-                    reflectionPrompts: ["string"],
-                    closing: "string",
-                    safetyNote: "string",
-                  },
-                  request,
-                  grounding: {
-                    category: localResult.category,
-                    categoryId: localResult.categoryId,
-                    localTitle: localResult.title,
-                    localOpening: localResult.opening,
-                    localPrayer: localResult.prayer,
-                    localAffirmation: localResult.affirmation,
-                    localPracticeSteps: localResult.practiceSteps,
-                    localReflectionPrompts: localResult.reflectionPrompts,
-                    localClosing: localResult.closing,
-                    safetyBoundary: localResult.safetyNote,
-                  },
-                }),
-                5800,
-              ),
-            },
-          ],
-        }),
+        body: JSON.stringify(createAiRequestBody(request, localResult)),
       });
 
       if (!response.ok) {
@@ -194,8 +213,9 @@ export function CreateClient(props: CreateLibraryProps): JSX.Element {
       console.error("Create AI request failed.", error);
       setState({
         kind: "error",
-        message:
-          "The AI composition service was not available. Check the DeepSeek key and try again.",
+        message: shouldUseAi(request)
+          ? "The AI composition service was not available. Check the DeepSeek key and try again."
+          : "No compatible on-board composition was available. Try a different intention or remove an avoidance.",
       });
     }
   }
