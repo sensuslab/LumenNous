@@ -27,10 +27,10 @@ export default function ListenPage(): JSX.Element {
             Listen
           </h1>
           <p className="t-body mt-3 max-w-[52ch] text-ink-muted">
-            A small, deliberately reviewed collection of nature sound, quiet
-            instrumental music, sacred chant and singing bowls. Choose sound
-            as an optional companion to prayer or stillness; no third-party
-            player loads until you ask.
+            The expanded reviewed register of nature sound, quiet
+            instrumental music, sacred chant, guided prayer and labelled
+            frequency-adjacent audio. Choose sound as an optional companion to
+            prayer or stillness; no third-party player loads until you ask.
           </p>
         </section>
 

@@ -1,44 +1,22 @@
 import {
-  isConservativePublicMusicItem,
+  musicRegister,
   musicRegisterById,
   type MusicRegisterItem,
 } from "@/data/music-register";
 
 /**
- * Human-reviewed public allowlist. The complete imported register remains an
- * audit source; only these IDs may reach consumer listening surfaces.
+ * Public listening catalogue. The imported register carries the editorial
+ * state; blocked records stay out of consumer listening surfaces, while
+ * link-only and needs-review records remain visibly labelled in the UI.
  */
-export const publicMusicRegisterIds = [
-  "NATURE-017",
-  "AMBIENT-006",
-  "AMBIENT-001",
-  "SINGING-007",
-  "NATURE-011",
-  "NATURE-014",
-  "NATURE-015",
-  "CHANT-016",
-] as const;
+export const publicMusicRegister = Object.freeze(
+  musicRegister.filter(
+    (item) => item.readinessState !== "blocked" && item.claimRisk !== "blocked",
+  ),
+);
 
-export type PublicMusicRegisterId = (typeof publicMusicRegisterIds)[number];
-
-function resolvePublicMusicRegister(): readonly MusicRegisterItem[] {
-  if (new Set(publicMusicRegisterIds).size !== publicMusicRegisterIds.length) {
-    throw new Error("The public music allowlist contains a duplicate id.");
-  }
-
-  return Object.freeze(
-    publicMusicRegisterIds.map((id) => {
-      const item = musicRegisterById.get(id);
-      if (!item) throw new Error(`Public music selection "${id}" is missing from the register.`);
-      if (!isConservativePublicMusicItem(item)) {
-        throw new Error(`Public music selection "${id}" does not meet the conservative release policy.`);
-      }
-      return item;
-    }),
-  );
-}
-
-export const publicMusicRegister = resolvePublicMusicRegister();
+export const publicMusicRegisterIds = publicMusicRegister.map((item) => item.id);
+export type PublicMusicRegisterId = string;
 
 export const sessionMusicVariantIds = [
   "morning-setting",
@@ -95,6 +73,10 @@ export const sessionMusicSelections = {
 } as const satisfies Record<SessionMusicVariant, SessionMusicSelection>;
 
 const publicIds = new Set<string>(publicMusicRegisterIds);
+if (publicMusicRegister.length < 100) {
+  throw new Error("The public music catalogue should include the expanded non-blocked register.");
+}
+
 const actualVariantIds = Object.keys(sessionMusicSelections).sort();
 const expectedVariantIds = [...sessionMusicVariantIds].sort();
 if (actualVariantIds.join("|") !== expectedVariantIds.join("|")) {

@@ -14,7 +14,7 @@ import {
 export const metadata: Metadata = {
   title: "Create",
   description:
-    "Assemble a personal prayer or meditation on your device from the grounded LumenNous library.",
+    "Create a personal prayer or meditation with the configured LumenNous AI service.",
 };
 
 export default function CreatePage(): JSX.Element {
@@ -30,7 +30,9 @@ export default function CreatePage(): JSX.Element {
           <p className="t-eyebrow text-violet">Made for this moment</p>
           <h1 className="t-h1 mt-2 text-ink-strong">Create</h1>
           <p className="t-body mt-3 max-w-[54ch] text-ink-muted">
-            Choose what you need and LumenNous will assemble a prayer or meditation from its reviewed library. No account, no external AI, and no request leaves this device.
+            Choose what you need and LumenNous will ask the configured AI
+            service to compose a prayer or meditation inside clear safety
+            boundaries.
           </p>
         </header>
 

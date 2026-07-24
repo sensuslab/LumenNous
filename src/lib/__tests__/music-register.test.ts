@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  isConservativePublicMusicItem,
   musicRegister,
   musicRegisterDuplicateUrls,
   musicRegisterFamilies,
@@ -85,26 +84,18 @@ describe("music register audit snapshot", () => {
 });
 
 describe("reviewed public listening", () => {
-  it("resolves only the explicit eight-item conservative allowlist", () => {
-    expect(publicMusicRegisterIds).toEqual([
-      "NATURE-017",
-      "AMBIENT-006",
-      "AMBIENT-001",
-      "SINGING-007",
-      "NATURE-011",
-      "NATURE-014",
-      "NATURE-015",
-      "CHANT-016",
-    ]);
+  it("publishes the expanded non-blocked register", () => {
+    expect(publicMusicRegister).toHaveLength(108);
     expect(publicMusicRegister.map((item) => item.id)).toEqual(
       publicMusicRegisterIds,
     );
-    expect(publicMusicRegister.every(isConservativePublicMusicItem)).toBe(true);
     expect(
-      publicMusicRegister.some((item) =>
-        ["HZ", "BINAURAL", "DNA", "CHAKRA"].includes(item.family),
+      publicMusicRegister.every(
+        (item) => item.readinessState !== "blocked" && item.claimRisk !== "blocked",
       ),
-    ).toBe(false);
+    ).toBe(true);
+    expect(publicMusicRegister.some((item) => item.family === "GUIDED")).toBe(true);
+    expect(publicMusicRegister.some((item) => item.playbackMode === "link")).toBe(true);
   });
 
   it("maps each supported session variant to one or two public selections", () => {

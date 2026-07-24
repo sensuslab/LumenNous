@@ -134,7 +134,7 @@ export default function TodayPage(): JSX.Element {
                   Create a personal practice
                 </Button>
               </div>
-              <p className="t-meta mt-3 text-ink-faint">No account and no external AI.</p>
+              <p className="t-meta mt-3 text-ink-faint">No account. AI is routed through the server.</p>
             </div>
           </div>
         </GlassCard>

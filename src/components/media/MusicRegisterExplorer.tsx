@@ -39,16 +39,17 @@ function formatDuration(seconds: number | null): string {
 
 function canPlay(item: MusicRegisterItem): boolean {
   return (
-    ["CHANT", "AMBIENT", "NATURE", "SINGING"].includes(item.family) &&
     item.playbackMode === "embed" &&
-    item.readinessState === "ready_for_editorial_review" &&
-    item.claimRisk === "low" &&
-    ["official_institution", "institution", "likely_official"].includes(item.rightsStatus) &&
-    ![
-      "COMMERCIALLY_POPULAR_BUT_UNSUBSTANTIATED",
-      "CONTRADICTED_OR_MISLEADING",
-    ].includes(item.evidenceLabel)
+    item.readinessState !== "blocked" &&
+    item.claimRisk !== "blocked"
   );
+}
+
+function reviewLabel(item: MusicRegisterItem): string {
+  if (item.readinessState === "ready_for_editorial_review") return "Reviewed";
+  return item.readinessState
+    .replace(/^needs_/, "Needs ")
+    .replaceAll("_", " ");
 }
 
 export function MusicRegisterExplorer({
@@ -63,7 +64,13 @@ export function MusicRegisterExplorer({
   const [frequency, setFrequency] = useState<number | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const reviewedItems = useMemo(() => items.filter(canPlay), [items]);
+  const reviewedItems = useMemo(
+    () =>
+      items.filter(
+        (item) => item.readinessState !== "blocked" && item.claimRisk !== "blocked",
+      ),
+    [items],
+  );
   const families = useMemo(
     () => [...new Set(reviewedItems.map((item) => item.family))],
     [reviewedItems],
@@ -90,7 +97,7 @@ export function MusicRegisterExplorer({
     });
   }, [family, frequency, query, reviewedItems]);
 
-  const playableCount = reviewedItems.length;
+  const playableCount = reviewedItems.filter(canPlay).length;
   const minFrequency = frequencies[0] ?? 0;
   const maxFrequency = frequencies.at(-1) ?? 1;
   const logMin = Math.log(minFrequency || 1);
@@ -112,7 +119,7 @@ export function MusicRegisterExplorer({
           </h2>
         </div>
         <p className="t-meta text-ink-faint">
-          {playableCount} selections · click to play
+          {reviewedItems.length} selections · {playableCount} playable here
         </p>
       </div>
 
@@ -229,7 +236,7 @@ export function MusicRegisterExplorer({
                   <h3 className="mt-2 font-display text-lg leading-snug text-ink-strong">{item.title}</h3>
                   <p className="t-body-sm mt-1 text-ink-muted">{item.channel}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <Chip kind="source" tone="blue">Reviewed selection</Chip>
+                    <Chip kind="source" tone="blue">{reviewLabel(item)}</Chip>
                     <Chip kind="source" tone="neutral">
                       {EVIDENCE_LABELS[item.evidenceLabel]}
                     </Chip>
@@ -250,9 +257,19 @@ export function MusicRegisterExplorer({
                         <Icon name={active ? "x" : "play"} className="h-4 w-4" aria-hidden="true" />
                         {active ? "Close player" : "Play here"}
                       </button>
+                    ) : item.playbackMode === "link" ? (
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="glass inline-flex min-h-11 items-center gap-2 rounded-sm px-4 py-2 font-sans text-sm font-semibold text-ink-strong hover:border-line"
+                      >
+                        <Icon name="arrow-up-right" className="h-4 w-4" aria-hidden="true" />
+                        Open on YouTube
+                      </a>
                     ) : (
                       <span className="inline-flex min-h-11 items-center font-sans text-sm text-ink-faint">
-                        Playback unavailable pending review
+                        Playback unavailable
                       </span>
                     )}
                     <span className="t-meta text-ink-faint">{item.playlistFit}</span>

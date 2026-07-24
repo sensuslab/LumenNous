@@ -12,7 +12,7 @@ import { HorizonGlow } from "@/components/celestial/HorizonGlow";
 export const metadata: Metadata = {
   title: "Privacy",
   description:
-    "Privacy in plain language: no account, local-only saved items, on-device composition, and no analytics in this build.",
+    "Privacy in plain language: no account, local-only saved items, server-routed AI composition, and no analytics in this build.",
 };
 
 const SECTIONS: { id: string; title: string; body: string }[] = [
@@ -28,8 +28,8 @@ const SECTIONS: { id: string; title: string; body: string }[] = [
   },
   {
     id: "local-engine",
-    title: "The on-device Engine",
-    body: "When you create a prayer or meditation, your request is classified and matched entirely in your browser. It is not sent to our server or to an AI provider, and the words are discarded after the composition. Local history contains only content IDs, shuffle bags and cycle counters so the next result is less repetitive.",
+    title: "Create and AI",
+    body: "When you create a prayer or meditation in this test build, your request is sent to the configured AI service through the LumenNous server route. Fixed safety responses are handled locally and do not ask the model to improvise. Local history contains only content IDs, shuffle bags and cycle counters so repeated local fallbacks are less repetitive.",
   },
   {
     id: "analytics",
@@ -49,7 +49,7 @@ const SECTIONS: { id: string; title: string; body: string }[] = [
   {
     id: "security",
     title: "Security",
-    body: "There are no AI keys or composition credentials because Create does not call an external service. Normal secure hosting protections still apply when the app shell or third-party media links are loaded.",
+    body: "The AI key is held server-side as a Render environment variable and is never exposed to the browser. Normal secure hosting protections still apply when the app shell or third-party media links are loaded.",
   },
   {
     id: "sensitive",
@@ -78,7 +78,7 @@ export default function PrivacyPage(): JSX.Element {
           <ul className="t-body mt-4 space-y-3 text-ink">
             <li>No account. No name, email or location asked for, ever.</li>
             <li>Saved items live only in your browser. We never see them.</li>
-            <li>Create runs on your device. Your request is not sent anywhere.</li>
+            <li>Create uses the configured AI service in this test build.</li>
             <li>This build contains no analytics or advertising trackers.</li>
             <li>Delete local data any time from Saved. It was only ever on your device.</li>
           </ul>

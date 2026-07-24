@@ -58,10 +58,12 @@ export function CreateRequestForm({
   categories,
   onSubmit,
   initialRequest,
+  isSubmitting = false,
 }: {
   categories: readonly Category[];
   onSubmit: (request: EngineRequest) => void;
   initialRequest?: EngineRequest;
+  isSubmitting?: boolean;
 }): JSX.Element {
   const commonAvoidanceValues = new Set<string>(
     COMMON_AVOIDANCES.map((item) => item.value),
@@ -317,7 +319,7 @@ export function CreateRequestForm({
           <div>
             <p className="t-eyebrow text-gold">Ready when you are</p>
             <h2 id="receive-practice-heading" className="t-h3 mt-1 text-ink-strong">Receive your practice</h2>
-            <p className="t-body-sm mt-2 text-ink-muted">Your choices will be assembled from the reviewed LumenNous library.</p>
+            <p className="t-body-sm mt-2 text-ink-muted">Your choices will be sent to the configured AI service for this test build.</p>
           </div>
         </header>
 
@@ -325,17 +327,25 @@ export function CreateRequestForm({
           <div className="flex items-start gap-3">
             <Icon name="shield-quiet" className="mt-0.5 h-5 w-5 shrink-0 text-violet" aria-hidden="true" />
             <div>
-              <p className="t-label font-sans text-ink-strong">Private by design</p>
+              <p className="t-label font-sans text-ink-strong">Server-side AI key</p>
               <p className="t-body-sm mt-1 text-ink-muted">
-                Your words stay on this device and are discarded after this composition. LumenNous keeps only content IDs and cycle counts to reduce repetition.
+                Your request is sent through the LumenNous server route; the
+                DeepSeek key stays on Render and is never exposed to the
+                browser.
               </p>
               <Link href="/privacy#local-engine" className="t-body-sm mt-2 inline-flex min-h-11 items-center text-ink-muted underline-offset-4 hover:text-ink-strong hover:underline">Read the privacy details</Link>
             </div>
           </div>
         </aside>
 
-        <button type="submit" className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-sm bg-pearl-fill px-6 font-sans text-[0.9375rem] font-semibold text-bg-1 transition-[transform,background-color] duration-200 ease-std hover:bg-pearl-fill-hover active:scale-[0.98]">
-          Assemble my {outputType === "combined-practice" ? "practice" : outputType}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-sm bg-pearl-fill px-6 font-sans text-[0.9375rem] font-semibold text-bg-1 transition-[transform,background-color] duration-200 ease-std hover:bg-pearl-fill-hover active:scale-[0.98] disabled:cursor-wait disabled:opacity-70"
+        >
+          {isSubmitting
+            ? "Creating with AI..."
+            : `Assemble my ${outputType === "combined-practice" ? "practice" : outputType}`}
         </button>
         {error ? <p role="alert" className="t-body-sm mt-3 text-warn">{error}</p> : null}
       </section>

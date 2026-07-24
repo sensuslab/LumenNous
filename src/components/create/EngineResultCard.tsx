@@ -23,6 +23,7 @@ export function EngineResultCard({
   onCreateAnother: () => void;
   onEditRequest: () => void;
 }): JSX.Element {
+  const isAiResult = result.fingerprint.startsWith("ai-");
   const fullText = [
     result.opening,
     result.prayer,
@@ -42,11 +43,15 @@ export function EngineResultCard({
           Your practice is ready
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <Chip kind="source" classification="EDIT">ASSEMBLED ON THIS DEVICE</Chip>
+          <Chip kind="source" classification="EDIT">
+            {isAiResult ? "AI-ASSISTED COMPOSITION" : "ASSEMBLED ON THIS DEVICE"}
+          </Chip>
           <TraditionLabelGroup labels={result.traditionLabels} />
         </div>
         <p className="t-meta mt-2 text-ink-faint">
-          Corpus-grounded library cycle {result.recipe.cycle}
+          {isAiResult
+            ? "Generated through the configured AI service with LumenNous safety boundaries"
+            : `Corpus-grounded library cycle ${result.recipe.cycle}`}
         </p>
 
         <h2 className="t-h1 mt-4 text-ink-strong">{result.title}</h2>

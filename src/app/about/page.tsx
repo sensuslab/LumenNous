@@ -47,7 +47,7 @@ export default function AboutPage(): JSX.Element {
             <p className="t-eyebrow text-gold">It is</p>
             <ul className="t-body-sm mt-4 space-y-3 text-ink-muted">
               <li>A free library of prayers, affirmations, practices and listening.</li>
-              <li>An on-device Engine that assembles a personal practice from that library.</li>
+              <li>A Create flow that uses the configured AI service inside clear safety boundaries.</li>
               <li>A quiet room that works in seconds, offline-friendly, account-free.</li>
             </ul>
           </GlassCard>
@@ -114,7 +114,7 @@ export default function AboutPage(): JSX.Element {
               {
                 n: "02",
                 title: "Compose",
-                body: "Editors write the library. Create selects compatible records on your device, validates the result and shows exactly how it was assembled. It does not call an external AI service or invent sources.",
+                body: "Editors write the library and safety boundaries. In this test build, Create sends your request to the configured AI service and asks for a bounded original composition. Fixed safety responses still bypass generation.",
               },
               {
                 n: "03",
