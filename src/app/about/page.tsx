@@ -133,6 +133,12 @@ export default function AboutPage(): JSX.Element {
               </li>
             ))}
           </ol>
+          <Link
+            href="/prayer-engine"
+            className="t-body-sm mt-6 inline-flex min-h-11 items-center font-sans font-medium text-violet underline-offset-4 hover:underline"
+          >
+            How the PrayerEngine assembles a practice
+          </Link>
         </section>
 
         <section aria-labelledby="coherence-method" className="mt-14">
