@@ -78,7 +78,7 @@ export default function PrivacyPage(): JSX.Element {
           <ul className="t-body mt-4 space-y-3 text-ink">
             <li>No account. No name, email or location asked for, ever.</li>
             <li>Saved items live only in your browser. We never see them.</li>
-            <li>Create uses AI only for 'based on my words' requests in this test build.</li>
+            <li>Create uses AI only for &lsquo;based on my words&rsquo; requests in this test build.</li>
             <li>This build contains no analytics or advertising trackers.</li>
             <li>Delete local data any time from Saved. It was only ever on your device.</li>
           </ul>

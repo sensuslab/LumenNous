@@ -57,6 +57,7 @@ npm start
 | `/learn` | Browse short teachings and method notes |
 | `/learn/[slug]` | Teaching detail |
 | `/saved` | Consent-gated local saved items and local-data controls |
+| `/prayer-engine` | Landing page explaining the purpose and functionality of the PrayerEngine |
 | `/about`, `/privacy` | Method, boundaries and privacy commitments |
 
 Legacy `/ask`, `/category/*`, `/playlist/*` and `/favourites` URLs redirect
