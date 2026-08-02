@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>LumenNous — a quiet engine for an old practice</title>
+    <meta
+      name="description"
+      content="LumenNous turns a stated need into a small, structured prayer or practice. The PrayerEngine classifies, filters and assembles reviewed material on your device — no account, no feed, no streak."
+    />
+    <meta name="theme-color" content="#0A0E1A" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="LumenNous" />
+    <meta property="og:title" content="LumenNous — a quiet engine for an old practice" />
+    <meta
+      property="og:description"
+      content="Name what is present, receive a fitting practice, and keep agency over what you use."
+    />
+    <meta property="og:image" content="/icons/icon-512.png" />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="icon" href="/icons/icon-192.png" sizes="192x192" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/cormorantgaramond-500.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-400.woff2" crossorigin />
+
+    <!--
+      Standalone promo landing.
+
+      Hand-written, dependency-free HTML served at /welcome (see the rewrite in
+      next.config.ts). It carries no application JavaScript, no service-worker
+      registration and no App Router shell, so it paints before anything of the
+      app itself is loaded or pointed to.
+
+      THE TOKENS BELOW ARE COPIED FROM src/app/globals.css §2. They are the one
+      piece of duplication in the project, and `welcome-page.test.ts` asserts
+      that every value here still matches the design system — along with the
+      library counts in the "What is inside" section. If that test fails, this
+      file has drifted: update it rather than the test.
+    -->
+    <style>
+      /* ---- Fonts (vendored; mirrors next/font/local in src/app/layout.tsx) -- */
+      @font-face {
+        font-family: "Cormorant Garamond";
+        src: url("/fonts/cormorantgaramond-500.woff2") format("woff2");
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Cormorant Garamond";
+        src: url("/fonts/cormorantgaramond-400i.woff2") format("woff2");
+        font-weight: 400;
+        font-style: italic;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Inter";
+        src: url("/fonts/inter-400.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Inter";
+        src: url("/fonts/inter-600.woff2") format("woff2");
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "IBM Plex Mono";
+        src: url("/fonts/ibmplexmono-500.woff2") format("woff2");
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      /* ---- Nocturne tokens (globals.css §2) ------------------------------- */
+      :root {
+        color-scheme: dark;
+
+        --bg-0: #06080f;
+        --bg-1: #0a0e1a;
+        --bg-2: #0e1424;
+        --bg-3: #131a2e;
+
+        --ink-strong: #f4f0e6;
+        --ink: #e6e1d3;
+        --ink-muted: #a7a4b8;
+        --ink-faint: #8b88a0;
+        --ink-ghost: #6e6c82;
+
+        --gold: #d9ba85;
+        --gold-strong: #e8d0a4;
+        --gold-deep: #a8894f;
+        --violet: #a79be8;
+        --violet-deep: #6c5bb7;
+        --blue: #8fb0ea;
+        --pearl-fill: #eae4d4;
+        --pearl-fill-hover: #f4eee0;
+        --safety: #e8b4a0;
+
+        --line-subtle: rgba(230, 225, 211, 0.1);
+        --line: rgba(230, 225, 211, 0.17);
+        --line-strong: rgba(217, 186, 133, 0.35);
+        --glass-bg: linear-gradient(160deg, rgba(148, 163, 216, 0.1), rgba(148, 163, 216, 0.045));
+        --glass-blur: blur(18px) saturate(140%);
+        --glass-bg-solid: #11182b;
+        --surface-bg: rgba(17, 24, 43, 0.94);
+        --surface-border: rgba(230, 225, 211, 0.16);
+
+        --r-xs: 2px;
+        --r-sm: 4px;
+        --r-md: 6px;
+        --r-lg: 8px;
+        --r-pill: 999px;
+
+        --dur-std: 200ms;
+        --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+        --ease-std: cubic-bezier(0.4, 0, 0.2, 1);
+
+        --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+        --font-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+        --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+      }
+
+      /* ---- Base ----------------------------------------------------------- */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      body,
+      h1,
+      h2,
+      h3,
+      p,
+      ul,
+      ol,
+      li,
+      figure,
+      blockquote,
+      dl,
+      dd {
+        margin: 0;
+        padding: 0;
+      }
+      ul,
+      ol {
+        list-style: none;
+      }
+      html {
+        font-size: 100%;
+        scroll-behavior: smooth;
+      }
+      body {
+        min-height: 100dvh;
+        background:
+          radial-gradient(120% 90% at 50% -10%, rgba(108, 91, 183, 0.16), transparent 55%),
+          radial-gradient(90% 60% at 50% 110%, rgba(217, 186, 133, 0.05), transparent 60%),
+          linear-gradient(180deg, #0a0e1a 0%, #06080f 100%);
+        background-attachment: fixed;
+        background-color: var(--bg-1);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-size: 1rem;
+        line-height: 1.625;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: var(--font-serif);
+        font-weight: 500;
+        color: var(--ink-strong);
+        text-wrap: balance;
+      }
+      a {
+        color: inherit;
+      }
+      ::selection {
+        background: rgba(217, 186, 133, 0.24);
+        color: var(--ink-strong);
+      }
+      :focus {
+        outline: none;
+      }
+      :focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 2px;
+        border-radius: var(--r-xs);
+      }
+
+      /* ---- Type scale (globals.css §2.7) ---------------------------------- */
+      .t-display {
+        font-family: var(--font-serif);
+        font-size: clamp(2.5rem, 7vw, 3.5rem);
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+      }
+      .t-h2 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.625rem, 4.5vw, 2rem);
+        line-height: 1.25;
+      }
+      .t-h3 {
+        font-family: var(--font-serif);
+        font-size: 1.25rem;
+        line-height: 1.35;
+      }
+      .t-prayer-sm {
+        font-family: var(--font-serif);
+        font-weight: 400;
+        font-style: italic;
+        font-size: 1.25rem;
+        line-height: 1.6;
+        color: var(--ink-strong);
+      }
+      .t-body {
+        font-size: 1rem;
+        line-height: 1.625;
+        color: var(--ink);
+      }
+      .t-body-sm {
+        font-size: 0.875rem;
+        line-height: 1.6;
+        color: var(--ink-muted);
+      }
+      .t-label {
+        font-weight: 600;
+        font-size: 0.8125rem;
+        line-height: 1.4;
+        color: var(--ink-strong);
+      }
+      .t-eyebrow {
+        font-family: var(--font-mono);
+        font-weight: 500;
+        font-size: 0.6875rem;
+        line-height: 1.5;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--gold);
+      }
+      .t-eyebrow--violet {
+        color: var(--violet);
+      }
+      .t-eyebrow--safety {
+        color: var(--safety);
+      }
+      .t-eyebrow--faint {
+        color: var(--ink-faint);
+      }
+      .t-meta {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        line-height: 1.5;
+        color: var(--ink-muted);
+      }
+      .muted {
+        color: var(--ink-muted);
+      }
+
+      /* ---- Ambience (globals.css §3) -------------------------------------- */
+      /* Static star layers: pure gradients, no JS and nothing that animates.
+         Three tiles at co-prime-ish sizes, so the field repeats without the
+         repetition being legible. */
+      .stars {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background-image:
+          radial-gradient(1.4px 1.4px at 18% 22%, rgba(244, 240, 230, 0.55), transparent 55%),
+          radial-gradient(1.1px 1.1px at 71% 12%, rgba(244, 240, 230, 0.4), transparent 55%),
+          radial-gradient(1.2px 1.2px at 44% 67%, rgba(217, 186, 133, 0.42), transparent 55%),
+          radial-gradient(1px 1px at 88% 81%, rgba(244, 240, 230, 0.32), transparent 55%),
+          radial-gradient(1.6px 1.6px at 33% 41%, rgba(244, 240, 230, 0.45), transparent 55%),
+          radial-gradient(1.3px 1.3px at 8% 74%, rgba(167, 155, 232, 0.4), transparent 55%),
+          radial-gradient(1.1px 1.1px at 63% 29%, rgba(244, 240, 230, 0.3), transparent 55%),
+          radial-gradient(1.7px 1.7px at 51% 88%, rgba(143, 176, 234, 0.34), transparent 55%),
+          radial-gradient(1.2px 1.2px at 26% 9%, rgba(217, 186, 133, 0.3), transparent 55%),
+          radial-gradient(1.4px 1.4px at 79% 54%, rgba(244, 240, 230, 0.34), transparent 55%);
+        background-size:
+          290px 290px,
+          290px 290px,
+          290px 290px,
+          290px 290px,
+          470px 470px,
+          470px 470px,
+          470px 470px,
+          730px 730px,
+          730px 730px,
+          730px 730px;
+      }
+      .grain {
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        pointer-events: none;
+        opacity: 0.035;
+        mix-blend-mode: overlay;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 128px 128px;
+      }
+      .horizon {
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 42vh;
+        pointer-events: none;
+        background: radial-gradient(80% 100% at 50% 0%, rgba(108, 91, 183, 0.14), transparent 70%);
+      }
+
+      /* ---- Surfaces ------------------------------------------------------- */
+      .glass {
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--line-subtle);
+      }
+      .card {
+        background: var(--surface-bg);
+        border: 1px solid var(--surface-border);
+        box-shadow: inset 0 1px 0 rgba(244, 240, 230, 0.035);
+        border-radius: var(--r-md);
+        padding: 1.25rem;
+      }
+      .panel {
+        border: 1px solid var(--line-subtle);
+        border-radius: var(--r-sm);
+        padding: 1rem;
+      }
+      @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+        .glass {
+          background: rgba(16, 22, 42, 0.92);
+        }
+      }
+      @media (prefers-reduced-transparency: reduce) {
+        .glass {
+          background: var(--glass-bg-solid);
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+        }
+      }
+      @media (prefers-contrast: more) {
+        :root {
+          --line-subtle: rgba(230, 225, 211, 0.16);
+        }
+      }
+
+      /* ---- Layout (mobile first) ------------------------------------------ */
+      .wrap {
+        width: 100%;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+      }
+      .section {
+        margin-top: 4rem;
+      }
+      .section__title {
+        border-bottom: 1px solid var(--line-subtle);
+        padding-bottom: 0.75rem;
+      }
+      .measure {
+        max-width: 62ch;
+      }
+      .stack > * + * {
+        margin-top: 1rem;
+      }
+      .grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: 1fr;
+      }
+      .grid--stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      @media (min-width: 640px) {
+        .grid--3 {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .grid--stats {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+      @media (min-width: 768px) {
+        .wrap {
+          padding: 0 2rem;
+        }
+        .grid--2 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .section {
+          margin-top: 5rem;
+        }
+      }
+
+      /* ---- Chrome --------------------------------------------------------- */
+      .skip-link {
+        position: fixed;
+        top: 0.75rem;
+        left: 0.75rem;
+        z-index: 100;
+        padding: 0.75rem 1rem;
+        border-radius: var(--r-sm);
+        background: var(--bg-3);
+        border: 1px solid var(--line-strong);
+        color: var(--gold);
+        font-weight: 600;
+        font-size: 0.8125rem;
+        text-decoration: none;
+        transform: translateY(-200%);
+        transition: transform var(--dur-std) var(--ease-out);
+      }
+      .skip-link:focus-visible {
+        transform: translateY(0);
+      }
+      .masthead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-top: calc(env(safe-area-inset-top) + 1.25rem);
+      }
+      .wordmark {
+        font-family: var(--font-serif);
+        font-size: 1.125rem;
+        color: var(--ink-strong);
+        text-decoration: none;
+        letter-spacing: 0.01em;
+      }
+      .masthead__link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0 0.5rem;
+        font-size: 0.875rem;
+        color: var(--ink-muted);
+        text-decoration: none;
+        transition: color var(--dur-std) var(--ease-std);
+      }
+      .masthead__link:hover {
+        color: var(--ink-strong);
+      }
+
+      /* ---- Buttons (globals design.md §6.2) ------------------------------- */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 48px;
+        padding: 0.875rem 1.5rem;
+        border-radius: var(--r-sm);
+        border: 1px solid transparent;
+        font-family: var(--font-sans);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        line-height: 1;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          transform 120ms var(--ease-std),
+          filter 120ms var(--ease-std),
+          background-color 120ms var(--ease-std),
+          border-color 120ms var(--ease-std),
+          color 120ms var(--ease-std);
+      }
+      .btn:active {
+        transform: scale(0.98);
+        filter: brightness(1.08);
+      }
+      .btn--primary {
+        background: var(--pearl-fill);
+        color: var(--bg-1);
+      }
+      .btn--primary:hover {
+        background: var(--pearl-fill-hover);
+      }
+      .btn--secondary {
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border-color: var(--line-subtle);
+        color: var(--ink-strong);
+      }
+      .btn--secondary:hover {
+        border-color: var(--line-strong);
+        color: var(--gold);
+      }
+      .btn-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      @media (min-width: 640px) {
+        .btn-row {
+          flex-direction: row;
+          justify-content: center;
+        }
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 40px;
+        padding: 0.5rem 0.875rem;
+        border: 1px solid var(--line-subtle);
+        border-radius: var(--r-pill);
+        font-weight: 600;
+        font-size: 0.8125rem;
+        color: var(--ink-muted);
+        white-space: nowrap;
+      }
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+      }
+
+      /* ---- Hero ----------------------------------------------------------- */
+      .hero {
+        position: relative;
+        text-align: center;
+        padding-top: 3.5rem;
+      }
+      .hero__quote {
+        max-width: 38ch;
+        margin: 1.5rem auto 0;
+      }
+      .hero__lead {
+        max-width: 52ch;
+        margin: 1.5rem auto 0;
+        color: var(--ink-muted);
+      }
+      .hero .btn-row {
+        margin-top: 2.5rem;
+      }
+      .hero__note {
+        margin-top: 1.25rem;
+      }
+      .orbit {
+        display: block;
+        margin: 0 auto;
+        opacity: 0.5;
+        width: 180px;
+        height: 180px;
+      }
+
+      /* ---- Steps ---------------------------------------------------------- */
+      .steps {
+        margin-top: 2rem;
+      }
+      .steps > li {
+        display: flex;
+        gap: 1rem;
+      }
+      .steps > li + li {
+        margin-top: 2rem;
+      }
+      .steps__n {
+        font-family: var(--font-mono);
+        font-size: 1.75rem;
+        line-height: 1;
+        color: var(--ink-ghost);
+        flex: none;
+      }
+      .steps__body {
+        max-width: 52ch;
+        margin-top: 0.5rem;
+      }
+
+      /* ---- Stats ---------------------------------------------------------- */
+      /* Flex column so the value can be ordered above its <dt> label while the
+         definition list keeps its required dt-then-dd source order. */
+      .stat {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+      }
+      .stat__value {
+        display: block;
+        font-family: var(--font-serif);
+        font-size: 1.875rem;
+        line-height: 1;
+        color: var(--gold);
+        font-variant-numeric: lining-nums tabular-nums;
+      }
+      .stat__label {
+        display: block;
+        margin-top: 0.5rem;
+      }
+
+      /* ---- Divider (globals.css §3.5) ------------------------------------- */
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 3.5rem 0;
+      }
+      .divider::before,
+      .divider::after {
+        content: "";
+        height: 1px;
+        flex: 1;
+        background: var(--line-subtle);
+      }
+
+      /* ---- Footer --------------------------------------------------------- */
+      .footer {
+        margin-top: 4rem;
+        padding-bottom: calc(env(safe-area-inset-bottom) + 3rem);
+        text-align: center;
+      }
+      .footer__links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.25rem 1.25rem;
+        margin-top: 1rem;
+      }
+      .footer__links a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        color: var(--violet);
+        text-decoration: none;
+        font-size: 0.875rem;
+      }
+      .footer__links a:hover {
+        text-decoration: underline;
+        text-underline-offset: 4px;
+      }
+
+      /* ---- Reduced motion (globals.css §4.3) ------------------------------ */
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="stars" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="horizon" aria-hidden="true"></div>
+
+    <div class="wrap">
+      <header class="masthead">
+        <a class="wordmark" href="/">LumenNous</a>
+        <a class="masthead__link" href="/">Enter the app &rsaquo;</a>
+      </header>
+
+      <main id="main">
+        <!-- ============================ Hero ============================ -->
+        <section class="hero" aria-labelledby="hero-title">
+          <svg class="orbit" viewBox="0 0 320 320" fill="none" aria-hidden="true" focusable="false">
+            <circle cx="160" cy="160" r="90" stroke="var(--line-subtle)" stroke-width="1" />
+            <circle cx="160" cy="160" r="120" stroke="var(--line-subtle)" stroke-width="1" />
+            <circle
+              cx="160"
+              cy="160"
+              r="150"
+              stroke="var(--line-subtle)"
+              stroke-width="1"
+              stroke-dasharray="1 6"
+              stroke-linecap="round"
+            />
+            <path
+              d="M 232.8 107.1 A 90 90 0 0 0 187.8 74.4"
+              stroke="rgba(217,186,133,0.35)"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+            <circle cx="258.3" cy="91.2" r="2.5" fill="var(--gold)" />
+            <circle cx="30.1" cy="235.0" r="2.5" fill="var(--violet)" opacity="0.8" />
+            <circle cx="160" cy="160" r="3" fill="var(--ink)" opacity="0.9" />
+          </svg>
+
+          <p class="t-eyebrow" style="margin-top: 2rem">A quiet engine for an old practice</p>
+          <h1 class="t-display" id="hero-title" style="margin-top: 0.75rem">LumenNous</h1>
+
+          <p class="t-prayer-sm hero__quote">
+            Name what is present, receive a fitting practice, and keep agency over what you use.
+          </p>
+
+          <p class="t-body hero__lead">
+            Say what you need in your own words. The PrayerEngine reads it, finds the intention
+            underneath, and assembles a prayer, affirmation or short practice from reviewed
+            material — in about a second, on your device.
+          </p>
+
+          <div class="btn-row">
+            <a class="btn btn--primary" href="/">Enter the app</a>
+            <a class="btn btn--secondary" href="#how">See how it works</a>
+          </div>
+
+          <p class="t-meta hero__note">No account · Works offline · Nothing tracked</p>
+        </section>
+
+        <!-- ========================== What it is ======================== -->
+        <section class="section" aria-labelledby="what">
+          <h2 class="t-h2 section__title" id="what">A small room, not a feed</h2>
+          <p class="t-body measure" style="margin-top: 1rem; color: var(--ink-muted)">
+            A blank page is a poor companion when you are anxious, grieving or simply tired.
+            LumenNous removes the open-ended task: name the need, and receive language, attention
+            and structure you can use straight away.
+          </p>
+
+          <div class="grid grid--3" style="margin-top: 2rem">
+            <div class="panel">
+              <h3 class="t-label">Begin in seconds</h3>
+              <p class="t-body-sm" style="margin-top: 0.5rem">
+                One focused prayer, affirmation and suggested practice waiting each day — no
+                setup, no sign-in, nothing to configure first.
+              </p>
+            </div>
+            <div class="panel">
+              <h3 class="t-label">Ask in your own words</h3>
+              <p class="t-body-sm" style="margin-top: 0.5rem">
+                Describe what is present, or pick from 26 intentions. Either way you get something
+                shaped for the moment rather than a generic page.
+              </p>
+            </div>
+            <div class="panel">
+              <h3 class="t-label">Stay in the practice</h3>
+              <p class="t-body-sm" style="margin-top: 0.5rem">
+                Timed practices, a three-minute coherence prayer and optional reviewed listening —
+                with a stop control always in reach.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================== How it works ====================== -->
+        <section class="section" id="how" aria-labelledby="how-title">
+          <h2 class="t-h2 section__title" id="how-title">How the PrayerEngine works</h2>
+          <p class="t-body measure" style="margin-top: 1rem; color: var(--ink-muted)">
+            Five steps, all of them on your device, none of them inventing doctrine on your
+            behalf.
+          </p>
+
+          <ol class="steps">
+            <li>
+              <span class="steps__n" aria-hidden="true">01</span>
+              <div>
+                <h3 class="t-h3">It reads for safety first</h3>
+                <p class="t-body-sm steps__body">
+                  Before anything is composed, a conservative classifier looks for crisis, acute
+                  distress and metaphysical-escalation signals. Anything it flags stops the engine
+                  and returns fixed wording written by people.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="steps__n" aria-hidden="true">02</span>
+              <div>
+                <h3 class="t-h3">It finds the intention</h3>
+                <p class="t-body-sm steps__body">
+                  Your words are scored against a researched taxonomy of needs. Choose an
+                  intention yourself and that choice always wins.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="steps__n" aria-hidden="true">03</span>
+              <div>
+                <h3 class="t-h3">It filters the library</h3>
+                <p class="t-body-sm steps__body">
+                  Candidates are narrowed by form and length, ranked for the tone and language you
+                  prefer, and anything matching a word or image you asked to avoid is removed
+                  outright.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="steps__n" aria-hidden="true">04</span>
+              <div>
+                <h3 class="t-h3">It draws without repeating</h3>
+                <p class="t-body-sm steps__body">
+                  Every compatible item is offered once before any of them come round again — and
+                  a new cycle never opens with the one you just received.
+                </p>
+              </div>
+            </li>
+            <li>
+              <span class="steps__n" aria-hidden="true">05</span>
+              <div>
+                <h3 class="t-h3">It forgets almost everything</h3>
+                <p class="t-body-sm steps__body">
+                  What you typed is never stored. Only content IDs and cycle counters stay behind,
+                  in your browser, and you can clear them whenever you like.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <!-- ============================ Controls ======================== -->
+        <section class="section" aria-labelledby="steer">
+          <h2 class="t-h2 section__title" id="steer">You steer it</h2>
+          <p class="t-body measure" style="margin-top: 1rem; color: var(--ink-muted)">
+            Every control is optional, and each one changes what the engine is allowed to choose.
+          </p>
+
+          <div style="margin-top: 1.75rem">
+            <p class="t-eyebrow t-eyebrow--violet">Form</p>
+            <div class="chip-row">
+              <span class="chip">Prayer</span>
+              <span class="chip">Affirmation</span>
+              <span class="chip">Meditation</span>
+              <span class="chip">Coherence practice</span>
+            </div>
+          </div>
+          <div style="margin-top: 1.5rem">
+            <p class="t-eyebrow t-eyebrow--violet">Length</p>
+            <div class="chip-row">
+              <span class="chip">2 min</span>
+              <span class="chip">5 min</span>
+              <span class="chip">10 min</span>
+              <span class="chip">15 min</span>
+            </div>
+          </div>
+          <div style="margin-top: 1.5rem">
+            <p class="t-eyebrow t-eyebrow--violet">Tone</p>
+            <div class="chip-row">
+              <span class="chip">Gentle</span>
+              <span class="chip">Direct</span>
+              <span class="chip">Contemplative</span>
+              <span class="chip">Devotional</span>
+              <span class="chip">Grounding</span>
+            </div>
+          </div>
+          <div style="margin-top: 1.5rem">
+            <p class="t-eyebrow t-eyebrow--violet">Language</p>
+            <div class="chip-row">
+              <span class="chip">Creator</span>
+              <span class="chip">Source</span>
+              <span class="chip">Divine</span>
+              <span class="chip">Gnostic terms</span>
+              <span class="chip">Neutral</span>
+            </div>
+          </div>
+          <p class="t-body-sm measure" style="margin-top: 1.5rem">
+            Name something you would rather not meet — an image, a word, a framing — and material
+            containing it is dropped from the pool entirely, not merely ranked lower.
+          </p>
+        </section>
+
+        <!-- ============================ Trust =========================== -->
+        <section class="section" aria-labelledby="care">
+          <h2 class="t-h2 section__title" id="care">Held with care</h2>
+          <div class="grid grid--2" style="margin-top: 2rem">
+            <div class="card glass">
+              <p class="t-eyebrow t-eyebrow--safety">Safety before content</p>
+              <p class="t-body-sm" style="margin-top: 1rem">
+                Arrive in real distress and you are met with grounding and encouragement toward
+                trusted, human support — never with an assembled practice, and never with
+                deliverance framing or a confirmation of supernatural harm.
+              </p>
+            </div>
+            <div class="card glass">
+              <p class="t-eyebrow">Your words stay yours</p>
+              <p class="t-body-sm" style="margin-top: 1rem">
+                No account, no database, no analytics and no advertising trackers. Saved items and
+                engine history live in your browser, and Saved can export or delete all of it.
+              </p>
+            </div>
+          </div>
+
+          <ul class="t-body measure stack" style="margin-top: 2rem; color: var(--ink-muted)">
+            <li>Not a church, teacher or authority — and not a replacement for one.</li>
+            <li>Not medical, psychological or crisis care.</li>
+            <li>
+              No promise of healing, protection or wealth, and suffering is never blamed on
+              insufficient belief.
+            </li>
+            <li>No streaks, scores or profiles. Take only what serves you and leave the rest.</li>
+          </ul>
+        </section>
+
+        <!-- ============================ Library ========================= -->
+        <section class="section" aria-labelledby="inside">
+          <h2 class="t-h2 section__title" id="inside">What is inside</h2>
+          <p class="t-body measure" style="margin-top: 1rem; color: var(--ink-muted)">
+            Nothing is invented at the moment you ask. The engine arranges material that already
+            exists in a reviewed library, where every item carries its classification — historical
+            text, modern interpretation, practitioner tradition, research or LumenNous editorial —
+            and its sources.
+          </p>
+
+          <dl class="grid grid--stats" style="margin-top: 2rem">
+            <div class="panel stat">
+              <dt class="t-meta stat__label" style="order: 2">active intentions</dt>
+              <dd class="stat__value" style="order: 1">26</dd>
+            </div>
+            <div class="panel stat">
+              <dt class="t-meta stat__label" style="order: 2">reviewed prayers</dt>
+              <dd class="stat__value" style="order: 1">72</dd>
+            </div>
+            <div class="panel stat">
+              <dt class="t-meta stat__label" style="order: 2">affirmations</dt>
+              <dd class="stat__value" style="order: 1">96</dd>
+            </div>
+            <div class="panel stat">
+              <dt class="t-meta stat__label" style="order: 2">guided practices</dt>
+              <dd class="stat__value" style="order: 1">47</dd>
+            </div>
+            <div class="panel stat">
+              <dt class="t-meta stat__label" style="order: 2">reflection prompts</dt>
+              <dd class="stat__value" style="order: 1">140</dd>
+            </div>
+            <div class="panel stat">
+              <dt class="t-meta stat__label" style="order: 2">coherence sessions</dt>
+              <dd class="stat__value" style="order: 1">5</dd>
+            </div>
+          </dl>
+        </section>
+
+        <div class="divider" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <path
+              d="M6.5 0.8 7.7 5.3 12.2 6.5 7.7 7.7 6.5 12.2 5.3 7.7 0.8 6.5 5.3 5.3Z"
+              stroke="var(--gold-deep)"
+              stroke-width="1"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+
+        <!-- ============================ Close =========================== -->
+        <section aria-labelledby="begin" style="text-align: center">
+          <h2 class="t-h2" id="begin">Start with what is actually present</h2>
+          <p class="t-body" style="max-width: 46ch; margin: 1rem auto 0; color: var(--ink-muted)">
+            It opens straight into today&rsquo;s prayer. Nothing to create, nothing to confirm.
+          </p>
+          <div class="btn-row" style="margin-top: 2rem">
+            <a class="btn btn--primary" href="/">Enter the app</a>
+            <a class="btn btn--secondary" href="/prayer-engine">Read the engine in detail</a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p class="t-meta">LumenNous — contemplative practice, honestly labelled.</p>
+        <nav class="footer__links" aria-label="More about LumenNous">
+          <a href="/about">About</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/prayer-engine">PrayerEngine</a>
+          <a href="/">Open the app</a>
+        </nav>
+      </footer>
+    </div>
+  </body>
+</html>

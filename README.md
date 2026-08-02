@@ -63,6 +63,23 @@ npm start
 Legacy `/ask`, `/category/*`, `/playlist/*` and `/favourites` URLs redirect
 to their canonical routes.
 
+## The promo landing
+
+`/welcome` is a standalone promotional landing page for campaign links and
+marketing domains. It is hand-written static HTML in `public/welcome/`,
+deliberately outside the App Router: no React, no service worker and no
+application JavaScript, so it paints before any of the app is loaded. A
+rewrite in `next.config.ts` maps the extensionless URL, and the fonts it needs
+are vendored to `public/fonts/`.
+
+Because it cannot import the design tokens or the content layer, it is the one
+place where Nocturne values and library counts are duplicated.
+`src/lib/__tests__/welcome-page.test.ts` fails the build if that copy drifts
+from `src/app/globals.css` or from the content layer, so update the page rather
+than the test.
+
+The app itself is untouched by this: `/` is still Today.
+
 ## The local Engine
 
 `src/lib/engine.ts` performs the complete Create flow synchronously in the
