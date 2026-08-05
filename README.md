@@ -78,7 +78,27 @@ place where Nocturne values and library counts are duplicated.
 from `src/app/globals.css` or from the content layer, so update the page rather
 than the test.
 
-The app itself is untouched by this: `/` is still Today.
+### First-run entrance
+
+`/welcome` is also the entrance for a first-time visitor:
+
+```text
+/ -> animated introduction -> /welcome -> "Enter the app" -> /
+```
+
+`AppIntroduction` decides this before it writes the intro-seen flag, and hands
+off in `finish()` so the shell is never revealed on the way past. Returning
+visitors and anyone replaying the introduction from inside the app go straight
+back to Today.
+
+Because the landing carries no JavaScript, its links back into the app use
+`/?enter=1` to signal the return trip; the app reads that flag once, suppresses
+a second hand-off and strips it from the address bar. Without it, a visitor who
+arrived from a campaign link would bounce between `/` and `/welcome`, so the
+drift test asserts the landing never links to a bare `/`.
+
+Under blocked browser storage the intro-seen flag cannot persist, so the
+introduction and this hand-off repeat on every visit.
 
 ## The local Engine
 
@@ -159,8 +179,8 @@ low-stimulation mode.
 ## AI configuration
 
 The optional `/api/ai` route calls DeepSeek's OpenAI-compatible
-`/chat/completions` endpoint using `deepseek-v4-pro`. It accepts requests only
-when `DEEPSEEK_AI_ENABLED=true`; the API key is read on the server and is never
+`/chat/completions` endpoint using `DeepSeek-V4-Flash-0731`. It accepts requests
+only when `DEEPSEEK_AI_ENABLED=true`; the API key is read on the server and is never
 sent to the browser. Copy `.env.example` to a local ignored environment file
 when developing this optional integration.
 

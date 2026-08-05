@@ -128,9 +128,29 @@ describe("welcome landing assets and links", () => {
   });
 
   it("points into the app and its companion pages", () => {
-    expect(welcomeHtml).toContain('href="/"');
+    expect(welcomeHtml).toContain('href="/?enter=1"');
     expect(welcomeHtml).toContain('href="/prayer-engine"');
     expect(welcomeHtml).toContain('href="/about"');
     expect(welcomeHtml).toContain('href="/privacy"');
+  });
+
+  it("never links to a bare root, which would loop back through the intro", () => {
+    /* A first run ends by handing off to this page. Any link back to `/`
+       without the return flag would re-arm that hand-off and bounce the
+       visitor straight here again. */
+    expect(welcomeHtml).not.toMatch(/href="\/"/);
+  });
+
+  it("uses the return flag the introduction actually reads", () => {
+    const intro = readFileSync(
+      path.join(ROOT, "src/components/chrome/AppIntroduction.tsx"),
+      "utf8",
+    );
+    const param = intro.match(/ENTERED_PARAM = "([a-z]+)"/)?.[1];
+    const target = intro.match(/WELCOME_PATH = "([^"]+)"/)?.[1];
+
+    expect(param).toBeDefined();
+    expect(welcomeHtml).toContain(`href="/?${param}=1"`);
+    expect(target).toBe("/welcome");
   });
 });
