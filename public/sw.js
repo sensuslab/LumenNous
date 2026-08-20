@@ -13,7 +13,7 @@
  * preload is used when available and handled safely.
  */
 
-const VERSION = "v4";
+const VERSION = "v5";
 const SHELL_CACHE = `lumennous-shell-${VERSION}`;
 const RUNTIME_CACHE = `lumennous-runtime-${VERSION}`;
 
@@ -21,6 +21,7 @@ const APP_SHELL = [
   "/",
   "/explore",
   "/create",
+  "/when-lit",
   "/sessions",
   "/sessions/morning-setting",
   "/sessions/midday-recenter",

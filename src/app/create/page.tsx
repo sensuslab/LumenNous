@@ -30,8 +30,8 @@ export default function CreatePage(): JSX.Element {
           <p className="t-eyebrow text-violet">Made for this moment</p>
           <h1 className="t-h1 mt-2 text-ink-strong">Create</h1>
           <p className="t-body mt-3 max-w-[54ch] text-ink-muted">
-            Write your own words for a custom AI-assisted request, or choose a
-            specific intention to use the on-board LumenNous library system.
+            Write a sentence or choose an intention. LumenNous matches it to
+            the on-board library and assembles a bounded practice in this browser.
           </p>
         </header>
 

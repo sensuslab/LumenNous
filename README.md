@@ -6,9 +6,10 @@ a present need into a small, structured practice without presenting itself as
 an oracle, therapist, church or medical tool.
 
 The account-free Create Engine classifies a request on the device and assembles
-reviewed library material with a non-repeating shuffle system. An optional,
-server-only DeepSeek boundary is included for future approved experiences; it
-is disabled by default and is not required by the local Engine.
+reviewed library material with a non-repeating shuffle system. Create does not
+send sacred or personal composition text to an AI model. An isolated,
+server-only DeepSeek route remains disabled for any future separately reviewed
+experience and is not called by the product UI.
 
 ## Current build
 
@@ -45,11 +46,12 @@ npm start
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Today: one focused prayer, affirmation and suggested practice |
+| `/` | Today: one focused prayer and five untracked, optional non-physical doors |
 | `/explore` | Browse the 26 active needs and intentions |
 | `/explore/[slug]` | Category library with prayers, practices and prompts |
 | `/practice/[slug]` | Timed, accessible practice player |
 | `/create` | Compose a tailored prayer, affirmation, meditation or coherence prayer on device |
+| `/when-lit` | Fixed companion path for amplified or distressed moments |
 | `/sessions` | Review the five-stage method and choose a daily session variant |
 | `/sessions/[slug]` | Timed three-minute coherence prayer with optional reviewed listening |
 | `/listen` | Browse and play the eight reviewed contemplative-listening selections |
@@ -116,9 +118,10 @@ browser:
 7. Store only IDs, cycle counters and recent fingerprints in local storage.
 
 Every item is used once before its bag refills, and a refill cannot begin with
-the item used immediately before it. Request text is never persisted. Crisis,
-acute-distress and metaphysical-escalation phrases bypass composition and show
-fixed human-written support language.
+the item used immediately before it. Request text is never persisted. Crisis
+and metaphysical-escalation phrases bypass composition and show fixed,
+human-written support language. Distress remains eligible for a bounded local
+composition and also surfaces the fixed When lit companion path.
 
 ## Corpus integration
 
@@ -176,13 +179,13 @@ explicit action. The app targets WCAG 2.2 AA with semantic structure, visible
 focus, 44px or larger touch targets, reduced-motion support and an app-wide
 low-stimulation mode.
 
-## AI configuration
+## Dormant AI boundary
 
-The optional `/api/ai` route calls DeepSeek's OpenAI-compatible
-`/chat/completions` endpoint using `DeepSeek-V4-Flash-0731`. It accepts requests
-only when `DEEPSEEK_AI_ENABLED=true`; the API key is read on the server and is never
-sent to the browser. Copy `.env.example` to a local ignored environment file
-when developing this optional integration.
+The isolated `/api/ai` route is not called by Create or any other product UI.
+It accepts requests only when `DEEPSEEK_AI_ENABLED=true`; the API key is read
+on the server and is never sent to the browser. Any future use requires a
+separate editorial, safety and privacy review rather than silently changing
+the local composition contract.
 
 ## Deployment
 
@@ -201,6 +204,8 @@ docker run -p 3000:3000 lumennous
 
 - Create personalises by classification, filtering and curated assembly; it
   does not invent unrestricted prose from the request.
+- Body-positioning, movement and other physical recommendations remain outside
+  the enrichment work until their separate diagram and safety review is complete.
 - General Corpus snapshots are promoted manually; the music register has a
   repeatable import command.
 - Generated sessions can be copied or shared but are not yet saved as complete
@@ -209,6 +214,8 @@ docker run -p 3000:3000 lumennous
 
 See [docs/LUMENNOUS_PRODUCT_PLAN.md](docs/LUMENNOUS_PRODUCT_PLAN.md) for the
 route map, design strategy, Engine specification and staged roadmap.
+See [docs/NON_PHYSICAL_ENRICHMENT_PLAN.md](docs/NON_PHYSICAL_ENRICHMENT_PLAN.md)
+for the research-to-product decisions and phased non-physical roadmap.
 See [docs/MUSIC_INTEGRATION.md](docs/MUSIC_INTEGRATION.md) for playback,
 review policy and high-fidelity audio strategy.
 See
