@@ -29,6 +29,8 @@ export function AffirmationCard({
   href: string;
   className?: string;
 }): JSX.Element {
+  const copyText = `${affirmation.text}\n\nBack it with: ${affirmation.backingActHint}`;
+
   return (
     <GlassCard as="article" className={`flex flex-col gap-4 ${className}`}>
       <div className="flex items-start justify-between gap-3">
@@ -45,10 +47,14 @@ export function AffirmationCard({
               addedAt: new Date().toISOString(),
             }}
           />
-          <CopyButton text={affirmation.text} label="Copy affirmation" />
+          <CopyButton text={copyText} label="Copy affirmation and next act" />
         </div>
       </div>
       <p className="t-prayer-sm text-ink-strong">{affirmation.text}</p>
+      <div className="border-t border-line-subtle pt-4">
+        <p className="t-eyebrow text-ink-faint">Back it with</p>
+        <p className="t-body-sm mt-2 text-ink">{affirmation.backingActHint}</p>
+      </div>
     </GlassCard>
   );
 }
