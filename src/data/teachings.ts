@@ -95,6 +95,9 @@ const raw: Teaching[] = [
     classification: "historical-teaching",
     relatedCategoryIds: ["connection-to-source", "cosmic-and-planetary-reflection"],
     sourceIds: ["src-apocryphon-of-john", "src-jonas-gnostic-religion", "src-layton-gnostic-scriptures"],
+    sourceUses: [
+      { anchorId: "anc-john-epinoia", relation: "comparative-context" },
+    ],
     furtherReading: [
       { title: "The Apocryphon of John (online translation)", author: "Gnostic Society Library", url: "http://gnosis.org/naghamm/apocjn.html" },
       { title: "The Gnostic Scriptures", author: "Bentley Layton", url: "" },
@@ -124,6 +127,9 @@ const raw: Teaching[] = [
     classification: "symbolic",
     relatedCategoryIds: ["cosmic-and-planetary-reflection", "gnosis-and-inner-knowing"],
     sourceIds: ["src-apocryphon-of-john", "src-jonas-gnostic-religion"],
+    sourceUses: [
+      { anchorId: "anc-john-sophia-correction", relation: "comparative-context" },
+    ],
     furtherReading: [
       { title: "The Gnostic Religion", author: "Hans Jonas", url: "" },
       { title: "The Nag Hammadi Library in English", author: "James M. Robinson (ed.)", url: "http://gnosis.org/naghamm/nhl.html" },
@@ -157,11 +163,70 @@ const raw: Teaching[] = [
     classification: "historical-teaching",
     relatedCategoryIds: ["gnosis-and-inner-knowing", "grief-and-lament", "connection-to-source"],
     sourceIds: ["src-pistis-sophia", "src-apocryphon-of-john", "src-jonas-gnostic-religion"],
+    sourceUses: [
+      { anchorId: "anc-john-sophia-correction", relation: "paraphrase" },
+    ],
     furtherReading: [
       { title: "Pistis Sophia (Mead translation)", author: "G. R. S. Mead", url: "http://gnosis.org/library/pistis-sophia.htm" },
       { title: "The Gnostic New Age", author: "April D. DeConick", url: "" },
     ],
     tags: ["sophia", "wisdom", "myth"],
+    editorialStatus: "draft",
+  },
+  {
+    id: "tch-two-melchizedeks",
+    slug: "two-melchizedeks",
+    title: "Two Melchizedeks, two historical settings",
+    summary:
+      "Why a fragmentary Nag Hammadi revelation and Grumbine's 1919 esoteric book must remain distinct even when they meet around purpose and service.",
+    body: [
+      "## A name shared across very different works",
+      "",
+      "Melchizedek appears briefly in Genesis as king of Salem and priest of God Most High, then becomes a figure of priestly interpretation in Psalm 110 and Hebrews. The name also appears in two works used by LumenNous, but those works do not form a single secret tradition and should not be blended into one voice.",
+      "",
+      "The Nag Hammadi tractate *Melchizedek* survives in a badly damaged Coptic manuscript from late antiquity. Its remaining passages present priestly, revelatory and Christological material, yet large gaps limit certainty about the work's full argument. The responsible response is restraint: name the fragmentary condition, avoid filling its silences, and do not turn it into evidence for a modern institution or lineage.",
+      "",
+      "J. C. F. C. Grumbine's *Melchizedek; or, The Secret Doctrine of the Bible* belongs to a very different setting: an English-language esoteric publication from 1919. Grumbine offers layered symbolic reading, a descent-and-return cosmology, and teachings about self-possession and spiritual realization. These are modern interpretations, not translations of the ancient tractate and not the consensus of biblical scholarship. The available scan also has uneven optical character recognition, so quotation requires checking against page images.",
+      "",
+      "## The contemplative meeting point",
+      "",
+      "LumenNous lets the works meet only through a clearly labelled modern question: what might sacred purpose look like without clerical rank? Our answer is service rather than status — attention that makes a person more honest, less dependent on claims of hidden authority, and more able to act with care in ordinary life. Grumbine's own cautions against dependency, voices and power-seeking reinforce that boundary.",
+      "",
+      "This is comparative interpretation, not recovered doctrine. The ancient fragment remains ancient and incomplete; the 1919 book remains modern and esoteric. Their difference is part of the teaching.",
+    ].join("\n"),
+    classification: "modern-interpretation",
+    relatedCategoryIds: [
+      "connection-to-source",
+      "gnosis-and-inner-knowing",
+      "clarity-and-discernment",
+    ],
+    sourceIds: [
+      "src-nag-hammadi-melchizedek",
+      "src-grumbine-melchizedek",
+    ],
+    sourceUses: [
+      {
+        anchorId: "anc-nag-melchizedek-distinction",
+        relation: "comparative-context",
+      },
+      {
+        anchorId: "anc-grumbine-self-possession",
+        relation: "comparative-context",
+      },
+    ],
+    furtherReading: [
+      {
+        title: "The Nag Hammadi Scriptures",
+        author: "Marvin Meyer (ed.)",
+        url: "",
+      },
+      {
+        title: "Melchizedek; or, The Secret Doctrine of the Bible",
+        author: "J. C. F. C. Grumbine",
+        url: "",
+      },
+    ],
+    tags: ["melchizedek", "source-literacy", "purpose", "discernment"],
     editorialStatus: "draft",
   },
 ];
@@ -191,6 +256,9 @@ const raw2: Teaching[] = [
     classification: "historical-teaching",
     relatedCategoryIds: ["gnosis-and-inner-knowing", "clarity-and-discernment"],
     sourceIds: ["src-gospel-of-thomas", "src-pagels-gnostic-gospels", "src-deconick-gnostic-new-age"],
+    sourceUses: [
+      { anchorId: "anc-thomas-inner-outer", relation: "comparative-context" },
+    ],
     furtherReading: [
       { title: "The Gospel of Thomas (online translation)", author: "Gnostic Society Library", url: "http://gnosis.org/naghamm/gthlamb.html" },
       { title: "The Gnostic Gospels", author: "Elaine Pagels", url: "" },

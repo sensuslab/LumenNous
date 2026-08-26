@@ -24,7 +24,7 @@ const SECTIONS: { id: string; title: string; body: string }[] = [
   {
     id: "local-storage",
     title: "Local storage — your device, your rules",
-    body: "Saved items and display preferences live in your browser's local storage, only after you've been told and can decline. They are not synced, not backed up by us and not visible to us. Clearing browser data removes them. Export is available as JSON from Saved.",
+    body: "Saved items, display preferences and optional practice progress live in your browser's local storage, only after you've been told and can decline. Pathways store stage IDs; a completed daily Inner Practice stores its date and concept ID. Neither stores reflections, journal text or worldview choices. These records are not synced, not backed up by us and not visible to us. Clearing browser data removes them. Saved items can be exported as JSON from Saved.",
   },
   {
     id: "local-engine",

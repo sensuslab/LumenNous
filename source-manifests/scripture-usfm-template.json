@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0",
+  "id": "ingest-scripture-usfm-template",
+  "sourceId": "src-scripture-edition-template",
+  "input": {
+    "format": "usfm",
+    "fileNameHint": "scripture.usfm",
+    "expectedSha256": null,
+    "encoding": "utf8"
+  },
+  "sourceRecords": [
+    {
+      "id": "src-scripture-edition-template",
+      "title": "Replace with scripture edition title",
+      "author": "",
+      "institution": "Replace with translator or publishing institution",
+      "year": null,
+      "sourceType": "scripture",
+      "tradition": "Replace with the text's tradition and canon",
+      "claimClassification": "historical-teaching",
+      "url": "",
+      "citation": "Replace with a publication-grade edition citation before commit.",
+      "copyrightNotes": "Confirm translation and digital-text rights before commit.",
+      "lastVerified": "2026-08-26"
+    }
+  ],
+  "edition": {
+    "id": "ed-scripture-usfm-template",
+    "sourceId": "src-scripture-edition-template",
+    "includedSourceIds": [],
+    "label": "Replace with scripture edition label",
+    "editorOrTranslator": "Replace with editor or translator",
+    "publisher": "Replace with publisher",
+    "publicationYear": null,
+    "language": "Replace with language",
+    "rightsStatus": "unknown",
+    "ocrQuality": "not-applicable",
+    "contentFormat": "usfm",
+    "contentSha256": null,
+    "locatorStrategy": "USFM book, chapter and verse markers mapped to canonical book/chapter/verse nodes.",
+    "digitalLocator": "",
+    "notes": "Template only. Replace every placeholder and complete rights review before commit.",
+    "lastVerified": "2026-08-26"
+  }
+}

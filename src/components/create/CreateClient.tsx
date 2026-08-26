@@ -5,8 +5,11 @@ import { z } from "zod";
 import type {
   Affirmation,
   Category,
+  ConceptEngineFrame,
+  ContemplativeConcept,
   EngineRequest,
   EngineResult,
+  PassageAnchor,
   Practice,
   Prayer,
   ReflectionPrompt,
@@ -26,7 +29,12 @@ interface CreateLibraryProps {
   affirmations: readonly Affirmation[];
   practices: readonly Practice[];
   prompts: readonly ReflectionPrompt[];
+  conceptFrames: readonly ConceptEngineFrame[];
+  conceptsById: Record<string, ContemplativeConcept>;
   sourcesById: Record<string, Source>;
+  passageAnchorsById: Record<string, PassageAnchor>;
+  initialConceptId?: string;
+  initialWorldviewProfile?: EngineRequest["worldviewProfile"];
 }
 
 type State =
@@ -82,6 +90,7 @@ function truncate(value: string, maxLength: number): string {
 function createAiRequestBody(
   request: EngineRequest,
   localResult: EngineResult,
+  conceptFrame: ConceptEngineFrame | undefined,
 ): {
   maxTokens: number;
   temperature: number;
@@ -94,7 +103,7 @@ function createAiRequestBody(
       {
         role: "system",
         content:
-          "You write LumenNous contemplative practices. Return only valid JSON. Do not include markdown. Never diagnose, promise outcomes, claim healing, or invent citations. Keep language grounded, gentle, and spiritually literate.",
+          "You write LumenNous contemplative practices. Return only valid JSON. Do not include markdown. Never diagnose, promise outcomes, claim healing, or invent citations. Never present intuition, voices, signs, images or inner impressions as commands or privileged facts. Keep language grounded, gentle, and spiritually literate.",
       },
       {
         role: "user",
@@ -112,6 +121,14 @@ function createAiRequestBody(
               safetyNote: "string",
             },
             request,
+            editorialLens: conceptFrame
+              ? {
+                  title: conceptFrame.title,
+                  description: conceptFrame.description,
+                  worldviewProfile: request.worldviewProfile,
+                  safetyBoundary: conceptFrame.safetyNote,
+                }
+              : null,
             grounding: {
               category: localResult.category,
               categoryId: localResult.categoryId,
@@ -154,6 +171,7 @@ export function CreateClient(props: CreateLibraryProps): JSX.Element {
       affirmations: props.affirmations,
       practices: props.practices,
       prompts: props.prompts,
+      conceptFrames: props.conceptFrames,
     };
   }
 
@@ -174,7 +192,15 @@ export function CreateClient(props: CreateLibraryProps): JSX.Element {
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(createAiRequestBody(request, localResult)),
+        body: JSON.stringify(
+          createAiRequestBody(
+            request,
+            localResult,
+            props.conceptFrames.find(
+              (frame) => frame.conceptId === request.conceptId,
+            ),
+          ),
+        ),
       });
 
       if (!response.ok) {
@@ -203,6 +229,7 @@ export function CreateClient(props: CreateLibraryProps): JSX.Element {
             : localResult.reflectionPrompts,
         closing: ai.closing || localResult.closing,
         sourceIds: [],
+        sourceUses: [],
         traditionLabels: ["original-composition"],
         safetyNote: ai.safetyNote || localResult.safetyNote,
         assembledAt: new Date().toISOString(),
@@ -241,6 +268,14 @@ export function CreateClient(props: CreateLibraryProps): JSX.Element {
     const sources = state.result.sourceIds
       .map((id) => props.sourcesById[id])
       .filter((source): source is Source => source !== undefined);
+    const anchors = state.result.sourceUses
+      .map((use) => props.passageAnchorsById[use.anchorId])
+      .filter((anchor): anchor is PassageAnchor => anchor !== undefined);
+    const concepts = state.result.conceptIds
+      .map((id) => props.conceptsById[id])
+      .filter(
+        (concept): concept is ContemplativeConcept => concept !== undefined,
+      );
     const coherenceSession = getCoherenceSessionForCategory(
       state.result.categoryId,
     );
@@ -250,6 +285,8 @@ export function CreateClient(props: CreateLibraryProps): JSX.Element {
       <EngineResultCard
         result={state.result}
         sources={sources}
+        anchors={anchors}
+        concepts={concepts}
         categorySlug={category?.slug ?? "grounding-and-stillness"}
         coherenceSessionHref={
           state.result.outputType === "combined-practice" && coherenceSession
@@ -270,8 +307,12 @@ export function CreateClient(props: CreateLibraryProps): JSX.Element {
     <>
       <CreateRequestForm
         categories={props.categories}
+        conceptFrames={props.conceptFrames}
+        conceptsById={props.conceptsById}
         onSubmit={handleSubmit}
         initialRequest={lastRequest ?? undefined}
+        initialConceptId={props.initialConceptId}
+        initialWorldviewProfile={props.initialWorldviewProfile}
         isSubmitting={state.kind === "loading"}
       />
       {state.kind === "error" ? (

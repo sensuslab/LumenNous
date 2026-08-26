@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0",
+  "id": "ingest-grumbine-melchizedek-1919",
+  "sourceId": "src-grumbine-melchizedek",
+  "input": {
+    "format": "epub",
+    "fileNameHint": "melchizedek00grum.epub",
+    "expectedSha256": "b910262c30f32da4225a57858421658f1394ca0c1d4dcc27eff973ce2b84c639",
+    "encoding": "utf8"
+  },
+  "sourceRecords": [],
+  "edition": {
+    "id": "ed-grumbine-1919-ocr",
+    "sourceId": "src-grumbine-melchizedek",
+    "includedSourceIds": [],
+    "label": "OCR scan of Grumbine's 1919 Melchizedek",
+    "editorOrTranslator": "J. C. F. C. Grumbine",
+    "publisher": "The Order of the White Rose",
+    "publicationYear": 1919,
+    "language": "English",
+    "rightsStatus": "unknown",
+    "ocrQuality": "low",
+    "contentFormat": "epub",
+    "contentSha256": "b910262c30f32da4225a57858421658f1394ca0c1d4dcc27eff973ce2b84c639",
+    "locatorStrategy": "EPUB spine path with lecture and extraction-line context; exact wording requires verification against page images.",
+    "digitalLocator": "",
+    "notes": "The EPUB reports automated character recognition and contains pages with explicit low-accuracy warnings. Use conceptual paraphrase; verify quotations against page images and confirm rights for each release jurisdiction.",
+    "lastVerified": "2026-08-25"
+  }
+}

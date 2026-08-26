@@ -1,0 +1,49 @@
+[
+  {
+    "id": "ed-nag-hammadi-working-epub",
+    "sourceId": "src-nag-hammadi-library",
+    "includedSourceIds": [
+      "src-gospel-of-thomas",
+      "src-gospel-of-truth",
+      "src-apocryphon-of-john",
+      "src-gospel-of-philip",
+      "src-authoritative-teaching",
+      "src-discourse-eighth-ninth",
+      "src-prayer-thanksgiving",
+      "src-thunder-perfect-mind",
+      "src-teachings-silvanus",
+      "src-nag-hammadi-melchizedek"
+    ],
+    "label": "Private working EPUB of The Nag Hammadi Library",
+    "editorOrTranslator": "James M. Robinson (general editor); multiple translators",
+    "publisher": "Editorial working copy; source edition associated with Harper & Row / Brill",
+    "publicationYear": 1988,
+    "language": "English translation from Coptic witnesses",
+    "rightsStatus": "reference-only",
+    "ocrQuality": "variable",
+    "contentFormat": "epub",
+    "contentSha256": "bca39acba37dcb31d009fc9cc2774ace57b41d9ddb8762fd446d7890f90103cf",
+    "locatorStrategy": "EPUB spine path and tractate-local section or saying reference; canonical node ranges supersede these locators after verified re-ingestion.",
+    "digitalLocator": "",
+    "notes": "Private editorial reference containing duplicate translations of several tractates. Compare translations for conceptual stability and verify publication wording against an authorised edition.",
+    "lastVerified": "2026-08-25"
+  },
+  {
+    "id": "ed-grumbine-1919-ocr",
+    "sourceId": "src-grumbine-melchizedek",
+    "includedSourceIds": [],
+    "label": "OCR scan of Grumbine's 1919 Melchizedek",
+    "editorOrTranslator": "J. C. F. C. Grumbine",
+    "publisher": "The Order of the White Rose",
+    "publicationYear": 1919,
+    "language": "English",
+    "rightsStatus": "unknown",
+    "ocrQuality": "low",
+    "contentFormat": "epub",
+    "contentSha256": "b910262c30f32da4225a57858421658f1394ca0c1d4dcc27eff973ce2b84c639",
+    "locatorStrategy": "EPUB spine path with lecture and extraction-line context; exact wording requires verification against page images.",
+    "digitalLocator": "",
+    "notes": "The EPUB reports automated character recognition and contains pages with explicit low-accuracy warnings. Use conceptual paraphrase; verify quotations against page images and confirm rights for each release jurisdiction.",
+    "lastVerified": "2026-08-25"
+  }
+]

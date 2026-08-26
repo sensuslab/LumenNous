@@ -2,7 +2,12 @@
 
 import { useState, type FormEvent, type JSX } from "react";
 import Link from "next/link";
-import type { Category, EngineRequest } from "@/lib/schemas";
+import type {
+  Category,
+  ConceptEngineFrame,
+  ContemplativeConcept,
+  EngineRequest,
+} from "@/lib/schemas";
 import { Chip } from "@/components/ui/Chip";
 import { Icon } from "@/components/ui/Icon";
 
@@ -46,6 +51,17 @@ const LANGUAGES: Array<{ id: EngineRequest["languagePreference"]; label: string 
   { id: "neutral", label: "Neutral spiritual" },
 ];
 
+const WORLDVIEWS: Array<{
+  id: EngineRequest["worldviewProfile"];
+  label: string;
+  hint: string;
+}> = [
+  { id: "open-universal", label: "Open / universal", hint: "Inclusive spiritual language without a required creed" },
+  { id: "gnostic", label: "Gnostic", hint: "Source-specific Nag Hammadi concepts, clearly labelled" },
+  { id: "esoteric-christian", label: "Esoteric Christian", hint: "Later Christian-mystical interpretation, clearly labelled" },
+  { id: "neutral", label: "Neutral", hint: "Reflective and non-theistic framing" },
+];
+
 const COMMON_AVOIDANCES = [
   { value: "breath", label: "Breath focus" },
   { value: "gnosis", label: "Gnostic terms" },
@@ -56,13 +72,21 @@ const MAX_NEED = 600;
 
 export function CreateRequestForm({
   categories,
+  conceptFrames,
+  conceptsById,
   onSubmit,
   initialRequest,
+  initialConceptId = "",
+  initialWorldviewProfile = "open-universal",
   isSubmitting = false,
 }: {
   categories: readonly Category[];
+  conceptFrames: readonly ConceptEngineFrame[];
+  conceptsById: Record<string, ContemplativeConcept>;
   onSubmit: (request: EngineRequest) => void;
   initialRequest?: EngineRequest;
+  initialConceptId?: string;
+  initialWorldviewProfile?: EngineRequest["worldviewProfile"];
   isSubmitting?: boolean;
 }): JSX.Element {
   const commonAvoidanceValues = new Set<string>(
@@ -83,6 +107,13 @@ export function CreateRequestForm({
     useState<EngineRequest["languagePreference"]>(
       initialRequest?.languagePreference ?? "source",
     );
+  const [worldviewProfile, setWorldviewProfile] =
+    useState<EngineRequest["worldviewProfile"]>(
+      initialRequest?.worldviewProfile ?? initialWorldviewProfile,
+    );
+  const [conceptId, setConceptId] = useState(
+    initialRequest?.conceptId ?? initialConceptId,
+  );
   const [avoidances, setAvoidances] = useState<string[]>(
     initialRequest?.avoidances.filter((item) => commonAvoidanceValues.has(item)) ?? [],
   );
@@ -93,6 +124,22 @@ export function CreateRequestForm({
   );
   const [error, setError] = useState("");
   const basedOnWords = categoryId === "not-sure";
+  const availableConceptFrames = conceptFrames.filter((frame) =>
+    frame.compatibleWorldviews.includes(worldviewProfile),
+  );
+  const selectedConceptFrame = conceptFrames.find(
+    (frame) => frame.conceptId === conceptId,
+  );
+
+  function chooseWorldview(next: EngineRequest["worldviewProfile"]): void {
+    setWorldviewProfile(next);
+    if (
+      selectedConceptFrame &&
+      !selectedConceptFrame.compatibleWorldviews.includes(next)
+    ) {
+      setConceptId("");
+    }
+  }
 
   function toggleAvoidance(value: string): void {
     setAvoidances((current) =>
@@ -120,6 +167,8 @@ export function CreateRequestForm({
       duration,
       tone,
       languagePreference,
+      worldviewProfile,
+      conceptId: outputType === "combined-practice" ? "" : conceptId,
       avoidances: [...new Set([...avoidances, ...custom])].slice(0, 20),
     });
   }
@@ -203,7 +252,10 @@ export function CreateRequestForm({
                 type="button"
                 role="radio"
                 aria-checked={outputType === option.id}
-                onClick={() => setOutputType(option.id)}
+                onClick={() => {
+                  setOutputType(option.id);
+                  if (option.id === "combined-practice") setConceptId("");
+                }}
                 className={`field-surface h-[120px] rounded-sm p-3 text-left transition-[border-color,background-color] duration-200 ease-std ${outputType === option.id ? "border-[rgba(167,155,232,0.62)] bg-[rgba(167,155,232,0.12)]" : ""}`}
               >
                 <Icon name={option.icon} className={`h-5 w-5 ${outputType === option.id ? "text-violet" : "text-ink-muted"}`} aria-hidden="true" />
@@ -243,6 +295,59 @@ export function CreateRequestForm({
                 </button>
               ))}
             </div>
+          </fieldset>
+        ) : null}
+
+        {outputType !== "combined-practice" ? (
+          <fieldset className="mt-6 border-t border-line pt-5">
+            <legend className="t-label font-sans text-ink-strong">
+              Contemplative lens
+            </legend>
+            <p className="t-body-sm mt-1 text-ink-muted">
+              Optional. A lens adds original editorial language mapped to
+              specific passages; it does not change the source into doctrine.
+            </p>
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label className="t-label font-sans text-ink-strong">
+                Worldview framing
+                <select
+                  value={worldviewProfile}
+                  onChange={(event) =>
+                    chooseWorldview(
+                      event.target.value as EngineRequest["worldviewProfile"],
+                    )
+                  }
+                  className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none"
+                >
+                  {WORLDVIEWS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="t-label font-sans text-ink-strong">
+                Guiding concept
+                <select
+                  value={conceptId}
+                  onChange={(event) => setConceptId(event.target.value)}
+                  className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none"
+                >
+                  <option value="">Open — no added lens</option>
+                  {availableConceptFrames.map((frame) => (
+                    <option key={frame.id} value={frame.conceptId}>
+                      {frame.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <p className="t-body-sm mt-3 rounded-sm border border-line-subtle p-3 text-ink-muted">
+              {selectedConceptFrame
+                ? conceptsById[selectedConceptFrame.conceptId]?.summary ??
+                  selectedConceptFrame.description
+                : WORLDVIEWS.find((option) => option.id === worldviewProfile)?.hint}
+            </p>
           </fieldset>
         ) : null}
 
@@ -338,7 +443,7 @@ export function CreateRequestForm({
               <p className="t-body-sm mt-1 text-ink-muted">
                 {basedOnWords
                   ? "Your request is sent through the LumenNous server route; the DeepSeek key stays on Render and is never exposed to the browser."
-                  : "No model call is made for a chosen intention; the app assembles from its reviewed local library, as it does when the AI service is off."}
+                  : "No model call is made for a chosen intention; the app assembles from its human-authored local library, as it does when the AI service is off."}
               </p>
               <Link href="/privacy#local-engine" className="t-body-sm mt-2 inline-flex min-h-11 items-center text-ink-muted underline-offset-4 hover:text-ink-strong hover:underline">Read the privacy details</Link>
             </div>

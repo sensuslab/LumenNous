@@ -22,7 +22,12 @@
  */
 
 import { affirmations, categoryById, categoryBySlug, prayers } from "../data";
-import type { Affirmation, Prayer } from "./schemas";
+import type {
+  Affirmation,
+  ConceptEngineFrame,
+  Prayer,
+  WorldviewProfile,
+} from "./schemas";
 
 /* ------------------------------------------------------------------ */
 /* Hashing                                                             */
@@ -151,6 +156,26 @@ export function getDailyAffirmation(
   if (pool.length === 0) return undefined;
   const key = `${localISODate(date)}|${categorySlug ?? "all"}|affirmation`;
   return pool[hashString(key) % pool.length];
+}
+
+/**
+ * Select a stable concept frame for one local calendar date and an explicitly
+ * chosen worldview. The worldview is an in-memory presentation choice, not an
+ * inferred belief. The caller supplies the reviewed frame shelf so this helper
+ * stays deterministic and independently testable.
+ */
+export function getDailyConceptFrame(
+  localDate: string,
+  worldview: WorldviewProfile,
+  frames: readonly ConceptEngineFrame[],
+): ConceptEngineFrame | undefined {
+  const compatible = frames.filter((frame) =>
+    frame.compatibleWorldviews.includes(worldview),
+  );
+  if (compatible.length === 0) return undefined;
+  const index =
+    hashString(`${localDate}|${worldview}|inner-practice`) % compatible.length;
+  return compatible[index];
 }
 
 /* ------------------------------------------------------------------ */

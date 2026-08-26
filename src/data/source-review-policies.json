@@ -1,0 +1,41 @@
+[
+  {
+    "id": "source-two-melchizedeks",
+    "label": "The two Melchizedeks remain distinct",
+    "detail": "Keep the fragmentary ancient tractate separate from Grumbine's 1919 esoteric interpretation and from institutional priesthood claims.",
+    "stage": "source",
+    "activation": "all",
+    "sourceIds": [
+      "src-nag-hammadi-melchizedek",
+      "src-grumbine-melchizedek"
+    ],
+    "editionIds": []
+  },
+  {
+    "id": "source-fragmentary-ancient-text",
+    "label": "Fragmentary source limits are visible",
+    "detail": "Name the ancient tractate's damaged and incomplete state. Do not fill textual gaps with a later source, private intuition or institutional lineage claim.",
+    "stage": "source",
+    "activation": "any",
+    "sourceIds": ["src-nag-hammadi-melchizedek"],
+    "editionIds": []
+  },
+  {
+    "id": "source-modern-esoteric-context",
+    "label": "Modern esoteric interpretation is attributed",
+    "detail": "Present Grumbine's claims as a 1919 esoteric interpretation, not as the ancient tractate, a critical translation or biblical scholarly consensus.",
+    "stage": "copy",
+    "activation": "any",
+    "sourceIds": ["src-grumbine-melchizedek"],
+    "editionIds": []
+  },
+  {
+    "id": "safety-supernormal-context-only",
+    "label": "Supernormal vocabulary remains context only",
+    "detail": "Do not turn historical language about voices, prophecy, healing or psychic faculties into training, validation, promised power or a reason to surrender self-possession.",
+    "stage": "safety",
+    "activation": "any",
+    "sourceIds": ["src-grumbine-melchizedek"],
+    "editionIds": []
+  }
+]

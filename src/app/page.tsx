@@ -5,7 +5,11 @@ import {
   getAudioById,
   getCategoryById,
   getPracticesByCategory,
+  listConceptEngineFrames,
+  listContemplativeConcepts,
+  listPassageAnchors,
   listPrayers,
+  listSources,
 } from "@/lib/content";
 import { getDailyItem } from "@/lib/daily";
 import { DailyPrayerCard } from "@/components/prayer/DailyPrayerCard";
@@ -17,6 +21,7 @@ import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { HorizonGlow } from "@/components/celestial/HorizonGlow";
 import { LocalSessionSuggestion } from "@/components/session/LocalSessionSuggestion";
+import { DailyInnerPracticeCard } from "@/components/concepts/DailyInnerPracticeCard";
 
 /**
  * Today — `/` (today.md). The heart of the app: a complete, beautiful prayer
@@ -80,6 +85,33 @@ export default function TodayPage(): JSX.Element {
     secondary && secondary.categoryIds.length > 0
       ? getCategoryById(secondary.categoryIds[0] ?? "")
       : undefined;
+  const conceptFrames = listConceptEngineFrames();
+  const frameConceptIds = new Set(
+    conceptFrames.map((frame) => frame.conceptId),
+  );
+  const frameSourceIds = new Set(
+    conceptFrames.flatMap((frame) => frame.sourceIds),
+  );
+  const frameAnchorIds = new Set(
+    conceptFrames.flatMap((frame) =>
+      frame.sourceUses.map((use) => use.anchorId),
+    ),
+  );
+  const conceptsById = Object.fromEntries(
+    listContemplativeConcepts()
+      .filter((concept) => frameConceptIds.has(concept.id))
+      .map((concept) => [concept.id, concept]),
+  );
+  const sourcesById = Object.fromEntries(
+    listSources()
+      .filter((source) => frameSourceIds.has(source.id))
+      .map((source) => [source.id, source]),
+  );
+  const anchorsById = Object.fromEntries(
+    listPassageAnchors()
+      .filter((anchor) => frameAnchorIds.has(anchor.id))
+      .map((anchor) => [anchor.id, anchor]),
+  );
 
   return (
     <>
@@ -96,6 +128,15 @@ export default function TodayPage(): JSX.Element {
             whyNote={whyNote}
           />
         </div>
+
+        <Divider className="my-10" />
+
+        <DailyInnerPracticeCard
+          frames={conceptFrames}
+          conceptsById={conceptsById}
+          sourcesById={sourcesById}
+          anchorsById={anchorsById}
+        />
 
         <Divider className="my-10" />
 

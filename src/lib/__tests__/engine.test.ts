@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   affirmations,
   categories,
+  conceptEngineFrames,
   practices,
   prayers,
   reflectionPrompts,
@@ -22,6 +23,7 @@ const library: EngineLibrary = {
   affirmations,
   practices,
   prompts: reflectionPrompts,
+  conceptFrames: conceptEngineFrames,
 };
 
 const baseRequest: EngineRequest = {
@@ -31,6 +33,8 @@ const baseRequest: EngineRequest = {
   duration: "five-minutes",
   tone: "gentle",
   languagePreference: "source",
+  worldviewProfile: "open-universal",
+  conceptId: "",
   avoidances: [],
 };
 
@@ -253,5 +257,75 @@ describe("composeWithEngine", () => {
       { history, random: () => 0.5 },
     );
     expect(JSON.stringify(history.read())).not.toContain(privateWords);
+  });
+
+  it("carries passage-level provenance into source-grounded results", () => {
+    const result = composeWithEngine(
+      {
+        ...baseRequest,
+        categoryId: "gnosis-and-inner-knowing",
+        userNeed: "I want a grounded inner-knowing practice.",
+      },
+      library,
+      { history: createMemoryEngineHistory(), random: () => 0.5 },
+    );
+
+    expect(result.sourceUses.length).toBeGreaterThan(0);
+    expect(result.sourceUses[0]?.anchorId).toMatch(/^anc-/);
+    expect(result.traditionLabels).toContain("modern-interpretation");
+  });
+
+  it("applies a source-grounded concept lens across an ordinary intention", () => {
+    const result = composeWithEngine(
+      {
+        ...baseRequest,
+        categoryId: "courage-and-resilience",
+        worldviewProfile: "neutral",
+        conceptId: "con-purpose-service",
+      },
+      library,
+      { history: createMemoryEngineHistory(), random: () => 0.5 },
+    );
+
+    expect(result.conceptIds).toEqual(["con-purpose-service"]);
+    expect(result.prayer).toMatch(/Keep purpose close to the ground/i);
+    expect(result.sourceIds).toEqual(
+      expect.arrayContaining([
+        "src-nag-hammadi-melchizedek",
+        "src-grumbine-melchizedek",
+      ]),
+    );
+    expect(result.sourceUses.length).toBeGreaterThanOrEqual(3);
+    expect(result.worldviewProfile).toBe("neutral");
+    expect(result.safetyNote).toMatch(/confers no title, ordination, lineage or authority/i);
+  });
+
+  it("rejects a lens outside its declared worldview framing", () => {
+    expect(() =>
+      composeWithEngine(
+        {
+          ...baseRequest,
+          worldviewProfile: "neutral",
+          conceptId: "con-sophia-correction",
+        },
+        library,
+        { history: createMemoryEngineHistory(), random: () => 0.5 },
+      ),
+    ).toThrow(/not available for the neutral worldview profile/i);
+  });
+
+  it("does not alter the fixed coherence method with a concept lens", () => {
+    const result = composeWithEngine(
+      {
+        ...baseRequest,
+        outputType: "combined-practice",
+        conceptId: "con-inner-light",
+      },
+      library,
+      { history: createMemoryEngineHistory(), random: () => 0.5 },
+    );
+
+    expect(result.conceptIds).toEqual([]);
+    expect(result.practiceSteps).toHaveLength(5);
   });
 });

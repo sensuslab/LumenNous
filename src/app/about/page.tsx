@@ -94,9 +94,9 @@ export default function AboutPage(): JSX.Element {
           <div>
             <ProseH2>Who tends the library</ProseH2>
             <p className="t-body mt-4 max-w-[62ch] text-ink-muted">
-              Content is researched, drafted and reviewed by editors. Seed
-              material is marked &ldquo;draft editorial content under
-              review&rdquo; until its final pass. Sources are real and cited;
+              Content is researched and drafted by editors. Seed material stays
+              marked &ldquo;draft editorial content under review&rdquo; until
+              source, safety and copy review are complete. Sources are real and cited;
               nothing is invented.
             </p>
           </div>

@@ -4,6 +4,7 @@ import type { JSX } from "react";
 import type { Metadata } from "next";
 import {
   getCategoryById,
+  getPassageAnchorsByIds,
   getSourcesByIds,
   getTeachingBySlug,
   listTeachings,
@@ -43,6 +44,9 @@ export default async function TeachingPage({ params }: PageProps): Promise<JSX.E
 
   const chip = classificationChip(teaching.classification);
   const sources = getSourcesByIds(teaching.sourceIds);
+  const anchors = getPassageAnchorsByIds(
+    teaching.sourceUses?.map((use) => use.anchorId) ?? [],
+  );
   const relatedCategories = teaching.relatedCategoryIds
     .map((id) => getCategoryById(id))
     .filter((category): category is NonNullable<typeof category> => category !== undefined && category.isActive);
@@ -106,7 +110,7 @@ export default async function TeachingPage({ params }: PageProps): Promise<JSX.E
           </section>
         ) : null}
 
-        <SourceDrawer sources={sources} className="mt-10" />
+        <SourceDrawer sources={sources} anchors={anchors} className="mt-10" />
 
         {teaching.furtherReading.length > 0 ? (
           <section aria-labelledby="further-reading" className="mt-10">

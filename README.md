@@ -6,9 +6,15 @@ a present need into a small, structured practice without presenting itself as
 an oracle, therapist, church or medical tool.
 
 The account-free Create Engine classifies a request on the device and assembles
-reviewed library material with a non-repeating shuffle system. An optional,
+human-authored editorial material with a non-repeating shuffle system. An optional,
 server-only DeepSeek boundary is included for future approved experiences; it
 is disabled by default and is not required by the local Engine.
+
+The Learn wing includes a source-traceable Concept Atlas and contemplative
+pathways through fullness, inner-light discernment and purpose as service.
+Optional pathway progress remains on the device and stores stage IDs only.
+Today also offers a deterministic four-minute Inner Practice drawn from the
+same reviewed concept frames, with source disclosure and local-only completion.
 
 ## Current build
 
@@ -56,6 +62,11 @@ npm start
 | `/listen/[slug]` | Playlist detail |
 | `/learn` | Browse short teachings and method notes |
 | `/learn/[slug]` | Teaching detail |
+| `/concepts` | Filter the source-traceable Concept Atlas by worldview and application |
+| `/concepts/[slug]` | Trace one concept through source strands, safety boundaries, pathways and Create |
+| `/pathways` | Browse guided, source-aware contemplative journeys |
+| `/pathways/[slug]` | Complete pathway stages with optional on-device progress |
+| `/editorial` | No-index local workspace for source, safety and copy review records |
 | `/saved` | Consent-gated local saved items and local-data controls |
 | `/prayer-engine` | Landing page explaining the purpose and functionality of the PrayerEngine |
 | `/about`, `/privacy` | Method, boundaries and privacy commitments |
@@ -109,11 +120,13 @@ browser:
 2. Run the safety classifier before normal composition.
 3. Respect an explicit category or classify the need from Corpus profiles.
 4. Filter for output type, duration, tone, language and exact avoidances.
-5. Draw compatible content IDs from per-context shuffle bags.
-6. Assemble and validate a recipe from prayers, affirmations, practices and
+5. Apply an optional concept lens only when its source, worldview and safety
+   metadata are compatible with the request.
+6. Draw compatible content IDs from per-context shuffle bags.
+7. Assemble and validate a recipe from prayers, affirmations, practices and
    reflection prompts. Coherence output keeps the reviewed five-stage order
    and fixed three-minute core instead of scaling an unrelated meditation.
-7. Store only IDs, cycle counters and recent fingerprints in local storage.
+8. Store only IDs, cycle counters and recent fingerprints in local storage.
 
 Every item is used once before its bag refills, and a refill cannot begin with
 the item used immediately before it. Request text is never persisted. Crisis,
@@ -215,3 +228,9 @@ See
 [docs/QUANTUM_PRAYER_MUSIC_ALIGNMENT.md](docs/QUANTUM_PRAYER_MUSIC_ALIGNMENT.md)
 for the source-method review, scientific boundary, catalogue audit and
 session-to-sound decisions.
+See [docs/SOURCE_PROVENANCE.md](docs/SOURCE_PROVENANCE.md) for the passage-map
+model and [docs/EDITORIAL_WORKFLOW.md](docs/EDITORIAL_WORKFLOW.md) for the
+fail-closed review, JSON ingestion and promotion process.
+See [docs/SOURCE_INGESTION.md](docs/SOURCE_INGESTION.md) for adding EPUB,
+scripture and other texts through the format-neutral workbench and canonical
+passage-anchor workflow.
