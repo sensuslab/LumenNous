@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   EngineRequestSchema,
   EngineResultSchema,
+  EditorialReviewSchema,
   PrayerSchema,
 } from "../schemas";
 import { categories, validateContent } from "../../data";
@@ -20,8 +21,46 @@ describe("validateContent()", () => {
     expect(report.counts.sources).toBeGreaterThanOrEqual(30);
     expect(report.counts.audioItems).toBeGreaterThanOrEqual(12);
     expect(report.counts.playlists).toBe(10);
-    expect(report.counts.teachings).toBe(16);
+    expect(report.counts.teachings).toBe(17);
     expect(report.counts.sessions).toBe(5);
+    expect(report.counts.sourceEditions).toBe(2);
+    expect(report.counts.sourceReviewPolicies).toBeGreaterThanOrEqual(4);
+    expect(report.counts.passageAnchors).toBeGreaterThanOrEqual(17);
+    expect(report.counts.contemplativeConcepts).toBeGreaterThanOrEqual(13);
+    expect(report.counts.contemplativePathways).toBe(3);
+    expect(report.counts.conceptEngineFrames).toBe(10);
+  });
+});
+
+describe("EditorialReviewSchema", () => {
+  const review = {
+    id: "rev-test",
+    subjectId: "tch-test",
+    status: "published",
+    completedStages: ["source", "safety", "copy"],
+    reviewer: "Editorial reviewer",
+    reviewedAt: "2026-08-25",
+    notes: "Source wording, safety framing and copy checked.",
+  };
+
+  it("requires source, safety and copy review before publication", () => {
+    expect(() => EditorialReviewSchema.parse(review)).not.toThrow();
+    expect(() =>
+      EditorialReviewSchema.parse({
+        ...review,
+        completedStages: ["source", "copy"],
+      }),
+    ).toThrow(/safety review/i);
+  });
+
+  it("requires an attributable reviewer and date", () => {
+    expect(() =>
+      EditorialReviewSchema.parse({
+        ...review,
+        reviewer: "",
+        reviewedAt: null,
+      }),
+    ).toThrow(/reviewer and review date/i);
   });
 });
 
@@ -85,6 +124,8 @@ describe("EngineRequestSchema", () => {
     duration: "five-minutes",
     tone: "gentle",
     languagePreference: "source",
+    worldviewProfile: "open-universal",
+    conceptId: "",
     avoidances: ["illness"],
   };
 

@@ -99,7 +99,7 @@ describe("welcome landing library counts", () => {
 
   it("quotes the same totals the content layer reports", () => {
     expect(statValue("active intentions")).toBe(listActiveCategories().length);
-    expect(statValue("reviewed prayers")).toBe(listPrayers().length);
+    expect(statValue("editorial prayers")).toBe(listPrayers().length);
     expect(statValue("affirmations")).toBe(listAffirmations().length);
     expect(statValue("guided practices")).toBe(listPractices().length);
     expect(statValue("reflection prompts")).toBe(listReflectionPrompts().length);

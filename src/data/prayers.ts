@@ -20,6 +20,7 @@
 import {
   PrayerSchema,
   type Prayer,
+  type SourceRelation,
   type TimeOfDay,
   type TraditionLabel,
 } from "../lib/schemas";
@@ -38,6 +39,7 @@ interface PrayerDef {
   practiceSteps: string[];
   traditionLabels: TraditionLabel[];
   sourceIds: string[];
+  sourceUses?: Array<{ anchorId: string; relation: SourceRelation }>;
   tags: string[];
   timeOfDay: TimeOfDay;
   seasonalMonths?: number[];
@@ -135,7 +137,14 @@ const DEFS: Record<string, PrayerDef[]> = {
         "Close by naming one thing you are grateful to exist.",
       ],
       traditionLabels: ["original-composition", "modern-interpretation", "historical-teaching"],
-      sourceIds: ["src-apocryphon-of-john", "src-nag-hammadi-library"],
+      sourceIds: [
+        "src-apocryphon-of-john",
+        "src-gospel-of-truth",
+        "src-nag-hammadi-library",
+      ],
+      sourceUses: [
+        { anchorId: "anc-truth-belonging-rest", relation: "inspired-by" },
+      ],
       tags: ["source", "presence", "longing"],
       timeOfDay: "any",
     },
@@ -200,13 +209,16 @@ const DEFS: Record<string, PrayerDef[]> = {
       practiceDuration: 6,
       practiceSteps: [
         "Sit quietly and ask inwardly: what do I already know about this day?",
-        "Notice the first quiet answer before the analysing begins.",
+        "Notice whatever appears without treating it as instruction or final truth.",
         "Read the prayer slowly, twice.",
-        "Write nothing down; simply carry the question with you.",
-        "Return to the question once more before sleep.",
+        "Test any insight against facts, care, and the perspective of someone trustworthy.",
+        "Return to the question once more before sleep; an unanswered question is complete.",
       ],
       traditionLabels: ["original-composition", "modern-interpretation", "historical-teaching"],
       sourceIds: ["src-gospel-of-thomas", "src-pagels-gnostic-gospels"],
+      sourceUses: [
+        { anchorId: "anc-thomas-inner-outer", relation: "inspired-by" },
+      ],
       tags: ["gnosis", "inner-knowing", "spark"],
       timeOfDay: "any",
     },
@@ -230,6 +242,9 @@ const DEFS: Record<string, PrayerDef[]> = {
       ],
       traditionLabels: ["original-composition", "historical-teaching"],
       sourceIds: ["src-gospel-of-thomas"],
+      sourceUses: [
+        { anchorId: "anc-thomas-inner-outer", relation: "paraphrase" },
+      ],
       tags: ["seeking", "questions", "humility"],
       timeOfDay: "any",
     },
@@ -254,6 +269,9 @@ const DEFS: Record<string, PrayerDef[]> = {
       ],
       traditionLabels: ["original-composition", "symbolic-language", "modern-interpretation"],
       sourceIds: ["src-gospel-of-thomas", "src-cloud-of-unknowing"],
+      sourceUses: [
+        { anchorId: "anc-thomas-inner-light", relation: "inspired-by" },
+      ],
       tags: ["inner-light", "attention", "meditation"],
       timeOfDay: "evening",
     },
@@ -307,15 +325,15 @@ const DEFS: Record<string, PrayerDef[]> = {
     },
     {
       title: "Two Voices",
-      opening: "Discerning Spirit, who can tell echo from voice,",
+      opening: "Discerning Spirit, meet me in honest attention,",
       body:
         "two counsels argue in me and both claim to be wisdom. One flatters my fear and calls it caution; one " +
-        "flatters my pride and calls it purpose. Somewhere beneath the debate is your quieter word. Teach me the " +
-        "feel of it: the counsel that does not need to shout, that leaves me more honest rather than more " +
-        "comfortable, more free rather than more afraid. Until I can tell them apart, keep me from signing " +
-        "anything in a hurry — with my hand or with my heart.",
+        "flatters my pride and calls it purpose. Quiet may help me hear them clearly, but quiet alone does not " +
+        "make a thought true. Teach me to test each counsel by honesty, care, evidence and the freedom it leaves " +
+        "for other people. Until the next step is clear enough to examine, keep me from signing anything in a " +
+        "hurry — with my hand or with my heart.",
       closing: "Let what is true in me answer what is true in you. Amen.",
-      affirmation: "The truest counsel in me does not need to shout.",
+      affirmation: "Quiet makes room for clarity; evidence, care and conversation help me recognise it.",
       practiceDuration: 6,
       practiceSteps: [
         "Sit with the two options and give each a plain, fair description.",
@@ -1676,6 +1694,7 @@ function buildPrayers(): Prayer[] {
         practiceSteps: def.practiceSteps,
         reflectionPromptIds: [promptA, promptB],
         sourceIds: def.sourceIds,
+        sourceUses: def.sourceUses,
         audioIds: [],
         tags: def.tags,
         timeOfDay: def.timeOfDay,

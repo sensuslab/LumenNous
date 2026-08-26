@@ -62,9 +62,93 @@ export const TimeOfDaySchema = z.enum([
 ]);
 export type TimeOfDay = z.infer<typeof TimeOfDaySchema>;
 
-/** All seed content ships as "draft" pending editorial review (see brief). */
-export const EditorialStatusSchema = z.enum(["draft", "published", "review"]);
+/** Editorial lifecycle. Public release requires source, safety and copy review. */
+export const EditorialStatusSchema = z.enum(["draft", "review", "published"]);
 export type EditorialStatus = z.infer<typeof EditorialStatusSchema>;
+
+export const EditorialReviewStageSchema = z.enum([
+  "source",
+  "safety",
+  "copy",
+]);
+export type EditorialReviewStage = z.infer<typeof EditorialReviewStageSchema>;
+
+/** How product language relates to a cited passage. */
+export const SourceRelationSchema = z.enum([
+  "quotation",
+  "paraphrase",
+  "inspired-by",
+  "comparative-context",
+]);
+export type SourceRelation = z.infer<typeof SourceRelationSchema>;
+
+export const RightsStatusSchema = z.enum([
+  "public-domain",
+  "licensed",
+  "permission-required",
+  "reference-only",
+  "unknown",
+]);
+export type RightsStatus = z.infer<typeof RightsStatusSchema>;
+
+export const OcrQualitySchema = z.enum([
+  "not-applicable",
+  "clean",
+  "variable",
+  "low",
+]);
+export type OcrQuality = z.infer<typeof OcrQualitySchema>;
+
+export const SourceDocumentFormatSchema = z.enum([
+  "epub",
+  "pdf",
+  "plain-text",
+  "markdown",
+  "html",
+  "osis",
+  "usfm",
+  "json-tree",
+]);
+export type SourceDocumentFormat = z.infer<
+  typeof SourceDocumentFormatSchema
+>;
+
+export const LocatorSchemeSchema = z.enum([
+  "canonical-node",
+  "epub-path",
+  "scripture-reference",
+  "page",
+  "line",
+  "section",
+  "custom",
+]);
+export type LocatorScheme = z.infer<typeof LocatorSchemeSchema>;
+
+export const SourceVerificationSchema = z.enum([
+  "mapped-from-extraction",
+  "edition-checked",
+  "quotation-checked",
+]);
+export type SourceVerification = z.infer<typeof SourceVerificationSchema>;
+
+export const WorldviewProfileSchema = z.enum([
+  "open-universal",
+  "gnostic",
+  "esoteric-christian",
+  "neutral",
+]);
+export type WorldviewProfile = z.infer<typeof WorldviewProfileSchema>;
+
+export const ConceptSafetyTagSchema = z.enum([
+  "non-oracular",
+  "reality-test-inner-knowing",
+  "metaphor-only",
+  "no-supernormal-practice",
+  "ground-after-practice",
+  "non-clerical",
+  "source-specific",
+]);
+export type ConceptSafetyTag = z.infer<typeof ConceptSafetyTagSchema>;
 
 /**
  * Claim classification — how a statement/tradition should be framed.
@@ -249,6 +333,15 @@ export const PrayerSchema = z.object({
   practiceSteps: z.array(nonEmpty("practice step", 600)).min(3).max(6),
   reflectionPromptIds: z.array(idSchema),
   sourceIds: z.array(idSchema),
+  sourceUses: z
+    .array(
+      z.object({
+        anchorId: idSchema,
+        relation: SourceRelationSchema,
+      }),
+    )
+    .max(24)
+    .optional(),
   audioIds: z.array(idSchema),
   tags: z.array(nonEmpty("tag", 60)).max(12),
   timeOfDay: TimeOfDaySchema,
@@ -273,6 +366,12 @@ export const AffirmationSchema = z.object({
   categoryIds: z.array(idSchema).min(1),
   affirmationType: AffirmationTypeSchema,
   sourceIds: z.array(idSchema),
+  sourceUses: z
+    .array(
+      z.object({ anchorId: idSchema, relation: SourceRelationSchema }),
+    )
+    .max(12)
+    .optional(),
   tags: z.array(nonEmpty("tag", 60)).max(12),
   editorialStatus: EditorialStatusSchema,
 });
@@ -310,6 +409,12 @@ export const PracticeSchema = z.object({
   /** Care note; "" when none. Breath work must note dizziness guidance. */
   safetyNotes: z.string().max(2000),
   sourceIds: z.array(idSchema),
+  sourceUses: z
+    .array(
+      z.object({ anchorId: idSchema, relation: SourceRelationSchema }),
+    )
+    .max(24)
+    .optional(),
   audioIds: z.array(idSchema),
   editorialStatus: EditorialStatusSchema,
 });
@@ -499,6 +604,283 @@ export const SourceSchema = z.object({
 export type Source = z.infer<typeof SourceSchema>;
 
 /* ------------------------------------------------------------------ */
+/* Source editions, passage anchors and contemplative concepts         */
+/* ------------------------------------------------------------------ */
+
+export const SourceEditionSchema = z.object({
+  id: idSchema,
+  sourceId: idSchema,
+  /** Individual work source ids contained by a collection edition. */
+  includedSourceIds: z.array(idSchema).max(128).default([]),
+  label: nonEmpty("edition label", 300),
+  editorOrTranslator: z.string().max(300),
+  publisher: z.string().max(300),
+  publicationYear: z.number().int().min(1).max(2100).nullable(),
+  language: nonEmpty("edition language", 80),
+  rightsStatus: RightsStatusSchema,
+  ocrQuality: OcrQualitySchema,
+  contentFormat: SourceDocumentFormatSchema,
+  /** SHA-256 of the exact private editorial input; no source text is shipped. */
+  contentSha256: z
+    .string()
+    .regex(/^[a-f0-9]{64}$/, "expected a lowercase SHA-256")
+    .nullable(),
+  locatorStrategy: nonEmpty("edition locator strategy", 500),
+  digitalLocator: urlOrEmptySchema,
+  notes: nonEmpty("edition notes", 2000),
+  lastVerified: isoDateSchema,
+});
+export type SourceEdition = z.infer<typeof SourceEditionSchema>;
+
+export const StructuredLocatorSchema = z.object({
+  scheme: LocatorSchemeSchema,
+  /** Native reference or stable canonical node id at the start of the range. */
+  start: nonEmpty("locator start", 500),
+  /** Inclusive end reference when the anchor spans more than one unit. */
+  end: z.string().max(500).optional(),
+  display: nonEmpty("locator display", 500),
+});
+export type StructuredLocator = z.infer<typeof StructuredLocatorSchema>;
+
+export const PassageAnchorSchema = z.object({
+  id: idSchema,
+  sourceId: idSchema,
+  editionId: idSchema,
+  workTitle: nonEmpty("workTitle", 300),
+  sectionTitle: nonEmpty("sectionTitle", 300),
+  locator: nonEmpty("locator", 500),
+  structuredLocator: StructuredLocatorSchema,
+  conceptIds: z.array(idSchema).min(1).max(16),
+  verification: SourceVerificationSchema,
+  notes: nonEmpty("passage anchor notes", 1600),
+});
+export type PassageAnchor = z.infer<typeof PassageAnchorSchema>;
+
+export const SourcePolicyActivationSchema = z.enum(["any", "all"]);
+export type SourcePolicyActivation = z.infer<
+  typeof SourcePolicyActivationSchema
+>;
+
+export const SourceReviewPolicySchema = z.object({
+  id: idSchema,
+  label: nonEmpty("source review policy label", 200),
+  detail: nonEmpty("source review policy detail", 1200),
+  stage: EditorialReviewStageSchema,
+  activation: SourcePolicyActivationSchema,
+  sourceIds: z.array(idSchema).max(24),
+  editionIds: z.array(idSchema).max(24),
+});
+export type SourceReviewPolicy = z.infer<typeof SourceReviewPolicySchema>;
+
+export const CanonicalDocumentNodeKindSchema = z.enum([
+  "collection",
+  "work",
+  "book",
+  "chapter",
+  "section",
+  "paragraph",
+  "verse",
+  "page",
+  "line",
+]);
+export type CanonicalDocumentNodeKind = z.infer<
+  typeof CanonicalDocumentNodeKindSchema
+>;
+
+export const CanonicalDocumentNodeSchema = z.object({
+  id: idSchema,
+  parentId: idSchema.nullable(),
+  kind: CanonicalDocumentNodeKindSchema,
+  ordinal: z.number().int().min(0),
+  label: z.string().max(500),
+  nativeLocator: nonEmpty("native locator", 1000),
+  textSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  /** Present only in the ignored private workbench, never the app registry. */
+  text: z.string().optional(),
+});
+export type CanonicalDocumentNode = z.infer<
+  typeof CanonicalDocumentNodeSchema
+>;
+
+export const CanonicalDocumentSchema = z.object({
+  schemaVersion: z.literal("1.0"),
+  manifestId: idSchema,
+  sourceId: idSchema,
+  editionId: idSchema,
+  format: SourceDocumentFormatSchema,
+  inputSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  nodes: z.array(CanonicalDocumentNodeSchema).min(1),
+  warnings: z.array(z.string().max(1000)),
+});
+export type CanonicalDocument = z.infer<typeof CanonicalDocumentSchema>;
+
+export const SourceIngestionManifestSchema = z.object({
+  schemaVersion: z.literal("1.0"),
+  id: idSchema,
+  sourceId: idSchema,
+  input: z.object({
+    format: SourceDocumentFormatSchema,
+    fileNameHint: nonEmpty("source file name hint", 500),
+    expectedSha256: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .nullable(),
+    encoding: nonEmpty("source encoding", 80).default("utf8"),
+  }),
+  sourceRecords: z.array(SourceSchema).max(128),
+  edition: SourceEditionSchema,
+  workMappings: z
+    .array(
+      z.object({
+        sourceId: idSchema,
+        label: nonEmpty("work mapping label", 300),
+        pathIncludes: z.array(nonEmpty("work mapping path fragment", 500)).min(1),
+      }),
+    )
+    .max(128)
+    .optional(),
+});
+export type SourceIngestionManifest = z.infer<
+  typeof SourceIngestionManifestSchema
+>;
+
+export const ContemplativeApplicationSchema = z.enum([
+  "learn",
+  "prayer",
+  "practice",
+  "reflection",
+  "pathway",
+]);
+export type ContemplativeApplication = z.infer<
+  typeof ContemplativeApplicationSchema
+>;
+
+export const ContemplativeConceptSchema = z.object({
+  id: idSchema,
+  slug: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be kebab-case"),
+  name: nonEmpty("concept name", 160),
+  summary: nonEmpty("concept summary", 800),
+  sourceAnchorIds: z.array(idSchema).min(1).max(24),
+  classification: ClaimClassificationSchema,
+  traditionLabels: z.array(TraditionLabelSchema).min(1),
+  worldviewProfiles: z.array(WorldviewProfileSchema).min(1),
+  safetyTags: z.array(ConceptSafetyTagSchema).min(1),
+  applications: z.array(ContemplativeApplicationSchema).min(1),
+  editorialStatus: EditorialStatusSchema,
+});
+export type ContemplativeConcept = z.infer<
+  typeof ContemplativeConceptSchema
+>;
+
+/* ------------------------------------------------------------------ */
+/* Source-grounded contemplative pathways                              */
+/* ------------------------------------------------------------------ */
+
+export const PathwayActivityTypeSchema = z.enum([
+  "orient",
+  "contemplate",
+  "reflect",
+  "integrate",
+  "serve",
+]);
+export type PathwayActivityType = z.infer<
+  typeof PathwayActivityTypeSchema
+>;
+
+export const PathwaySourceUseSchema = z.object({
+  anchorId: idSchema,
+  relation: SourceRelationSchema,
+});
+export type PathwaySourceUse = z.infer<typeof PathwaySourceUseSchema>;
+
+export const PathwayActivitySchema = z.object({
+  id: idSchema,
+  title: nonEmpty("pathway activity title", 160),
+  activityType: PathwayActivityTypeSchema,
+  minutes: z.number().int().min(1).max(60),
+  purpose: nonEmpty("pathway activity purpose", 500),
+  instructions: z
+    .array(nonEmpty("pathway activity instruction", 800))
+    .min(2)
+    .max(8),
+  reflectionPrompt: nonEmpty("pathway reflection prompt", 600),
+  sourceUses: z.array(PathwaySourceUseSchema).min(1).max(12),
+  safetyNotes: nonEmpty("pathway activity safety notes", 1200),
+});
+export type PathwayActivity = z.infer<typeof PathwayActivitySchema>;
+
+export const PathwayStageSchema = z.object({
+  id: idSchema,
+  title: nonEmpty("pathway stage title", 160),
+  orientation: nonEmpty("pathway stage orientation", 1800),
+  conceptIds: z.array(idSchema).min(1).max(8),
+  activity: PathwayActivitySchema,
+  relatedPracticeSlug: z.string().min(1).max(100).optional(),
+});
+export type PathwayStage = z.infer<typeof PathwayStageSchema>;
+
+export const ContemplativePathwaySchema = z.object({
+  id: idSchema,
+  slug: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be kebab-case"),
+  title: nonEmpty("pathway title", 180),
+  subtitle: nonEmpty("pathway subtitle", 240),
+  summary: nonEmpty("pathway summary", 1000),
+  estimatedMinutes: z.number().int().min(5).max(600),
+  conceptIds: z.array(idSchema).min(2).max(16),
+  sourceIds: z.array(idSchema).min(1).max(24),
+  classification: ClaimClassificationSchema,
+  traditionLabels: z.array(TraditionLabelSchema).min(1),
+  worldviewProfiles: z.array(WorldviewProfileSchema).min(1),
+  stages: z.array(PathwayStageSchema).min(3).max(8),
+  accessibilityNotes: nonEmpty("pathway accessibility notes", 1600),
+  safetyNotes: nonEmpty("pathway safety notes", 1600),
+  editorialStatus: EditorialStatusSchema,
+});
+export type ContemplativePathway = z.infer<
+  typeof ContemplativePathwaySchema
+>;
+
+export const EditorialReviewSchema = z
+  .object({
+    id: idSchema,
+    subjectId: idSchema,
+    status: EditorialStatusSchema,
+    completedStages: z.array(EditorialReviewStageSchema).max(3),
+    reviewer: z.string().max(200),
+    reviewedAt: isoDateSchema.nullable(),
+    notes: z.string().max(2000),
+  })
+  .superRefine((review, ctx) => {
+    if (review.status !== "published") return;
+    const required = EditorialReviewStageSchema.options;
+    for (const stage of required) {
+      if (!review.completedStages.includes(stage)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["completedStages"],
+          message: `published content requires ${stage} review`,
+        });
+      }
+    }
+    if (!review.reviewer || !review.reviewedAt) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["reviewer"],
+        message: "published content requires a reviewer and review date",
+      });
+    }
+  });
+export type EditorialReview = z.infer<typeof EditorialReviewSchema>;
+
+/* ------------------------------------------------------------------ */
 /* Audio item (curated external listening)                              */
 /* ------------------------------------------------------------------ */
 
@@ -589,6 +971,12 @@ export const TeachingSchema = z.object({
   classification: ClaimClassificationSchema,
   relatedCategoryIds: z.array(idSchema).min(1),
   sourceIds: z.array(idSchema).min(1),
+  sourceUses: z
+    .array(
+      z.object({ anchorId: idSchema, relation: SourceRelationSchema }),
+    )
+    .max(24)
+    .optional(),
   furtherReading: z.array(FurtherReadingSchema).max(10),
   tags: z.array(nonEmpty("tag", 60)).max(12),
   editorialStatus: EditorialStatusSchema,
@@ -603,10 +991,42 @@ export const ReflectionPromptSchema = z.object({
   id: idSchema,
   text: nonEmpty("text", 600),
   categoryIds: z.array(idSchema).min(1),
+  sourceUses: z
+    .array(
+      z.object({ anchorId: idSchema, relation: SourceRelationSchema }),
+    )
+    .max(12)
+    .optional(),
   tags: z.array(nonEmpty("tag", 60)).max(12),
   editorialStatus: EditorialStatusSchema,
 });
 export type ReflectionPrompt = z.infer<typeof ReflectionPromptSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Concept lenses for transparent Engine composition                   */
+/* ------------------------------------------------------------------ */
+
+export const ConceptEngineFrameSchema = z.object({
+  id: idSchema,
+  conceptId: idSchema,
+  title: nonEmpty("concept frame title", 160),
+  description: nonEmpty("concept frame description", 600),
+  compatibleWorldviews: z.array(WorldviewProfileSchema).min(1),
+  classification: ClaimClassificationSchema,
+  traditionLabels: z.array(TraditionLabelSchema).min(1),
+  sourceIds: z.array(idSchema).min(1).max(12),
+  sourceUses: z
+    .array(z.object({ anchorId: idSchema, relation: SourceRelationSchema }))
+    .min(1)
+    .max(12),
+  prayerLine: nonEmpty("concept frame prayer line", 1200),
+  affirmation: nonEmpty("concept frame affirmation", 400),
+  practiceStep: nonEmpty("concept frame practice step", 600),
+  reflectionPrompt: nonEmpty("concept frame reflection prompt", 600),
+  safetyNote: nonEmpty("concept frame safety note", 1200),
+  editorialStatus: EditorialStatusSchema,
+});
+export type ConceptEngineFrame = z.infer<typeof ConceptEngineFrameSchema>;
 
 /* ------------------------------------------------------------------ */
 /* On-device Engine request / result                                    */
@@ -657,6 +1077,9 @@ export const EngineRequestSchema = z.object({
   duration: EngineDurationSchema,
   tone: EngineToneSchema,
   languagePreference: EngineLanguagePreferenceSchema,
+  worldviewProfile: WorldviewProfileSchema.default("open-universal"),
+  /** Empty means no source-grounded concept lens. */
+  conceptId: z.string().max(120).default(""),
   avoidances: z.array(nonEmpty("avoidance", 120)).max(20).default([]),
 });
 export type EngineRequest = z.infer<typeof EngineRequestSchema>;
@@ -683,6 +1106,14 @@ export const EngineResultSchema = z.object({
   reflectionPrompts: z.array(nonEmpty("reflection prompt", 600)).max(6),
   closing: z.string().max(2000),
   sourceIds: z.array(idSchema).max(12),
+  sourceUses: z
+    .array(
+      z.object({ anchorId: idSchema, relation: SourceRelationSchema }),
+    )
+    .max(24)
+    .default([]),
+  conceptIds: z.array(idSchema).max(6).default([]),
+  worldviewProfile: WorldviewProfileSchema.default("open-universal"),
   traditionLabels: z.array(TraditionLabelSchema),
   audioRecommendationIds: z.array(idSchema).max(6),
   safetyNote: z.string().max(2000),

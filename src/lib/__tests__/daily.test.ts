@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 import {
   getAnotherItem,
   getDailyAffirmation,
+  getDailyConceptFrame,
   getDailyItem,
   hashString,
   isSuitableForWindow,
@@ -15,6 +16,7 @@ import {
   windowForDate,
 } from "../daily";
 import { getPrayersByCategory } from "../content";
+import { conceptEngineFrames } from "../../data";
 
 const MORNING = new Date("2026-07-18T09:00:00");
 const EVENING = new Date("2026-07-18T21:00:00");
@@ -136,6 +138,46 @@ describe("getDailyAffirmation", () => {
     const second = getDailyAffirmation(MORNING, "courage-and-resilience");
     expect(first?.id).toBe(second?.id);
     expect(first?.categoryIds).toContain("courage-and-resilience");
+  });
+});
+
+describe("getDailyConceptFrame", () => {
+  it("is stable for a local date and explicit worldview", () => {
+    const first = getDailyConceptFrame(
+      "2026-08-26",
+      "open-universal",
+      conceptEngineFrames,
+    );
+    const second = getDailyConceptFrame(
+      "2026-08-26",
+      "open-universal",
+      conceptEngineFrames,
+    );
+    expect(first?.id).toBe(second?.id);
+  });
+
+  it("never returns an incompatible frame", () => {
+    for (const worldview of [
+      "open-universal",
+      "gnostic",
+      "esoteric-christian",
+      "neutral",
+    ] as const) {
+      for (let day = 1; day <= 28; day += 1) {
+        const frame = getDailyConceptFrame(
+          `2026-09-${String(day).padStart(2, "0")}`,
+          worldview,
+          conceptEngineFrames,
+        );
+        expect(frame?.compatibleWorldviews).toContain(worldview);
+      }
+    }
+  });
+
+  it("returns undefined when the supplied shelf has no compatible frame", () => {
+    expect(
+      getDailyConceptFrame("2026-08-26", "neutral", []),
+    ).toBeUndefined();
   });
 });
 

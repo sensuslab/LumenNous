@@ -7,8 +7,13 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint src",
-    "test": "vitest run",
+    "test": "vitest run && node --test scripts/editorial-review-registry.test.mjs scripts/source-ingestion-core.test.mjs",
     "check": "npm run lint && npm test && npm run build",
+    "editorial:check": "vitest run src/lib/__tests__/schemas.test.ts src/lib/__tests__/editorial-workspace.test.ts && node --test scripts/editorial-review-registry.test.mjs",
+    "editorial:ingest": "node scripts/editorial-review-ingest.mjs",
+    "sources:check": "vitest run src/lib/__tests__/schemas.test.ts src/lib/__tests__/source-ingestion.test.ts src/lib/__tests__/source-foundation.test.ts src/lib/__tests__/editorial-workspace.test.ts && node --test scripts/source-ingestion-core.test.mjs",
+    "sources:anchor": "node scripts/source-anchor.mjs",
+    "sources:ingest": "node scripts/source-ingest.mjs",
     "music:import": "node scripts/import-youtube-register.mjs"
   },
   "overrides": {

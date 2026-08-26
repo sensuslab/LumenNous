@@ -35,7 +35,7 @@ const DEFS: Record<string, AffDef[]> = {
   ],
   "gnosis-and-inner-knowing": [
     { text: "Beneath the noise of borrowed opinions, a quiet knowing in me remains.", type: "contemplative", tags: ["inner-knowing"] },
-    { text: "I can trust the still, small voice more than the loud, frightened one.", type: "grounding", tags: ["trust"] },
+    { text: "I can make room for quieter understanding and test it against care, evidence and reality.", type: "grounding", tags: ["trust"] },
     { text: "I am allowed to seek in my own way and arrive in my own time.", type: "contemplative", tags: ["seeking"] },
     { text: "What is true in me recognises what is true around me.", type: "contemplative", tags: ["truth"] },
   ],
@@ -43,7 +43,7 @@ const DEFS: Record<string, AffDef[]> = {
     { text: "I can see my situation honestly without seeing it hopelessly.", type: "grounding", tags: ["honesty"] },
     { text: "I do not need the whole map to take one faithful step.", type: "resilience", tags: ["steps"] },
     { text: "I am allowed to change my mind when truth changes my view.", type: "contemplative", tags: ["humility"] },
-    { text: "The quieter counsel is usually the truer one; I can wait for it.", type: "contemplative", tags: ["patience"] },
+    { text: "Quiet can make room for clarity; I can still check what I believe.", type: "contemplative", tags: ["patience"] },
   ],
   "protection-and-boundaries": [
     { text: "I am allowed to protect my peace without apologising for the boundary.", type: "resilience", tags: ["boundaries"] },

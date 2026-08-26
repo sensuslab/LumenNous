@@ -26,9 +26,9 @@ const DEFS: Record<string, string[]> = {
   ],
   "gnosis-and-inner-knowing": [
     "What do you know, deep down, that you have been pretending not to know?",
-    "Recall a time when quiet intuition proved wiser than loud opinion. What did that knowing feel like?",
+    "Recall a time when quiet reflection helped you notice something useful. What later evidence confirmed or corrected it?",
     "What noise — inner or outer — most often drowns out your deeper knowing?",
-    "If you trusted the still, small voice for one hour today, what might it say?",
+    "If you gave yourself an hour of quiet, what possibilities might you notice — and how could you test them?",
   ],
   "clarity-and-discernment": [
     "What decision are you circling, and what would you advise a dear friend in the same position?",

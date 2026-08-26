@@ -10,11 +10,14 @@ import {
   EngineResultSchema,
   type Affirmation,
   type Category,
+  type ConceptEngineFrame,
   type EngineRequest,
   type EngineResult,
   type Practice,
   type Prayer,
   type ReflectionPrompt,
+  type SourceRelation,
+  type TraditionLabel,
 } from "@/lib/schemas";
 import {
   classifySafety,
@@ -28,6 +31,7 @@ export interface EngineLibrary {
   affirmations: readonly Affirmation[];
   practices: readonly Practice[];
   prompts: readonly ReflectionPrompt[];
+  conceptFrames: readonly ConceptEngineFrame[];
 }
 
 export interface EngineHistory {
@@ -384,6 +388,32 @@ function hash(value: string): string {
   return `ln-${(result >>> 0).toString(36)}`;
 }
 
+function uniqueSourceUses(
+  uses: ReadonlyArray<
+    | { anchorId: string; relation: SourceRelation }
+    | undefined
+  >,
+): Array<{ anchorId: string; relation: SourceRelation }> {
+  const byAnchor = new Map<string, { anchorId: string; relation: SourceRelation }>();
+  for (const use of uses) {
+    if (use && !byAnchor.has(use.anchorId)) byAnchor.set(use.anchorId, use);
+  }
+  return [...byAnchor.values()];
+}
+
+function resultTraditionLabels(
+  prayer: Prayer | undefined,
+  hasSources: boolean,
+  addedLabels: readonly TraditionLabel[] = [],
+): TraditionLabel[] {
+  const base = prayer
+    ? prayer.traditionLabels
+    : hasSources
+      ? ["original-composition", "modern-interpretation"] as TraditionLabel[]
+      : ["original-composition"] as TraditionLabel[];
+  return [...new Set([...base, ...addedLabels])];
+}
+
 function safetyResult(
   request: EngineRequest,
   classification: SafetyClassification,
@@ -408,6 +438,9 @@ function safetyResult(
     reflectionPrompts: [],
     closing,
     sourceIds: [],
+    sourceUses: [],
+    conceptIds: [],
+    worldviewProfile: request.worldviewProfile,
     traditionLabels: [],
     audioRecommendationIds: [],
     safetyNote: "This fixed response is written and reviewed by people. It is not assembled by the Engine.",
@@ -446,8 +479,42 @@ export function composeWithEngine(
   if (!category) throw new Error("The Engine needs at least one active category.");
   if (safety.level !== "none") return safetyResult(request, safety, category, now);
 
+  const conceptFrame =
+    request.outputType !== "combined-practice" && request.conceptId
+      ? library.conceptFrames.find(
+          (frame) => frame.conceptId === request.conceptId,
+        )
+      : undefined;
+  if (request.conceptId && request.outputType !== "combined-practice") {
+    if (!conceptFrame) {
+      throw new Error(`Unknown contemplative concept lens "${request.conceptId}".`);
+    }
+    if (!conceptFrame.compatibleWorldviews.includes(request.worldviewProfile)) {
+      throw new Error(
+        `The selected concept lens is not available for the ${request.worldviewProfile} worldview profile.`,
+      );
+    }
+    if (
+      containsAvoidance(
+        [
+          conceptFrame.title,
+          conceptFrame.description,
+          conceptFrame.prayerLine,
+          conceptFrame.affirmation,
+          conceptFrame.practiceStep,
+          conceptFrame.reflectionPrompt,
+        ].join(" "),
+        request.avoidances,
+      )
+    ) {
+      throw new Error(
+        `The selected concept lens conflicts with a requested avoidance.`,
+      );
+    }
+  }
+
   const history = historyStore.read();
-  const key = `${category.id}:${request.outputType}:${request.duration}:${request.tone}:${request.languagePreference}`;
+  const key = `${category.id}:${request.outputType}:${request.duration}:${request.tone}:${request.languagePreference}:${request.worldviewProfile}:${conceptFrame?.id ?? "open"}`;
   const coherenceSession =
     request.outputType === "combined-practice"
       ? getCoherenceSessionForCategory(category.id)
@@ -570,8 +637,16 @@ export function composeWithEngine(
       ...(affirmation?.sourceIds ?? []),
       ...(practice?.sourceIds ?? []),
       ...(coherenceSession?.sourceIds ?? []),
+      ...(conceptFrame?.sourceIds ?? []),
     ]),
   ];
+  const sourceUses = uniqueSourceUses([
+    ...(prayer?.sourceUses ?? []),
+    ...(affirmation?.sourceUses ?? []),
+    ...(practice?.sourceUses ?? []),
+    ...(prompt?.sourceUses ?? []),
+    ...(conceptFrame?.sourceUses ?? []),
+  ]);
   const cycle = Math.max(
     prayerPick.cycle,
     affirmationPick.cycle,
@@ -600,6 +675,7 @@ export function composeWithEngine(
   const userFacingSafetyNote = [practiceSafetyNote, coherenceSafetyNote]
     .filter((note) => /[.!?]$/.test(note))
     .join(" ");
+  const conceptSafetyNote = conceptFrame?.safetyNote.trim() ?? "";
 
   return EngineResultSchema.parse({
     title,
@@ -612,8 +688,14 @@ export function composeWithEngine(
         : request.outputType === "meditation"
         ? practice?.preparation ?? "Arrive as you are."
         : prayer?.opening ?? "A line to carry into this moment.",
-    prayer: prayer?.body ?? "",
-    affirmation: affirmation?.text ?? "",
+    prayer:
+      conceptFrame && request.outputType === "prayer"
+        ? [conceptFrame.prayerLine, prayer?.body ?? ""].filter(Boolean).join("\n\n")
+        : prayer?.body ?? "",
+    affirmation:
+      conceptFrame && request.outputType === "affirmation"
+        ? conceptFrame.affirmation
+        : affirmation?.text ?? "",
     practiceDuration,
     practiceSteps: coherenceSession
       ? coherenceSession.stages.map((stage) =>
@@ -621,9 +703,19 @@ export function composeWithEngine(
             ? GROUNDING_REGULATION_INSTRUCTION
             : stage.instruction,
         )
-      : practice?.steps.map((step) => step.instruction) ??
-        (request.outputType === "prayer" ? prayer?.practiceSteps ?? [] : []),
-    reflectionPrompts: prompt ? [prompt.text] : [],
+      : [
+          ...(conceptFrame && request.outputType === "meditation"
+            ? [conceptFrame.practiceStep]
+            : []),
+          ...(practice?.steps.map((step) => step.instruction) ??
+            (request.outputType === "prayer" ? prayer?.practiceSteps ?? [] : [])),
+        ],
+    reflectionPrompts: [
+      ...(conceptFrame && request.outputType !== "affirmation"
+        ? [conceptFrame.reflectionPrompt]
+        : []),
+      ...(prompt ? [prompt.text] : []),
+    ],
     closing:
       coherenceSession
         ? coherenceSession.closing
@@ -632,7 +724,14 @@ export function composeWithEngine(
         : prayer?.closing ??
           "Read it slowly, and keep only what feels honest.",
     sourceIds,
-    traditionLabels: prayer?.traditionLabels ?? [],
+    sourceUses,
+    conceptIds: conceptFrame ? [conceptFrame.conceptId] : [],
+    worldviewProfile: request.worldviewProfile,
+    traditionLabels: resultTraditionLabels(
+      prayer,
+      sourceIds.length > 0,
+      conceptFrame?.traditionLabels ?? [],
+    ),
     audioRecommendationIds: [
       ...new Set([
         ...(prayer?.audioIds ?? []),
@@ -640,7 +739,9 @@ export function composeWithEngine(
         ...(coherenceSession?.audioTrackIds ?? []),
       ]),
     ],
-    safetyNote: userFacingSafetyNote,
+    safetyNote: [userFacingSafetyNote, conceptSafetyNote]
+      .filter(Boolean)
+      .join(" "),
     safetyLevel: "none",
     assembledAt: now().toISOString(),
     fingerprint,

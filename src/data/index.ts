@@ -15,17 +15,29 @@ import {
   AffirmationSchema,
   AudioItemSchema,
   CategorySchema,
+  ConceptEngineFrameSchema,
+  ContemplativePathwaySchema,
+  ContemplativeConceptSchema,
+  EditorialReviewSchema,
+  PassageAnchorSchema,
   PlaylistSchema,
   PracticeSchema,
   PrayerSchema,
   QuantumPrayerMethodSchema,
   ReflectionPromptSchema,
   SessionTemplateSchema,
+  SourceEditionSchema,
+  SourceReviewPolicySchema,
   SourceSchema,
   TeachingSchema,
   type Affirmation,
   type AudioItem,
   type Category,
+  type ConceptEngineFrame,
+  type ContemplativePathway,
+  type ContemplativeConcept,
+  type EditorialReview,
+  type PassageAnchor,
   type Playlist,
   type Practice,
   type Prayer,
@@ -33,6 +45,8 @@ import {
   type ReflectionPrompt,
   type SessionTemplate,
   type Source,
+  type SourceEdition,
+  type SourceReviewPolicy,
   type Teaching,
 } from "../lib/schemas";
 
@@ -47,6 +61,15 @@ import { playlists } from "./playlists";
 import { teachings } from "./teachings";
 import { quantumPrayerMethod } from "./quantum-prayer-method";
 import { sessionTemplates } from "./session-templates";
+import { contemplativePathways } from "./pathways";
+import { conceptEngineFrames } from "./concept-engine-frames";
+import {
+  contemplativeConcepts,
+  editorialReviews,
+  passageAnchors,
+  sourceReviewPolicies,
+  sourceEditions,
+} from "./source-foundation";
 
 export { categories } from "./categories";
 export { prayers, prayerById } from "./prayers";
@@ -67,6 +90,27 @@ export {
   sessionBySlug,
   sessionByVariant,
 } from "./session-templates";
+export {
+  contemplativeConcepts,
+  contemplativeConceptById,
+  contemplativeConceptBySlug,
+  editorialReviews,
+  passageAnchors,
+  passageAnchorById,
+  sourceEditions,
+  sourceEditionById,
+  sourceReviewPolicies,
+  sourceReviewPolicyById,
+} from "./source-foundation";
+export {
+  contemplativePathways,
+  contemplativePathwayById,
+  contemplativePathwayBySlug,
+} from "./pathways";
+export {
+  conceptEngineFrames,
+  conceptEngineFrameByConceptId,
+} from "./concept-engine-frames";
 
 /* ------------------------------------------------------------------ */
 /* Validation                                                          */
@@ -86,6 +130,13 @@ export interface ContentValidationReport {
     playlists: number;
     teachings: number;
     sessions: number;
+    sourceEditions: number;
+    sourceReviewPolicies: number;
+    passageAnchors: number;
+    contemplativeConcepts: number;
+    editorialReviews: number;
+    contemplativePathways: number;
+    conceptEngineFrames: number;
   };
 }
 
@@ -162,16 +213,41 @@ export function validateContent(): ContentValidationReport {
   const parsedSessions = SessionTemplateSchema.array().parse(
     sessionTemplates,
   ) as SessionTemplate[];
+  const parsedEditions = SourceEditionSchema.array().parse(
+    sourceEditions,
+  ) as SourceEdition[];
+  const parsedSourceReviewPolicies = SourceReviewPolicySchema.array().parse(
+    sourceReviewPolicies,
+  ) as SourceReviewPolicy[];
+  const parsedAnchors = PassageAnchorSchema.array().parse(
+    passageAnchors,
+  ) as PassageAnchor[];
+  const parsedConcepts = ContemplativeConceptSchema.array().parse(
+    contemplativeConcepts,
+  ) as ContemplativeConcept[];
+  const parsedReviews = EditorialReviewSchema.array().parse(
+    editorialReviews,
+  ) as EditorialReview[];
+  const parsedPathways = ContemplativePathwaySchema.array().parse(
+    contemplativePathways,
+  ) as ContemplativePathway[];
+  const parsedConceptFrames = ConceptEngineFrameSchema.array().parse(
+    conceptEngineFrames,
+  ) as ConceptEngineFrame[];
 
   const categoryIds = new Set(parsedCategories.map((c) => c.id));
   const prayerIds = new Set(parsedPrayers.map((p) => p.id));
   const promptIds = new Set(parsedPrompts.map((p) => p.id));
   const sourceIds = new Set(parsedSources.map((s) => s.id));
+  const sourceEditionIds = new Set(parsedEditions.map((edition) => edition.id));
+  const passageAnchorIds = new Set(parsedAnchors.map((anchor) => anchor.id));
+  const conceptIds = new Set(parsedConcepts.map((concept) => concept.id));
   const audioIds = new Set(parsedAudio.map((a) => a.id));
   const practiceSlugs = parsedPractices.map((p) => p.slug);
   const playlistSlugs = parsedPlaylists.map((p) => p.slug);
   const teachingSlugs = parsedTeachings.map((t) => t.slug);
   const sessionSlugs = parsedSessions.map((session) => session.slug);
+  const pathwaySlugs = parsedPathways.map((pathway) => pathway.slug);
 
   // 2. Unique ids and slugs.
   checkUnique(errors, "categories", parsedCategories.map((c) => c.id));
@@ -189,6 +265,30 @@ export function validateContent(): ContentValidationReport {
   checkUnique(errors, "teaching slugs", teachingSlugs);
   checkUnique(errors, "sessions", parsedSessions.map((session) => session.id));
   checkUnique(errors, "session slugs", sessionSlugs);
+  checkUnique(errors, "source editions", parsedEditions.map((edition) => edition.id));
+  checkUnique(
+    errors,
+    "source review policies",
+    parsedSourceReviewPolicies.map((policy) => policy.id),
+  );
+  checkUnique(errors, "passage anchors", parsedAnchors.map((anchor) => anchor.id));
+  checkUnique(errors, "contemplative concepts", parsedConcepts.map((concept) => concept.id));
+  checkUnique(errors, "concept slugs", parsedConcepts.map((concept) => concept.slug));
+  checkUnique(errors, "editorial reviews", parsedReviews.map((review) => review.id));
+  checkUnique(errors, "contemplative pathways", parsedPathways.map((pathway) => pathway.id));
+  checkUnique(errors, "pathway slugs", pathwaySlugs);
+  checkUnique(errors, "concept engine frames", parsedConceptFrames.map((frame) => frame.id));
+  checkUnique(errors, "concept engine frame conceptIds", parsedConceptFrames.map((frame) => frame.conceptId));
+  checkUnique(
+    errors,
+    "pathway stages",
+    parsedPathways.flatMap((pathway) => pathway.stages.map((stage) => stage.id)),
+  );
+  checkUnique(
+    errors,
+    "pathway activities",
+    parsedPathways.flatMap((pathway) => pathway.stages.map((stage) => stage.activity.id)),
+  );
 
   // 3. Referential integrity.
   for (const category of parsedCategories) {
@@ -245,6 +345,216 @@ export function validateContent(): ContentValidationReport {
       sourceIds,
     );
   }
+  for (const edition of parsedEditions) {
+    checkRefs(errors, "source edition", edition.id, "sourceId", [edition.sourceId], sourceIds);
+    checkRefs(
+      errors,
+      "source edition",
+      edition.id,
+      "includedSourceIds",
+      edition.includedSourceIds,
+      sourceIds,
+    );
+  }
+  for (const policy of parsedSourceReviewPolicies) {
+    if (policy.sourceIds.length === 0 && policy.editionIds.length === 0) {
+      errors.push(
+        `source review policy "${policy.id}": must scope at least one source or edition`,
+      );
+    }
+    checkRefs(
+      errors,
+      "source review policy",
+      policy.id,
+      "sourceIds",
+      policy.sourceIds,
+      sourceIds,
+    );
+    checkRefs(
+      errors,
+      "source review policy",
+      policy.id,
+      "editionIds",
+      policy.editionIds,
+      sourceEditionIds,
+    );
+  }
+  for (const anchor of parsedAnchors) {
+    checkRefs(errors, "passage anchor", anchor.id, "sourceId", [anchor.sourceId], sourceIds);
+    checkRefs(
+      errors,
+      "passage anchor",
+      anchor.id,
+      "editionId",
+      [anchor.editionId],
+      sourceEditionIds,
+    );
+    checkRefs(errors, "passage anchor", anchor.id, "conceptIds", anchor.conceptIds, conceptIds);
+    const edition = parsedEditions.find((item) => item.id === anchor.editionId);
+    if (
+      edition &&
+      edition.sourceId !== anchor.sourceId &&
+      !edition.includedSourceIds.includes(anchor.sourceId)
+    ) {
+      errors.push(
+        `passage anchor "${anchor.id}": sourceId does not match edition "${edition.id}"`,
+      );
+    }
+  }
+  for (const concept of parsedConcepts) {
+    checkRefs(
+      errors,
+      "contemplative concept",
+      concept.id,
+      "sourceAnchorIds",
+      concept.sourceAnchorIds,
+      passageAnchorIds,
+    );
+  }
+  for (const pathway of parsedPathways) {
+    checkRefs(
+      errors,
+      "contemplative pathway",
+      pathway.id,
+      "conceptIds",
+      pathway.conceptIds,
+      conceptIds,
+    );
+    checkRefs(
+      errors,
+      "contemplative pathway",
+      pathway.id,
+      "sourceIds",
+      pathway.sourceIds,
+      sourceIds,
+    );
+    for (const stage of pathway.stages) {
+      checkRefs(
+        errors,
+        "pathway stage",
+        stage.id,
+        "conceptIds",
+        stage.conceptIds,
+        conceptIds,
+      );
+      for (const conceptId of stage.conceptIds) {
+        if (!pathway.conceptIds.includes(conceptId)) {
+          errors.push(
+            `pathway stage "${stage.id}": conceptId "${conceptId}" is not declared by pathway "${pathway.id}"`,
+          );
+        }
+      }
+      if (
+        stage.relatedPracticeSlug &&
+        !practiceSlugs.includes(stage.relatedPracticeSlug)
+      ) {
+        errors.push(
+          `pathway stage "${stage.id}": unknown relatedPracticeSlug "${stage.relatedPracticeSlug}"`,
+        );
+      }
+      checkRefs(
+        errors,
+        "pathway activity",
+        stage.activity.id,
+        "sourceUses.anchorId",
+        stage.activity.sourceUses.map((use) => use.anchorId),
+        passageAnchorIds,
+      );
+      for (const use of stage.activity.sourceUses) {
+        const anchor = parsedAnchors.find((item) => item.id === use.anchorId);
+        if (anchor && !pathway.sourceIds.includes(anchor.sourceId)) {
+          errors.push(
+            `contemplative pathway "${pathway.id}": activity anchor "${anchor.id}" requires sourceId "${anchor.sourceId}"`,
+          );
+        }
+      }
+    }
+    const activityMinutes = pathway.stages.reduce(
+      (total, stage) => total + stage.activity.minutes,
+      0,
+    );
+    if (activityMinutes !== pathway.estimatedMinutes) {
+      errors.push(
+        `contemplative pathway "${pathway.id}": estimatedMinutes is ${pathway.estimatedMinutes}, but activities total ${activityMinutes}`,
+      );
+    }
+  }
+  for (const frame of parsedConceptFrames) {
+    checkRefs(
+      errors,
+      "concept engine frame",
+      frame.id,
+      "conceptId",
+      [frame.conceptId],
+      conceptIds,
+    );
+    checkRefs(
+      errors,
+      "concept engine frame",
+      frame.id,
+      "sourceIds",
+      frame.sourceIds,
+      sourceIds,
+    );
+    checkRefs(
+      errors,
+      "concept engine frame",
+      frame.id,
+      "sourceUses.anchorId",
+      frame.sourceUses.map((use) => use.anchorId),
+      passageAnchorIds,
+    );
+    for (const use of frame.sourceUses) {
+      const anchor = parsedAnchors.find((item) => item.id === use.anchorId);
+      if (anchor && !frame.sourceIds.includes(anchor.sourceId)) {
+        errors.push(
+          `concept engine frame "${frame.id}": anchor "${anchor.id}" requires sourceId "${anchor.sourceId}"`,
+        );
+      }
+      if (
+        anchor &&
+        use.relation !== "comparative-context" &&
+        !anchor.conceptIds.includes(frame.conceptId)
+      ) {
+        errors.push(
+          `concept engine frame "${frame.id}": anchor "${anchor.id}" is not mapped to conceptId "${frame.conceptId}"`,
+        );
+      }
+    }
+  }
+
+  const sourceUses: Array<{
+    kind: string;
+    id: string;
+    uses: Array<{ anchorId: string }>;
+    sourceIds: readonly string[] | null;
+  }> = [
+    ...parsedPrayers.map((record) => ({ kind: "prayer", id: record.id, uses: record.sourceUses ?? [], sourceIds: record.sourceIds })),
+    ...parsedAffirmations.map((record) => ({ kind: "affirmation", id: record.id, uses: record.sourceUses ?? [], sourceIds: record.sourceIds })),
+    ...parsedPractices.map((record) => ({ kind: "practice", id: record.id, uses: record.sourceUses ?? [], sourceIds: record.sourceIds })),
+    ...parsedPrompts.map((record) => ({ kind: "reflection prompt", id: record.id, uses: record.sourceUses ?? [], sourceIds: null })),
+    ...parsedTeachings.map((record) => ({ kind: "teaching", id: record.id, uses: record.sourceUses ?? [], sourceIds: record.sourceIds })),
+  ];
+  for (const record of sourceUses) {
+    checkRefs(
+      errors,
+      record.kind,
+      record.id,
+      "sourceUses.anchorId",
+      record.uses.map((use) => use.anchorId),
+      passageAnchorIds,
+    );
+    if (record.sourceIds) {
+      for (const use of record.uses) {
+        const anchor = parsedAnchors.find((item) => item.id === use.anchorId);
+        if (anchor && !record.sourceIds.includes(anchor.sourceId)) {
+          errors.push(
+            `${record.kind} "${record.id}": sourceUses anchor "${anchor.id}" requires sourceId "${anchor.sourceId}"`,
+          );
+        }
+      }
+    }
+  }
 
   // 4. Per-category minimums (seed library standard).
   for (const category of parsedCategories) {
@@ -276,7 +586,7 @@ export function validateContent(): ContentValidationReport {
     }
   }
 
-  // 6. Teaching length (250–450 words) and all-draft seed policy.
+  // 6. Teaching length (250–450 words) and publication-review policy.
   for (const teaching of parsedTeachings) {
     const words = wordCount(teaching.body);
     if (words < 250 || words > 450) {
@@ -292,11 +602,36 @@ export function validateContent(): ContentValidationReport {
     ...parsedPlaylists.map((r) => ({ kind: "playlist", id: r.id, status: r.editorialStatus })),
     ...parsedTeachings.map((r) => ({ kind: "teaching", id: r.id, status: r.editorialStatus })),
     ...parsedSessions.map((r) => ({ kind: "session", id: r.id, status: r.editorialStatus })),
+    ...parsedPathways.map((r) => ({ kind: "contemplative pathway", id: r.id, status: r.editorialStatus })),
+    ...parsedConceptFrames.map((r) => ({ kind: "concept engine frame", id: r.id, status: r.editorialStatus })),
   ];
-  for (const record of allRecords) {
-    if (record.status !== "draft") {
+  const reviewsBySubject = new Map(
+    parsedReviews.map((review) => [review.subjectId, review]),
+  );
+  const reviewableSubjectIds = new Set([
+    ...allRecords.map((record) => record.id),
+    ...parsedConcepts.map((record) => record.id),
+  ]);
+  for (const review of parsedReviews) {
+    if (!reviewableSubjectIds.has(review.subjectId)) {
       errors.push(
-        `${record.kind} "${record.id}": seed content must be editorialStatus "draft" pending review (got "${record.status}")`,
+        `editorial review "${review.id}": unknown subjectId "${review.subjectId}"`,
+      );
+    }
+  }
+  for (const record of [
+    ...allRecords,
+    ...parsedConcepts.map((record) => ({
+      kind: "contemplative concept",
+      id: record.id,
+      status: record.editorialStatus,
+    })),
+  ]) {
+    if (record.status !== "published") continue;
+    const review = reviewsBySubject.get(record.id);
+    if (!review || review.status !== "published") {
+      errors.push(
+        `${record.kind} "${record.id}": published content requires a completed editorial review record`,
       );
     }
   }
@@ -315,6 +650,13 @@ export function validateContent(): ContentValidationReport {
       playlists: parsedPlaylists.length,
       teachings: parsedTeachings.length,
       sessions: parsedSessions.length,
+      sourceEditions: parsedEditions.length,
+      sourceReviewPolicies: parsedSourceReviewPolicies.length,
+      passageAnchors: parsedAnchors.length,
+      contemplativeConcepts: parsedConcepts.length,
+      editorialReviews: parsedReviews.length,
+      contemplativePathways: parsedPathways.length,
+      conceptEngineFrames: parsedConceptFrames.length,
     },
   };
 

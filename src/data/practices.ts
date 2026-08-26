@@ -12,6 +12,7 @@ import {
   type Practice,
   type PracticeStep,
   type PracticeType,
+  type SourceRelation,
 } from "../lib/schemas";
 import {
   corpusSeedPractices,
@@ -29,6 +30,7 @@ interface PracticeDef {
   accessibilityNotes: string;
   safetyNotes: string;
   sourceIds: string[];
+  sourceUses?: Array<{ anchorId: string; relation: SourceRelation }>;
 }
 
 /** categoryId -> two practices (ids generated deterministically). */
@@ -117,13 +119,16 @@ const DEFS: Record<string, PracticeDef[]> = {
       steps: [
         { title: "Settle", instruction: "Breathe slowly until the body is quieter than the mind.", seconds: 90 },
         { title: "Ask", instruction: "Pose your question inwardly once, clearly — then let it go.", seconds: 60 },
-        { title: "Listen", instruction: "Rest in open attention. Do not manufacture answers; notice what quietly surfaces.", seconds: 240 },
-        { title: "Receive", instruction: "Name what arose — an image, a word, a shift — without judging it final.", seconds: 60 },
+        { title: "Listen", instruction: "Rest in open attention. Notice thoughts, images or shifts as material for reflection, not as instructions.", seconds: 240 },
+        { title: "Examine", instruction: "Name what arose without judging it final, then ask how it could be tested in ordinary life.", seconds: 60 },
       ],
-      closing: "Thank the quiet for whatever it gave, including the unanswered parts.",
+      closing: "Return with one possibility to examine in ordinary life. An unanswered question is complete.",
       accessibilityNotes: "No writing required; the question may be held silently throughout.",
       safetyNotes: "",
       sourceIds: ["src-gospel-of-thomas"],
+      sourceUses: [
+        { anchorId: "anc-thomas-inner-outer", relation: "inspired-by" },
+      ],
     },
     {
       slug: "inner-lamp-meditation",
@@ -141,6 +146,9 @@ const DEFS: Record<string, PracticeDef[]> = {
       accessibilityNotes: "If images are unhelpful, rest attention on the physical warmth or rise of the breath instead.",
       safetyNotes: "",
       sourceIds: ["src-gospel-of-thomas"],
+      sourceUses: [
+        { anchorId: "anc-thomas-inner-light", relation: "inspired-by" },
+      ],
     },
   ],
   "clarity-and-discernment": [
@@ -154,7 +162,7 @@ const DEFS: Record<string, PracticeDef[]> = {
         { title: "Hold", instruction: "Hold the situation in mind like a glass of stirred water. Do not stir further.", seconds: 60 },
         { title: "Breathe", instruction: "Breathe slowly, letting the water of the mind settle at its own pace.", seconds: 180 },
         { title: "Notice", instruction: "As things settle, notice what becomes visible: a motive, a fear, a simple fact.", seconds: 120 },
-        { title: "Name the step", instruction: "Let one honest next step surface. Small and clear beats grand and foggy.", seconds: 60 },
+        { title: "Name the step", instruction: "Choose one small next step supported by what you know. Small and clear beats grand and foggy.", seconds: 60 },
       ],
       closing: "Thank yourself for the patience of settling; take the one step when you leave.",
       accessibilityNotes: "Fully text-guided; the 'water' image is optional — stillness alone works.",
@@ -852,6 +860,7 @@ function buildPractices(): Practice[] {
         accessibilityNotes: def.accessibilityNotes,
         safetyNotes: def.safetyNotes,
         sourceIds: def.sourceIds,
+        sourceUses: def.sourceUses,
         audioIds: [],
         editorialStatus: "draft",
       };

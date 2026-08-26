@@ -31,7 +31,7 @@ import {
 export const metadata: Metadata = {
   title: "PrayerEngine",
   description:
-    "PrayerEngine is the on-device composition engine behind LumenNous Create: it classifies a stated need, applies safety routing, filters reviewed library material and assembles a structured practice — with no account, no server and no request text stored.",
+    "PrayerEngine is the on-device composition engine behind LumenNous Create: it classifies a stated need, applies safety routing, filters human-authored editorial material and assembles a structured practice — with no account, no server and no request text stored.",
 };
 
 function ProseH2({ id, children }: { id?: string; children: ReactNode }): JSX.Element {
@@ -65,16 +65,21 @@ const PIPELINE: ReadonlyArray<{ n: string; title: string; body: string }> = [
   },
   {
     n: "05",
+    title: "Apply an optional concept lens",
+    body: "If you choose one, the Engine adds a bounded editorial fragment with declared worldview compatibility, passage anchors and its own safety note. A lens outside the chosen worldview or in conflict with an avoidance fails closed.",
+  },
+  {
+    n: "06",
     title: "Draw without repeating",
     body: "Each context keeps its own shuffle bag. Every compatible item is used once before the bag refills, and a refill can never open with the item you just received.",
   },
   {
-    n: "06",
+    n: "07",
     title: "Assemble and re-validate",
     body: "Prayer, affirmation, practice steps and a reflection prompt are composed into one recipe, which is validated again before it reaches the screen. Coherence output keeps its reviewed five-stage order and fixed three-minute core.",
   },
   {
-    n: "07",
+    n: "08",
     title: "Remember almost nothing",
     body: "Only content IDs, cycle counters and short result fingerprints are written to this browser. The words you typed are never stored, never sent anywhere by the local engine, and never used to build a profile.",
   },
@@ -97,6 +102,14 @@ const CONTROLS: ReadonlyArray<{ label: string; options: string[] }> = [
     label: "Language",
     options: ["Creator", "Source", "Divine", "Gnostic terms", "Neutral"],
   },
+  {
+    label: "Worldview profile",
+    options: ["Open / universal", "Gnostic", "Esoteric Christian", "Neutral"],
+  },
+  {
+    label: "Concept lens",
+    options: ["Open", "Fullness", "Inner light", "Integration", "Purpose", "More"],
+  },
 ];
 
 export default function PrayerEnginePage(): JSX.Element {
@@ -109,7 +122,7 @@ export default function PrayerEnginePage(): JSX.Element {
 
   const stats: ReadonlyArray<{ value: string; label: string }> = [
     { value: String(categoryCount), label: "active intentions" },
-    { value: String(prayerCount), label: "reviewed prayers" },
+    { value: String(prayerCount), label: "editorial prayers" },
     { value: String(affirmationCount), label: "affirmations" },
     { value: String(practiceCount), label: "guided practices" },
     { value: String(promptCount), label: "reflection prompts" },
@@ -134,7 +147,7 @@ export default function PrayerEnginePage(): JSX.Element {
           <p className="t-body mx-auto mt-6 max-w-[54ch] text-ink-muted">
             PrayerEngine is the composition layer inside LumenNous. It turns a
             plainly stated need into a small, structured practice — assembled
-            from reviewed material, on your device, in the time it takes to
+            from human-authored material, on your device, in the time it takes to
             press a button.
           </p>
           <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
@@ -169,7 +182,8 @@ export default function PrayerEnginePage(): JSX.Element {
               <p className="t-eyebrow text-gold">It does</p>
               <ul className="t-body-sm mt-4 space-y-3 text-ink-muted">
                 <li>Classify a need against a researched taxonomy of intentions.</li>
-                <li>Assemble prayers, affirmations, practices and prompts that were written and reviewed by people.</li>
+                <li>Assemble human-authored prayers, affirmations, practices and prompts whose draft or review state remains visible.</li>
+                <li>Add an optional source-grounded concept lens with explicit worldview and safety boundaries.</li>
                 <li>Respect tone, language, length and the things you asked it to avoid.</li>
                 <li>Run locally, offline, in under a second.</li>
               </ul>
@@ -192,7 +206,7 @@ export default function PrayerEnginePage(): JSX.Element {
         <section aria-labelledby="how-it-works" className="mt-16 scroll-mt-24">
           <ProseH2 id="how-it-works">How a request becomes a practice</ProseH2>
           <p className="t-body mt-4 max-w-[62ch] text-ink-muted">
-            Seven steps, all of them synchronous and all of them in your
+            Eight steps, all of them synchronous and all of them in your
             browser.
           </p>
           <ol className="mt-8 space-y-8">
@@ -316,7 +330,7 @@ export default function PrayerEnginePage(): JSX.Element {
           <ProseH2 id="library">What it draws from</ProseH2>
           <p className="t-body mt-4 max-w-[62ch] text-ink-muted">
             Nothing is invented at request time. The engine only arranges
-            material that already exists in the reviewed library, where every
+            material that already exists in the editorial library, where every
             item carries its classification — historical text, modern
             interpretation, practitioner tradition, research or LumenNous
             editorial — and its sources.

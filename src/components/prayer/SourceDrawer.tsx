@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState, type JSX } from "react";
-import type { Source } from "@/lib/schemas";
+import type { PassageAnchor, Source } from "@/lib/schemas";
 import { classificationChip } from "./SourceBadge";
 import { Icon } from "@/components/ui/Icon";
 
@@ -13,10 +13,12 @@ import { Icon } from "@/components/ui/Icon";
 
 export function SourceDrawer({
   sources,
+  anchors = [],
   heading = "Sources and further reading",
   className = "",
 }: {
   sources: readonly Source[];
+  anchors?: readonly PassageAnchor[];
   heading?: string;
   className?: string;
 }): JSX.Element | null {
@@ -47,6 +49,9 @@ export function SourceDrawer({
         <ul id={panelId} className="mt-2 space-y-3 border-l border-line-subtle pl-4">
           {sources.map((source) => {
             const chip = classificationChip(source.claimClassification);
+            const sourceAnchors = anchors.filter(
+              (anchor) => anchor.sourceId === source.id,
+            );
             return (
               <li key={source.id} className="t-body-sm text-ink-muted">
                 <span className="t-meta mr-2 inline-block rounded-xs border border-line-subtle px-1.5 py-0.5 uppercase text-ink-faint">
@@ -58,6 +63,25 @@ export function SourceDrawer({
                 <span className="block text-ink-faint">{chip.text}</span>
                 {source.citation ? (
                   <span className="block text-ink-faint">{source.citation}</span>
+                ) : null}
+                {sourceAnchors.length > 0 ? (
+                  <ul
+                    aria-label={`Passage map for ${source.title}`}
+                    className="mt-2 space-y-2 rounded-sm border border-line-subtle bg-[rgba(255,255,255,0.018)] p-3"
+                  >
+                    {sourceAnchors.map((anchor) => (
+                      <li key={anchor.id}>
+                        <span className="t-meta block uppercase tracking-wider text-violet">
+                          Passage map · {anchor.verification.replaceAll("-", " ")}
+                        </span>
+                        <span className="mt-0.5 block text-ink">
+                          {anchor.workTitle} — {anchor.sectionTitle}
+                        </span>
+                        <span className="block text-ink-faint">{anchor.locator}</span>
+                        <span className="mt-1 block text-ink-muted">{anchor.notes}</span>
+                      </li>
+                    ))}
+                  </ul>
                 ) : null}
                 {source.url ? (
                   <a

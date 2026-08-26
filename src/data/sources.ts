@@ -15,6 +15,7 @@
  */
 
 import { SourceSchema, type Source } from "../lib/schemas";
+import ingestedSourceRecords from "./ingested-sources.json";
 
 const raw: Source[] = [
   {
@@ -109,6 +110,134 @@ const raw: Source[] = [
       "The Thunder, Perfect Mind. Coptic text from Nag Hammadi Codex VI. A paradoxical poetic self-disclosure of a feminine divine figure, echoing earlier Isis aretalogies.",
     copyrightNotes: "Reference only.",
     lastVerified: "2026-07-18",
+  },
+  {
+    id: "src-gospel-of-truth",
+    title: "The Gospel of Truth (Nag Hammadi Codices I and XII)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Valentinian Christian / Gnostic tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "The Gospel of Truth. Coptic witnesses in Nag Hammadi Codices I and XII; translated in Robinson, ed., The Nag Hammadi Library in English. A meditation on knowledge, error, belonging, fullness and rest.",
+    copyrightNotes:
+      "Translation rights remain with the translators and publisher; use passage anchors for reference and write original adaptations.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-exegesis-on-soul",
+    title: "The Exegesis on the Soul (Nag Hammadi Codex II)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Early Christian / Gnostic soul tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "The Exegesis on the Soul. Nag Hammadi Codex II,6. A symbolic account of descent, dispersion, reorientation and return.",
+    copyrightNotes:
+      "Reference the tractate; do not reproduce the modern English translation at length.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-authoritative-teaching",
+    title: "Authoritative Teaching (Nag Hammadi Codex VI)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Gnostic / philosophical soul tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "Authoritative Teaching. Nag Hammadi Codex VI,3. Uses the image of the word as medicine for perception and knowledge of the soul's root.",
+    copyrightNotes:
+      "Reference only; product language should be original paraphrase or clearly labelled interpretation.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-discourse-eighth-ninth",
+    title: "The Discourse on the Eighth and Ninth (Nag Hammadi Codex VI)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Hermetic tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "The Discourse on the Eighth and Ninth. Nag Hammadi Codex VI,6. A Hermetic dialogue of prayer, silence, hymn and ascent.",
+    copyrightNotes:
+      "Translation rights retained by the translator/publisher; cite and adapt rather than reproduce.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-prayer-thanksgiving",
+    title: "The Prayer of Thanksgiving (Nag Hammadi Codex VI)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Hermetic thanksgiving tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "The Prayer of Thanksgiving. Nag Hammadi Codex VI,7. A communal prayer centred on mind, speech, knowledge and preservation in embodied life.",
+    copyrightNotes:
+      "Reference only; use the prayer's movement as a structure for original composition.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-teachings-silvanus",
+    title: "The Teachings of Silvanus (Nag Hammadi Codex VII)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Early Christian wisdom teaching",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "The Teachings of Silvanus. Nag Hammadi Codex VII,4. Moral and contemplative instruction on mind, reason, discipline and self-knowledge.",
+    copyrightNotes:
+      "Reference only; avoid reproducing extended translated passages.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-nag-hammadi-melchizedek",
+    title: "Melchizedek (Nag Hammadi Codex IX)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Early Christian / Gnostic revelatory tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "Melchizedek. Nag Hammadi Codex IX,1. A highly fragmentary revelatory and priestly tractate; it must not be collapsed into later esoteric interpretations of Melchizedek.",
+    copyrightNotes:
+      "The tractate is fragmentary and the modern translation is copyrighted; reference only.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-grumbine-melchizedek",
+    title: "Melchizedek; or, The Secret Doctrine of the Bible",
+    author: "J. C. F. C. Grumbine",
+    institution: "The Order of the White Rose",
+    year: 1919,
+    sourceType: "modern-spiritual",
+    tradition: "Christian esotericism / mysticism",
+    claimClassification: "modern-interpretation",
+    url: "",
+    citation:
+      "Grumbine, J. C. F. C. Melchizedek; or, The Secret Doctrine of the Bible. Boston: The Order of the White Rose, 1919.",
+    copyrightNotes:
+      "The supplied EPUB is an OCR scan with variable accuracy. Confirm rights by release jurisdiction and verify any exact wording against page images before publication.",
+    lastVerified: "2026-08-25",
   },
   {
     id: "src-psalms-nrsv",
@@ -540,6 +669,9 @@ const raw: Source[] = [
 ];
 
 // Validated at module load — a malformed source record fails the build/tests.
-export const sources: Source[] = SourceSchema.array().parse(raw);
+export const sources: Source[] = SourceSchema.array().parse([
+  ...raw,
+  ...ingestedSourceRecords,
+]);
 
 export const sourceById = new Map(sources.map((source) => [source.id, source]));
