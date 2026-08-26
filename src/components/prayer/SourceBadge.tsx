@@ -16,6 +16,7 @@ const CLAIM_TO_CHIP: Record<ClaimClassification, { classification: ChipClassific
   "traditional-symbolic-use": { classification: "PRAC", text: "Traditional / symbolic use" },
   "experiential-claim": { classification: "EXP", text: "Experiential claim" },
   "preliminary-research": { classification: "RES", text: "Preliminary research" },
+  "research-synthesis": { classification: "RES", text: "Research synthesis" },
   "no-established-clinical-evidence": { classification: "EXP", text: "No established clinical evidence" },
 };
 

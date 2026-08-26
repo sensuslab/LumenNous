@@ -95,6 +95,9 @@ const raw: Teaching[] = [
     classification: "historical-teaching",
     relatedCategoryIds: ["connection-to-source", "cosmic-and-planetary-reflection"],
     sourceIds: ["src-apocryphon-of-john", "src-jonas-gnostic-religion", "src-layton-gnostic-scriptures"],
+    sourceUses: [
+      { anchorId: "anc-john-epinoia", relation: "comparative-context" },
+    ],
     furtherReading: [
       { title: "The Apocryphon of John (online translation)", author: "Gnostic Society Library", url: "http://gnosis.org/naghamm/apocjn.html" },
       { title: "The Gnostic Scriptures", author: "Bentley Layton", url: "" },
@@ -124,6 +127,9 @@ const raw: Teaching[] = [
     classification: "symbolic",
     relatedCategoryIds: ["cosmic-and-planetary-reflection", "gnosis-and-inner-knowing"],
     sourceIds: ["src-apocryphon-of-john", "src-jonas-gnostic-religion"],
+    sourceUses: [
+      { anchorId: "anc-john-sophia-correction", relation: "comparative-context" },
+    ],
     furtherReading: [
       { title: "The Gnostic Religion", author: "Hans Jonas", url: "" },
       { title: "The Nag Hammadi Library in English", author: "James M. Robinson (ed.)", url: "http://gnosis.org/naghamm/nhl.html" },
@@ -157,11 +163,70 @@ const raw: Teaching[] = [
     classification: "historical-teaching",
     relatedCategoryIds: ["gnosis-and-inner-knowing", "grief-and-lament", "connection-to-source"],
     sourceIds: ["src-pistis-sophia", "src-apocryphon-of-john", "src-jonas-gnostic-religion"],
+    sourceUses: [
+      { anchorId: "anc-john-sophia-correction", relation: "paraphrase" },
+    ],
     furtherReading: [
       { title: "Pistis Sophia (Mead translation)", author: "G. R. S. Mead", url: "http://gnosis.org/library/pistis-sophia.htm" },
       { title: "The Gnostic New Age", author: "April D. DeConick", url: "" },
     ],
     tags: ["sophia", "wisdom", "myth"],
+    editorialStatus: "draft",
+  },
+  {
+    id: "tch-two-melchizedeks",
+    slug: "two-melchizedeks",
+    title: "Two Melchizedeks, two historical settings",
+    summary:
+      "Why a fragmentary Nag Hammadi revelation and Grumbine's 1919 esoteric book must remain distinct even when they meet around purpose and service.",
+    body: [
+      "## A name shared across very different works",
+      "",
+      "Melchizedek appears briefly in Genesis as king of Salem and priest of God Most High, then becomes a figure of priestly interpretation in Psalm 110 and Hebrews. The name also appears in two works used by LumenNous, but those works do not form a single secret tradition and should not be blended into one voice.",
+      "",
+      "The Nag Hammadi tractate *Melchizedek* survives in a badly damaged Coptic manuscript from late antiquity. Its remaining passages present priestly, revelatory and Christological material, yet large gaps limit certainty about the work's full argument. The responsible response is restraint: name the fragmentary condition, avoid filling its silences, and do not turn it into evidence for a modern institution or lineage.",
+      "",
+      "J. C. F. C. Grumbine's *Melchizedek; or, The Secret Doctrine of the Bible* belongs to a very different setting: an English-language esoteric publication from 1919. Grumbine offers layered symbolic reading, a descent-and-return cosmology, and teachings about self-possession and spiritual realization. These are modern interpretations, not translations of the ancient tractate and not the consensus of biblical scholarship. The available scan also has uneven optical character recognition, so quotation requires checking against page images.",
+      "",
+      "## The contemplative meeting point",
+      "",
+      "LumenNous lets the works meet only through a clearly labelled modern question: what might sacred purpose look like without clerical rank? Our answer is service rather than status — attention that makes a person more honest, less dependent on claims of hidden authority, and more able to act with care in ordinary life. Grumbine's own cautions against dependency, voices and power-seeking reinforce that boundary.",
+      "",
+      "This is comparative interpretation, not recovered doctrine. The ancient fragment remains ancient and incomplete; the 1919 book remains modern and esoteric. Their difference is part of the teaching.",
+    ].join("\n"),
+    classification: "modern-interpretation",
+    relatedCategoryIds: [
+      "connection-to-source",
+      "gnosis-and-inner-knowing",
+      "clarity-and-discernment",
+    ],
+    sourceIds: [
+      "src-nag-hammadi-melchizedek",
+      "src-grumbine-melchizedek",
+    ],
+    sourceUses: [
+      {
+        anchorId: "anc-nag-melchizedek-distinction",
+        relation: "comparative-context",
+      },
+      {
+        anchorId: "anc-grumbine-self-possession",
+        relation: "comparative-context",
+      },
+    ],
+    furtherReading: [
+      {
+        title: "The Nag Hammadi Scriptures",
+        author: "Marvin Meyer (ed.)",
+        url: "",
+      },
+      {
+        title: "Melchizedek; or, The Secret Doctrine of the Bible",
+        author: "J. C. F. C. Grumbine",
+        url: "",
+      },
+    ],
+    tags: ["melchizedek", "source-literacy", "purpose", "discernment"],
     editorialStatus: "draft",
   },
 ];
@@ -191,6 +256,9 @@ const raw2: Teaching[] = [
     classification: "historical-teaching",
     relatedCategoryIds: ["gnosis-and-inner-knowing", "clarity-and-discernment"],
     sourceIds: ["src-gospel-of-thomas", "src-pagels-gnostic-gospels", "src-deconick-gnostic-new-age"],
+    sourceUses: [
+      { anchorId: "anc-thomas-inner-outer", relation: "comparative-context" },
+    ],
     furtherReading: [
       { title: "The Gospel of Thomas (online translation)", author: "Gnostic Society Library", url: "http://gnosis.org/naghamm/gthlamb.html" },
       { title: "The Gnostic Gospels", author: "Elaine Pagels", url: "" },
@@ -428,21 +496,21 @@ const raw3: Teaching[] = [
     slug: "how-lumennous-works",
     title: "How LumenNous works",
     summary:
-      "The editorial and technical method behind the library and its private, on-device Engine.",
+      "The editorial and technical method behind the library and the server-routed Create flow.",
     body: [
-      "## A library first, not a chatbot",
+      "## A library first, with bounded generation",
       "",
       "LumenNous begins with a curated library: original prayers, affirmations, practices and teachings, written to an editorial standard and labelled for tradition and evidence. Seed material remains marked as draft until its human editorial pass is complete. The daily selection on Today is deterministic, using the date and category so it stays stable through the day. Another selection is a library choice, not a message from beyond.",
       "",
       "## What the Engine does",
       "",
-      "Create does not call an external language model. A small Engine in your browser matches your stated need against the Corpus taxonomy, then selects compatible prayers, affirmations, practices and reflection prompts. Tone, length, sacred-language preference and avoidances influence which records qualify. The Engine assembles those records into a validated result; it cannot invent a citation or write outside the approved shelf.",
+      "In this test build, Create sends 'based on my words' requests through a server route to the configured AI provider. If a user chooses a specific intention from the dropdown, the on-board library system assembles the result without a model call. The local Engine still classifies AI-bound requests, supplies safe grounding context and handles fixed safety responses without asking a model to improvise. Generated text is labelled as AI-assisted and is not presented as a citation or message from beyond.",
       "",
       "Variation comes from shuffle bags. Each category, output type and preference set has a bag of compatible content IDs. An ID is used once before the bag is refilled, and a new cycle cannot begin with the item that ended the previous one. Combined practices draw from separate bags for prayer, affirmation, practice and prompt, making exact repetition unlikely without pretending that chance carries spiritual authority.",
       "",
       "## Privacy by design",
       "",
-      "No account is required. The words entered in Create stay in the browser for the current composition and are then discarded. Local history stores only content IDs, cycle counters and short fingerprints. Saved items live in browser storage, exportable and deletable at any time.",
+      "No account is required. In this test build, free-word Create requests are sent to the configured AI provider through the server route; chosen-intention requests stay with the on-board library system. Local history stores only content IDs, cycle counters and short fingerprints. Saved items live in browser storage, exportable and deletable at any time.",
       "",
       "## The human fences",
       "",
@@ -455,6 +523,113 @@ const raw3: Teaching[] = [
       { title: "Samaritans — 24/7 listening", author: "Samaritans", url: "https://www.samaritans.org/" },
     ],
     tags: ["method", "engine", "privacy", "safety"],
+    editorialStatus: "draft",
+  },
+  {
+    id: "tch-embodied-coherence-prayer",
+    slug: "embodied-coherence-prayer",
+    title: "The embodied coherence prayer method",
+    summary:
+      "A clear guide to the five-stage Quantum Prayer sequence, its intended outcomes, and the boundary between contemplative metaphor and physics.",
+    body: [
+      "## The practical method",
+      "",
+      "The source *Quantum Prayers: Coherence, Consciousness & The Art of Aligned Prayer* brings five familiar contemplative actions into one three-minute sequence. First, **regulate** for sixty seconds with an easy 4–2–6 count: inhale for four, pause for two, exhale for six. The count is optional; natural breathing is always valid. Second, **embody** for thirty seconds by noticing feet, support, posture, shoulders and jaw. Third, **evoke** for thirty seconds by inviting a small, believable trace of the quality being prayed for. Fourth, **articulate** one clear intention for thirty seconds, repeating it three times. Fifth, **release** for thirty seconds with gratitude and without gripping the outcome.",
+      "",
+      "## What we changed, and why",
+      "",
+      "The source asks the practitioner to feel as though the prayer is already answered and to end with certainty that “it is done.” LumenNous makes emotional evocation optional, accepts a faint or neutral feeling, and releases certainty as well as strain. These are deliberate care adaptations. They avoid forced positivity, make room for grief or trauma, and preserve the method’s deeper movement: settle, attend, speak honestly, then let go. A completed session ends with one grounded action where appropriate, not a guarantee about healing, money, appearance, relationships or another person’s choices.",
+      "",
+      "## What “quantum” means here",
+      "",
+      "The PDF presents observer effects, entanglement and quantum probability as literal mechanisms through which prayer changes reality. That conclusion is not established by physics or consciousness research. In this app, **quantum is contemplative metaphor**: language for possibility, participation and mystery. The practical mechanisms are breath pacing, body awareness, attention, meaning, emotional congruence, gratitude and release.",
+      "",
+      "The intended outcome is therefore internal and actionable: a steadier starting state, clearer intention, less urgency and greater readiness to choose wisely. Prayer can accompany care, courage and practical help. It does not replace them, and it does not make suffering a failure of belief.",
+    ].join("\n"),
+    classification: "modern-interpretation",
+    relatedCategoryIds: [
+      "grounding-and-stillness",
+      "clarity-and-discernment",
+      "connection-to-source",
+    ],
+    sourceIds: [
+      "src-quantum-prayers-coherence",
+      "src-slow-breathing-systematic-review",
+      "src-quantum-rng-null-study",
+    ],
+    furtherReading: [
+      {
+        title:
+          "How Breath-Control Can Change Your Life: A Systematic Review",
+        author: "Andrea Zaccaro et al.",
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/",
+      },
+      {
+        title:
+          "Large-scale quantum random-number-generator intention study",
+        author: "",
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC5872141/",
+      },
+    ],
+    tags: ["coherence", "method", "quantum-metaphor", "breath"],
+    editorialStatus: "draft",
+  },
+  {
+    id: "tch-choosing-sound-for-prayer",
+    slug: "choosing-sound-for-prayer",
+    title: "Choosing sound for prayer",
+    summary:
+      "How to choose silence, nature sound, instrumental music or sacred chant by session purpose rather than by advertised healing frequencies.",
+    body: [
+      "## Music-supported prayer is not music therapy",
+      "",
+      "Music therapy is a professional health discipline in which a qualified therapist selects and adapts musical experiences for a person’s assessed needs. Pressing play on a curated YouTube track can still be meaningful, settling or beautiful, but it should be called **reflective listening** or **music-supported practice**. Evidence for a therapeutic programme does not prove that a particular video will produce the same result.",
+      "",
+      "## Match the sound to the task",
+      "",
+      "For grounding, a predictable nature recording or sparse instrumental bed may offer a gentle sensory anchor. For morning orientation, a dawn soundscape can support alertness without urgency. Sacred chant can deepen devotion when its language and tradition genuinely fit; it works best as a distinct opening or closing, not underneath spoken prayer. For evening and rest preparation, steady ocean or rainforest sound may mask an inconsistent environment, but silence is equally complete. During acute stress, discernment or language-heavy work, sound can compete with attention—turning it off is a skilled choice.",
+      "",
+      "Preference, familiarity, lyrics, tempo, dynamics, cultural meaning and baseline arousal often matter more than a label. The evidence for binaural-beat entrainment is heterogeneous. White or pink noise shows a small laboratory-task benefit for some people with ADHD or elevated symptoms, while performance worsened in comparison groups without ADHD; no brown-noise studies were found in that meta-analysis. Singing-bowl findings remain preliminary and heterogeneous. None belongs as a universal default.",
+      "",
+      "## What not to select by",
+      "",
+      "Do not choose a track because it claims 432 Hz is natural, 528 Hz repairs DNA, Solfeggio tones cleanse the body, or chakra frequencies unblock energy. Those mechanisms are not established. LumenNous keeps such records in its audit catalogue for traceability but excludes them from public sessions.",
+      "",
+      "Start one reviewed option before prayer, keep it at the lowest comfortable level, take listening breaks and stop if tinnitus, discomfort, agitation or sensory overload appears. For sleep, prefer speakers and a timer rather than overnight earbuds. Never use a guided session while driving. The best accompaniment is the one that supports attention without becoming the claim.",
+    ].join("\n"),
+    classification: "research-synthesis",
+    relatedCategoryIds: [
+      "grounding-and-stillness",
+      "sleep-and-rest",
+      "connection-to-source",
+    ],
+    sourceIds: [
+      "src-neuroscience-frequency-music",
+      "src-music-listening-anxiety-meta-analysis",
+      "src-natural-sounds-synthesis",
+      "src-binaural-entrainment-review",
+      "src-adhd-coloured-noise-meta-analysis",
+      "src-singing-bowl-systematic-review",
+      "src-who-safe-listening",
+    ],
+    furtherReading: [
+      {
+        title: "Safe listening",
+        author: "World Health Organization",
+        url: "https://www.who.int/news-room/questions-and-answers/item/deafness-and-hearing-loss-safe-listening",
+      },
+      {
+        title: "Natural-sounds systematic review and meta-analysis",
+        author: "Rachel T. Buxton et al.",
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8040792/",
+      },
+      {
+        title: "Binaural-beat entrainment systematic review",
+        author: "",
+        url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/",
+      },
+    ],
+    tags: ["music", "evidence", "safe-listening", "prayer"],
     editorialStatus: "draft",
   },
 ];

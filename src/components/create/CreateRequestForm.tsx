@@ -2,7 +2,12 @@
 
 import { useState, type FormEvent, type JSX } from "react";
 import Link from "next/link";
-import type { Category, EngineRequest } from "@/lib/schemas";
+import type {
+  Category,
+  ConceptEngineFrame,
+  ContemplativeConcept,
+  EngineRequest,
+} from "@/lib/schemas";
 import { Chip } from "@/components/ui/Chip";
 import { Icon } from "@/components/ui/Icon";
 
@@ -15,7 +20,12 @@ const OUTPUT_TYPES: Array<{
   { id: "prayer", label: "Prayer", hint: "Words to receive", icon: "book-open" },
   { id: "affirmation", label: "Affirmation", hint: "One line to carry", icon: "spark" },
   { id: "meditation", label: "Meditation", hint: "Quiet steps", icon: "breath" },
-  { id: "combined-practice", label: "Combined", hint: "Prayer and practice", icon: "infinity" },
+  {
+    id: "combined-practice",
+    label: "Coherence",
+    hint: "Prayer in five stages",
+    icon: "infinity",
+  },
 ];
 
 const DURATIONS: Array<{ id: EngineRequest["duration"]; label: string }> = [
@@ -41,6 +51,17 @@ const LANGUAGES: Array<{ id: EngineRequest["languagePreference"]; label: string 
   { id: "neutral", label: "Neutral spiritual" },
 ];
 
+const WORLDVIEWS: Array<{
+  id: EngineRequest["worldviewProfile"];
+  label: string;
+  hint: string;
+}> = [
+  { id: "open-universal", label: "Open / universal", hint: "Inclusive spiritual language without a required creed" },
+  { id: "gnostic", label: "Gnostic", hint: "Source-specific Nag Hammadi concepts, clearly labelled" },
+  { id: "esoteric-christian", label: "Esoteric Christian", hint: "Later Christian-mystical interpretation, clearly labelled" },
+  { id: "neutral", label: "Neutral", hint: "Reflective and non-theistic framing" },
+];
+
 const COMMON_AVOIDANCES = [
   { value: "breath", label: "Breath focus" },
   { value: "gnosis", label: "Gnostic terms" },
@@ -51,12 +72,22 @@ const MAX_NEED = 600;
 
 export function CreateRequestForm({
   categories,
+  conceptFrames,
+  conceptsById,
   onSubmit,
   initialRequest,
+  initialConceptId = "",
+  initialWorldviewProfile = "open-universal",
+  isSubmitting = false,
 }: {
   categories: readonly Category[];
+  conceptFrames: readonly ConceptEngineFrame[];
+  conceptsById: Record<string, ContemplativeConcept>;
   onSubmit: (request: EngineRequest) => void;
   initialRequest?: EngineRequest;
+  initialConceptId?: string;
+  initialWorldviewProfile?: EngineRequest["worldviewProfile"];
+  isSubmitting?: boolean;
 }): JSX.Element {
   const commonAvoidanceValues = new Set<string>(
     COMMON_AVOIDANCES.map((item) => item.value),
@@ -76,6 +107,13 @@ export function CreateRequestForm({
     useState<EngineRequest["languagePreference"]>(
       initialRequest?.languagePreference ?? "source",
     );
+  const [worldviewProfile, setWorldviewProfile] =
+    useState<EngineRequest["worldviewProfile"]>(
+      initialRequest?.worldviewProfile ?? initialWorldviewProfile,
+    );
+  const [conceptId, setConceptId] = useState(
+    initialRequest?.conceptId ?? initialConceptId,
+  );
   const [avoidances, setAvoidances] = useState<string[]>(
     initialRequest?.avoidances.filter((item) => commonAvoidanceValues.has(item)) ?? [],
   );
@@ -85,6 +123,23 @@ export function CreateRequestForm({
       .join(", ") ?? "",
   );
   const [error, setError] = useState("");
+  const basedOnWords = categoryId === "not-sure";
+  const availableConceptFrames = conceptFrames.filter((frame) =>
+    frame.compatibleWorldviews.includes(worldviewProfile),
+  );
+  const selectedConceptFrame = conceptFrames.find(
+    (frame) => frame.conceptId === conceptId,
+  );
+
+  function chooseWorldview(next: EngineRequest["worldviewProfile"]): void {
+    setWorldviewProfile(next);
+    if (
+      selectedConceptFrame &&
+      !selectedConceptFrame.compatibleWorldviews.includes(next)
+    ) {
+      setConceptId("");
+    }
+  }
 
   function toggleAvoidance(value: string): void {
     setAvoidances((current) =>
@@ -112,6 +167,8 @@ export function CreateRequestForm({
       duration,
       tone,
       languagePreference,
+      worldviewProfile,
+      conceptId: outputType === "combined-practice" ? "" : conceptId,
       avoidances: [...new Set([...avoidances, ...custom])].slice(0, 20),
     });
   }
@@ -168,7 +225,7 @@ export function CreateRequestForm({
             onChange={(event) => setCategoryId(event.target.value)}
             className="field-surface min-h-12 w-full appearance-none rounded-sm px-3 pr-11 font-sans text-[0.9375rem] text-ink-strong focus-visible:outline-none"
           >
-            <option value="not-sure">Choose for me from what I wrote</option>
+            <option value="not-sure">Based on my words</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>{category.name}</option>
             ))}
@@ -195,7 +252,10 @@ export function CreateRequestForm({
                 type="button"
                 role="radio"
                 aria-checked={outputType === option.id}
-                onClick={() => setOutputType(option.id)}
+                onClick={() => {
+                  setOutputType(option.id);
+                  if (option.id === "combined-practice") setConceptId("");
+                }}
                 className={`field-surface h-[120px] rounded-sm p-3 text-left transition-[border-color,background-color] duration-200 ease-std ${outputType === option.id ? "border-[rgba(167,155,232,0.62)] bg-[rgba(167,155,232,0.12)]" : ""}`}
               >
                 <Icon name={option.icon} className={`h-5 w-5 ${outputType === option.id ? "text-violet" : "text-ink-muted"}`} aria-hidden="true" />
@@ -206,23 +266,105 @@ export function CreateRequestForm({
           </div>
         </fieldset>
 
-        <fieldset className="mt-6 border-t border-line pt-5">
-          <legend className="t-label mb-3 font-sans text-ink-strong">Length</legend>
-          <div role="radiogroup" aria-label="Choose a length" className="flex flex-wrap gap-2">
-            {DURATIONS.map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                role="radio"
-                aria-checked={duration === option.id}
-                onClick={() => setDuration(option.id)}
-                className="inline-flex min-h-11 items-center rounded-pill focus-visible:outline-none"
-              >
-                <Chip kind="filter" tone="violet" selected={duration === option.id}>{option.label}</Chip>
-              </button>
-            ))}
-          </div>
-        </fieldset>
+        {outputType !== "combined-practice" ? (
+          <fieldset className="mt-6 border-t border-line pt-5">
+            <legend className="t-label mb-3 font-sans text-ink-strong">
+              Length
+            </legend>
+            <div
+              role="radiogroup"
+              aria-label="Choose a length"
+              className="flex flex-wrap gap-2"
+            >
+              {DURATIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={duration === option.id}
+                  onClick={() => setDuration(option.id)}
+                  className="inline-flex min-h-11 items-center rounded-pill focus-visible:outline-none"
+                >
+                  <Chip
+                    kind="filter"
+                    tone="violet"
+                    selected={duration === option.id}
+                  >
+                    {option.label}
+                  </Chip>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        ) : null}
+
+        {outputType !== "combined-practice" ? (
+          <fieldset className="mt-6 border-t border-line pt-5">
+            <legend className="t-label font-sans text-ink-strong">
+              Contemplative lens
+            </legend>
+            <p className="t-body-sm mt-1 text-ink-muted">
+              Optional. A lens adds original editorial language mapped to
+              specific passages; it does not change the source into doctrine.
+            </p>
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label className="t-label font-sans text-ink-strong">
+                Worldview framing
+                <select
+                  value={worldviewProfile}
+                  onChange={(event) =>
+                    chooseWorldview(
+                      event.target.value as EngineRequest["worldviewProfile"],
+                    )
+                  }
+                  className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none"
+                >
+                  {WORLDVIEWS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="t-label font-sans text-ink-strong">
+                Guiding concept
+                <select
+                  value={conceptId}
+                  onChange={(event) => setConceptId(event.target.value)}
+                  className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none"
+                >
+                  <option value="">Open — no added lens</option>
+                  {availableConceptFrames.map((frame) => (
+                    <option key={frame.id} value={frame.conceptId}>
+                      {frame.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <p className="t-body-sm mt-3 rounded-sm border border-line-subtle p-3 text-ink-muted">
+              {selectedConceptFrame
+                ? conceptsById[selectedConceptFrame.conceptId]?.summary ??
+                  selectedConceptFrame.description
+                : WORLDVIEWS.find((option) => option.id === worldviewProfile)?.hint}
+            </p>
+          </fieldset>
+        ) : null}
+
+        {outputType === "combined-practice" ? (
+          <p className="t-body-sm mt-4 rounded-sm border border-[rgba(167,155,232,0.3)] bg-[rgba(167,155,232,0.055)] p-3 text-ink-muted">
+            Coherence uses a fixed three-minute core: regulate, embody, gently
+            evoke, speak one prayer three times, then release the outcome.
+            If you leave out breath focus, the first minute uses visual and
+            contact-point grounding instead.{" "}
+            <Link
+              href="/sessions"
+              className="font-medium text-violet underline-offset-4 hover:underline"
+            >
+              Review the method
+            </Link>
+          </p>
+        ) : null}
 
         <details className="mt-5 border-t border-line pt-4">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between font-sans text-[0.9375rem] font-medium text-ink-strong">
@@ -230,20 +372,27 @@ export function CreateRequestForm({
             <Icon name="chevron-down" className="h-4 w-4 text-ink-muted" aria-hidden="true" />
           </summary>
           <div className="mt-4 space-y-5 border-t border-line pt-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label className="t-label font-sans text-ink-strong">
-              Tone
-              <select value={tone} onChange={(event) => setTone(event.target.value as EngineRequest["tone"])} className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none">
-                {TONES.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
-              </select>
-            </label>
-            <label className="t-label font-sans text-ink-strong">
-              Sacred language
-              <select value={languagePreference} onChange={(event) => setLanguagePreference(event.target.value as EngineRequest["languagePreference"])} className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none">
-                {LANGUAGES.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
-              </select>
-            </label>
-          </div>
+          {outputType !== "combined-practice" ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <label className="t-label font-sans text-ink-strong">
+                Tone
+                <select value={tone} onChange={(event) => setTone(event.target.value as EngineRequest["tone"])} className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none">
+                  {TONES.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
+                </select>
+              </label>
+              <label className="t-label font-sans text-ink-strong">
+                Sacred language
+                <select value={languagePreference} onChange={(event) => setLanguagePreference(event.target.value as EngineRequest["languagePreference"])} className="field-surface mt-2 min-h-12 w-full rounded-sm px-3 font-sans text-[0.9375rem] text-ink focus-visible:outline-none">
+                  {LANGUAGES.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
+                </select>
+              </label>
+            </div>
+          ) : (
+            <p className="t-body-sm text-ink-muted">
+              Coherence uses reviewed fixed wording, so tone and
+              sacred-language selectors do not apply to this form.
+            </p>
+          )}
 
           <fieldset>
             <legend className="t-label font-sans text-ink-strong">Leave out</legend>
@@ -276,7 +425,11 @@ export function CreateRequestForm({
           <div>
             <p className="t-eyebrow text-gold">Ready when you are</p>
             <h2 id="receive-practice-heading" className="t-h3 mt-1 text-ink-strong">Receive your practice</h2>
-            <p className="t-body-sm mt-2 text-ink-muted">Your choices will be assembled from the reviewed LumenNous library.</p>
+            <p className="t-body-sm mt-2 text-ink-muted">
+              {basedOnWords
+                ? "Your words will shape a custom request to the configured AI service."
+                : "Your selected intention will use the on-board LumenNous library system."}
+            </p>
           </div>
         </header>
 
@@ -284,17 +437,29 @@ export function CreateRequestForm({
           <div className="flex items-start gap-3">
             <Icon name="shield-quiet" className="mt-0.5 h-5 w-5 shrink-0 text-violet" aria-hidden="true" />
             <div>
-              <p className="t-label font-sans text-ink-strong">Private by design</p>
+              <p className="t-label font-sans text-ink-strong">
+                {basedOnWords ? "Server-side AI key" : "On-board composition"}
+              </p>
               <p className="t-body-sm mt-1 text-ink-muted">
-                Your words stay on this device and are discarded after this composition. LumenNous keeps only content IDs and cycle counts to reduce repetition.
+                {basedOnWords
+                  ? "Your request is sent through the LumenNous server route; the DeepSeek key stays on Render and is never exposed to the browser."
+                  : "No model call is made for a chosen intention; the app assembles from its human-authored local library, as it does when the AI service is off."}
               </p>
               <Link href="/privacy#local-engine" className="t-body-sm mt-2 inline-flex min-h-11 items-center text-ink-muted underline-offset-4 hover:text-ink-strong hover:underline">Read the privacy details</Link>
             </div>
           </div>
         </aside>
 
-        <button type="submit" className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-sm bg-pearl-fill px-6 font-sans text-[0.9375rem] font-semibold text-bg-1 transition-[transform,background-color] duration-200 ease-std hover:bg-pearl-fill-hover active:scale-[0.98]">
-          Assemble my {outputType === "combined-practice" ? "practice" : outputType}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-sm bg-pearl-fill px-6 font-sans text-[0.9375rem] font-semibold text-bg-1 transition-[transform,background-color] duration-200 ease-std hover:bg-pearl-fill-hover active:scale-[0.98] disabled:cursor-wait disabled:opacity-70"
+        >
+          {isSubmitting
+            ? basedOnWords
+              ? "Creating with AI..."
+              : "Assembling..."
+            : `Assemble my ${outputType === "combined-practice" ? "practice" : outputType}`}
         </button>
         {error ? <p role="alert" className="t-body-sm mt-3 text-warn">{error}</p> : null}
       </section>

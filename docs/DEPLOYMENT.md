@@ -22,7 +22,7 @@ build for pull requests and pushes to `main`.
 4. Set `DEEPSEEK_AI_ENABLED=true` only after the product flow, consent copy,
    rate limiting, and cost controls have been approved.
 5. Keep `DEEPSEEK_BASE_URL=https://api.deepseek.com` and
-   `DEEPSEEK_MODEL=deepseek-v4-pro`, or rely on their code defaults.
+   `DEEPSEEK_MODEL=DeepSeek-V4-Flash-0731`, or rely on their code defaults.
 
 Vercel's Git integration creates preview deployments for branches and pull
 requests and deploys `main` to production. `vercel.json` pins the install and

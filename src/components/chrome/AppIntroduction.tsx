@@ -16,6 +16,15 @@ const REPLAY_EVENT = "lumennous:intro:replay";
 const INTRO_DURATION_MS = 9_000;
 const EXIT_DURATION_MS = 600;
 
+/* First run hands off to the standalone promo landing rather than dropping
+   straight into Today: intro -> /welcome -> the app. `/welcome` carries no
+   JavaScript, so it signals the return trip with a query flag instead of
+   storage; seeing that flag here suppresses the hand-off and prevents the
+   /welcome -> / -> /welcome loop for anyone who arrived from a campaign link
+   before ever loading the app. */
+const WELCOME_PATH = "/welcome";
+const ENTERED_PARAM = "enter";
+
 type Phase = "hidden" | "loading" | "playing" | "leaving";
 
 interface IntroWindow extends Window {
@@ -73,6 +82,8 @@ export function AppIntroduction(): JSX.Element | null {
   const loadedAssets = useRef(new Set<string>());
   const skipRef = useRef<HTMLButtonElement>(null);
   const exitTimer = useRef<number | undefined>(undefined);
+  const handOffToWelcome = useRef(false);
+  const returnedFromWelcome = useRef(false);
 
   const markReady = useCallback((id: string): void => {
     if (loadedAssets.current.has(id)) return;
@@ -86,6 +97,17 @@ export function AppIntroduction(): JSX.Element | null {
     const prefersStill =
       root.dataset.stim === "low" ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* Decide the hand-off before finish() writes the seen flag. A replay from
+       inside the app always finds the flag already set, so it lands back on the
+       page it was launched from. */
+    let alreadySeen = false;
+    try {
+      alreadySeen = localStorage.getItem(INTRO_SEEN_KEY) === "1";
+    } catch {
+      /* Treated as a first run; the intro replays under blocked storage too. */
+    }
+    handOffToWelcome.current = !alreadySeen && !returnedFromWelcome.current;
 
     window.clearTimeout((window as IntroWindow).__lumenIntroFallback);
     window.clearTimeout(exitTimer.current);
@@ -111,6 +133,15 @@ export function AppIntroduction(): JSX.Element | null {
       localStorage.setItem(INTRO_SEEN_KEY, "1");
     } catch {
       /* Storage can be unavailable in strict private modes. */
+    }
+
+    /* Leave for the promo landing before the shell is revealed, so a first run
+       never flashes Today on its way out. `replace` keeps Back from returning
+       to a page that would only send them here again. */
+    if (handOffToWelcome.current) {
+      handOffToWelcome.current = false;
+      window.location.replace(WELCOME_PATH);
+      return;
     }
 
     root.removeAttribute("data-intro");
@@ -143,6 +174,17 @@ export function AppIntroduction(): JSX.Element | null {
   }, [finish, phase]);
 
   useEffect(() => {
+    /* Read the return flag before anything can strip it, then tidy it out of
+       the address bar. This runs synchronously ahead of the boot frame below,
+       so start() always sees the captured value. Returning visitors skip the
+       intro entirely, which is why the URL is cleaned here and not in finish(). */
+    const url = new URL(window.location.href);
+    if (url.searchParams.has(ENTERED_PARAM)) {
+      returnedFromWelcome.current = url.searchParams.get(ENTERED_PARAM) === "1";
+      url.searchParams.delete(ENTERED_PARAM);
+      window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+    }
+
     const replay = (): void => start();
     window.addEventListener(REPLAY_EVENT, replay);
     const bootFrame = window.requestAnimationFrame(() => {

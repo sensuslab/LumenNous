@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0",
+  "id": "ingest-nag-hammadi-working-epub",
+  "sourceId": "src-nag-hammadi-library",
+  "input": {
+    "format": "epub",
+    "fileNameHint": "The_Nag_Hammadi_Library.epub",
+    "expectedSha256": "bca39acba37dcb31d009fc9cc2774ace57b41d9ddb8762fd446d7890f90103cf",
+    "encoding": "utf8"
+  },
+  "sourceRecords": [],
+  "edition": {
+    "id": "ed-nag-hammadi-working-epub",
+    "sourceId": "src-nag-hammadi-library",
+    "includedSourceIds": [
+      "src-gospel-of-thomas",
+      "src-gospel-of-truth",
+      "src-apocryphon-of-john",
+      "src-gospel-of-philip",
+      "src-authoritative-teaching",
+      "src-discourse-eighth-ninth",
+      "src-prayer-thanksgiving",
+      "src-thunder-perfect-mind",
+      "src-teachings-silvanus",
+      "src-nag-hammadi-melchizedek"
+    ],
+    "label": "Private working EPUB of The Nag Hammadi Library",
+    "editorOrTranslator": "James M. Robinson (general editor); multiple translators",
+    "publisher": "Editorial working copy; source edition associated with Harper & Row / Brill",
+    "publicationYear": 1988,
+    "language": "English translation from Coptic witnesses",
+    "rightsStatus": "reference-only",
+    "ocrQuality": "variable",
+    "contentFormat": "epub",
+    "contentSha256": "bca39acba37dcb31d009fc9cc2774ace57b41d9ddb8762fd446d7890f90103cf",
+    "locatorStrategy": "EPUB spine path and tractate-local section or saying reference; canonical node ranges supersede these locators after verified re-ingestion.",
+    "digitalLocator": "",
+    "notes": "Private editorial reference containing duplicate translations of several tractates. Compare translations for conceptual stability and verify publication wording against an authorised edition.",
+    "lastVerified": "2026-08-25"
+  },
+  "workMappings": [
+    {
+      "sourceId": "src-gospel-of-truth",
+      "label": "The Gospel of Truth",
+      "pathIncludes": [
+        "text_004.xhtml",
+        "text_005.xhtml",
+        "text_052.xhtml",
+        "text_053.xhtml"
+      ]
+    },
+    {
+      "sourceId": "src-apocryphon-of-john",
+      "label": "The Apocryphon of John",
+      "pathIncludes": ["text_008.xhtml", "text_021.xhtml"]
+    },
+    {
+      "sourceId": "src-gospel-of-thomas",
+      "label": "The Gospel of Thomas",
+      "pathIncludes": ["text_009.xhtml", "text_010.xhtml", "text_011.xhtml"]
+    },
+    {
+      "sourceId": "src-gospel-of-philip",
+      "label": "The Gospel of Philip",
+      "pathIncludes": ["text_012.xhtml"]
+    },
+    {
+      "sourceId": "src-thunder-perfect-mind",
+      "label": "The Thunder, Perfect Mind",
+      "pathIncludes": ["text_029.xhtml", "text_030.xhtml"]
+    },
+    {
+      "sourceId": "src-authoritative-teaching",
+      "label": "Authoritative Teaching",
+      "pathIncludes": ["text_031.xhtml"]
+    },
+    {
+      "sourceId": "src-discourse-eighth-ninth",
+      "label": "The Discourse on the Eighth and Ninth",
+      "pathIncludes": ["text_034.xhtml"]
+    },
+    {
+      "sourceId": "src-prayer-thanksgiving",
+      "label": "The Prayer of Thanksgiving",
+      "pathIncludes": ["text_035.xhtml"]
+    },
+    {
+      "sourceId": "src-teachings-silvanus",
+      "label": "The Teachings of Silvanus",
+      "pathIncludes": ["text_039.xhtml"]
+    },
+    {
+      "sourceId": "src-nag-hammadi-melchizedek",
+      "label": "Melchizedek",
+      "pathIncludes": ["text_043.xhtml"]
+    }
+  ]
+}

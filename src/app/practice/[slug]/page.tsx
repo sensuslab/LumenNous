@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import {
   getAudioById,
   getCategoryById,
+  getPassageAnchorsByIds,
   getPracticeBySlug,
   getPromptsByCategory,
   getSourcesByIds,
@@ -47,6 +48,9 @@ export default async function PracticePage({ params }: PageProps): Promise<JSX.E
 
   const category = practice.categoryIds.length > 0 ? getCategoryById(practice.categoryIds[0] ?? "") : undefined;
   const sources = getSourcesByIds(practice.sourceIds);
+  const anchors = getPassageAnchorsByIds(
+    practice.sourceUses?.map((use) => use.anchorId) ?? [],
+  );
   const audio = practice.audioIds
     .map((id) => getAudioById(id))
     .filter((item): item is NonNullable<typeof item> => item !== undefined)
@@ -157,7 +161,7 @@ export default async function PracticePage({ params }: PageProps): Promise<JSX.E
           </section>
         ) : null}
 
-        <SourceDrawer sources={sources} className="mt-10" />
+        <SourceDrawer sources={sources} anchors={anchors} className="mt-10" />
       </div>
     </>
   );

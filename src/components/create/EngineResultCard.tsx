@@ -1,26 +1,39 @@
 import Link from "next/link";
 import type { JSX } from "react";
-import type { EngineResult, Source } from "@/lib/schemas";
+import type {
+  ContemplativeConcept,
+  EngineResult,
+  PassageAnchor,
+  Source,
+} from "@/lib/schemas";
 import { Chip } from "@/components/ui/Chip";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Icon } from "@/components/ui/Icon";
 import { SourceBadge } from "@/components/prayer/SourceBadge";
+import { SourceDrawer } from "@/components/prayer/SourceDrawer";
 import { CopyButton, ShareButton } from "@/components/prayer/ShareButton";
 import { TraditionLabelGroup } from "@/components/prayer/TraditionLabel";
 
 export function EngineResultCard({
   result,
   sources,
+  anchors,
+  concepts,
   categorySlug,
+  coherenceSessionHref,
   onCreateAnother,
   onEditRequest,
 }: {
   result: EngineResult;
   sources: readonly Source[];
+  anchors: readonly PassageAnchor[];
+  concepts: readonly ContemplativeConcept[];
   categorySlug: string;
+  coherenceSessionHref: string | null;
   onCreateAnother: () => void;
   onEditRequest: () => void;
 }): JSX.Element {
+  const isAiResult = result.fingerprint.startsWith("ai-");
   const fullText = [
     result.opening,
     result.prayer,
@@ -40,12 +53,40 @@ export function EngineResultCard({
           Your practice is ready
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <Chip kind="source" classification="EDIT">ASSEMBLED ON THIS DEVICE</Chip>
+          <Chip kind="source" classification="EDIT">
+            {isAiResult ? "AI-ASSISTED COMPOSITION" : "ASSEMBLED ON THIS DEVICE"}
+          </Chip>
           <TraditionLabelGroup labels={result.traditionLabels} />
         </div>
         <p className="t-meta mt-2 text-ink-faint">
-          Corpus-grounded library cycle {result.recipe.cycle}
+          {isAiResult
+            ? "Generated through the configured AI service with LumenNous safety boundaries"
+            : `Corpus-grounded library cycle ${result.recipe.cycle}`}
         </p>
+
+        {concepts.length > 0 ? (
+          <aside className="mt-5 rounded-md border border-[rgba(167,155,232,0.28)] bg-[rgba(167,155,232,0.045)] p-4">
+            <p className="t-eyebrow text-violet">Guiding concept</p>
+            {concepts.map((concept) => (
+              <div key={concept.id} className="mt-2">
+                <Link
+                  href={`/concepts/${concept.slug}`}
+                  className="t-label inline-flex min-h-11 items-center gap-1 font-sans text-ink-strong underline-offset-4 hover:text-violet hover:underline"
+                >
+                  {concept.name}
+                  <Icon name="arrow-up-right" className="h-3.5 w-3.5" aria-hidden="true" />
+                </Link>
+                <p className="t-body-sm mt-1 text-ink-muted">{concept.summary}</p>
+              </div>
+            ))}
+            <p className="t-meta mt-3 text-ink-faint">
+              Worldview profile · {result.worldviewProfile.replaceAll("-", " ")}
+              {isAiResult
+                ? " · AI wording does not inherit source citations"
+                : " · passage relationships disclosed below"}
+            </p>
+          </aside>
+        ) : null}
 
         <h2 className="t-h1 mt-4 text-ink-strong">{result.title}</h2>
         <Link
@@ -119,8 +160,16 @@ export function EngineResultCard({
         ) : null}
 
         {sources.length > 0 ? (
-          <div className="mt-6 flex flex-wrap gap-1.5 border-t border-line pt-6">
-            {sources.map((source) => <SourceBadge key={source.id} source={source} />)}
+          <div className="mt-6 border-t border-line pt-6">
+            <div className="flex flex-wrap gap-1.5">
+              {sources.map((source) => <SourceBadge key={source.id} source={source} />)}
+            </div>
+            <SourceDrawer
+              sources={sources}
+              anchors={anchors}
+              heading="Why these words?"
+              className="mt-3"
+            />
           </div>
         ) : null}
 
@@ -131,6 +180,15 @@ export function EngineResultCard({
 
         <div className="mt-5 border-t border-line pt-5">
           <p className="t-eyebrow text-ink-faint">What next</p>
+          {coherenceSessionHref ? (
+            <Link
+              href={coherenceSessionHref}
+              className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-sm border border-[rgba(167,155,232,0.44)] bg-[rgba(167,155,232,0.08)] px-5 font-sans text-sm font-semibold text-ink-strong hover:border-[rgba(167,155,232,0.68)]"
+            >
+              <Icon name="orbit" className="h-4 w-4 text-violet" aria-hidden="true" />
+              Open the timed five-stage session
+            </Link>
+          ) : null}
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             <button
               type="button"

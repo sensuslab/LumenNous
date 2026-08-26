@@ -20,6 +20,7 @@ interface EvidenceChip {
 const EVIDENCE_CHIP: Partial<Record<AudioItem["evidenceClassification"], EvidenceChip>> = {
   "experiential-claim": { classification: "EXP", text: "Experiential / practitioner claim" },
   "preliminary-research": { classification: "RES", text: "Preliminary research" },
+  "research-synthesis": { classification: "RES", text: "Research synthesis" },
   "no-established-clinical-evidence": {
     classification: "EXP",
     text: "No established clinical evidence",

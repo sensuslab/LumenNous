@@ -1,51 +1,79 @@
 "use client";
 
-import { useEffect, useState, type JSX } from "react";
+import { useEffect, useMemo, useState, type JSX } from "react";
 
 /**
- * BreathingGuide (design.md §3.6, practice.md STATE B) — a slow ring that
- * swells on the in-breath and settles on the out-breath (4s in / 4s hold /
- * 6s out tempo). Under reduced motion or low-stimulation it renders a
- * static ring with a mono phase line updating each second; meaning is never
- * carried by motion or colour alone.
+ * A slow breathing ring. The pattern is supplied by the practice: existing
+ * practices retain 4–4–6 while the reviewed coherence method passes 4–2–6.
+ * Meaning is available in text and never depends on animation or colour.
  */
 
-const PHASES = [
-  { label: "Breathe in", seconds: 4 },
-  { label: "Hold gently", seconds: 4 },
-  { label: "Breathe out", seconds: 6 },
-] as const;
+export interface BreathPattern {
+  inhaleSeconds: number;
+  holdSeconds: number;
+  exhaleSeconds: number;
+}
 
 export function BreathingGuide({
   running,
+  pattern = { inhaleSeconds: 4, holdSeconds: 4, exhaleSeconds: 6 },
   className = "",
 }: {
   running: boolean;
+  pattern?: BreathPattern;
   className?: string;
 }): JSX.Element {
-  const [phaseIndex, setPhaseIndex] = useState(0);
-  const [second, setSecond] = useState(1);
+  const [cycleSecond, setCycleSecond] = useState(0);
+  const phases = useMemo(
+    () =>
+      [
+        { label: "Breathe in", seconds: pattern.inhaleSeconds },
+        ...(pattern.holdSeconds > 0
+          ? [{ label: "Pause gently", seconds: pattern.holdSeconds }]
+          : []),
+        { label: "Breathe out", seconds: pattern.exhaleSeconds },
+      ].filter((phase) => phase.seconds > 0),
+    [pattern.holdSeconds, pattern.inhaleSeconds, pattern.exhaleSeconds],
+  );
+  const cycleLength = phases.reduce(
+    (total, phase) => total + phase.seconds,
+    0,
+  );
 
   useEffect(() => {
     if (!running) return;
     const interval = window.setInterval(() => {
-      setSecond((current) => {
-        const phase = PHASES[phaseIndex] ?? PHASES[0];
-        if (current >= phase.seconds) {
-          setPhaseIndex((index) => (index + 1) % PHASES.length);
-          return 1;
-        }
-        return current + 1;
-      });
+      setCycleSecond((current) =>
+        cycleLength > 0 ? (current + 1) % cycleLength : 0,
+      );
     }, 1000);
     return () => window.clearInterval(interval);
-  }, [running, phaseIndex]);
+  }, [running, phases, cycleLength]);
 
-  const phase = PHASES[phaseIndex] ?? PHASES[0];
+  const effectiveCycleSecond =
+    cycleLength > 0 ? cycleSecond % cycleLength : 0;
+  let elapsedBeforePhase = 0;
+  const phase =
+    phases.find((candidate) => {
+      const contains =
+        effectiveCycleSecond >= elapsedBeforePhase &&
+        effectiveCycleSecond < elapsedBeforePhase + candidate.seconds;
+      if (!contains) elapsedBeforePhase += candidate.seconds;
+      return contains;
+    }) ??
+    phases[0] ?? {
+      label: "Breathe naturally",
+      seconds: 1,
+    };
+  const second = effectiveCycleSecond - elapsedBeforePhase + 1;
 
   return (
-    <div className={`flex flex-col items-center gap-3 ${className}`} aria-hidden="true">
-      <svg viewBox="0 0 240 240" className="h-40 w-40 md:h-60 md:w-60">
+    <div className={`flex flex-col items-center gap-3 ${className}`}>
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 240 240"
+        className="h-40 w-40 md:h-60 md:w-60"
+      >
         <circle
           cx="120"
           cy="120"
@@ -67,19 +95,17 @@ export function BreathingGuide({
           data-phase={phase.label}
           style={{
             transformOrigin: "120px 120px",
-            transition: "transform 4s var(--ease-breath, ease-in-out), opacity 1s ease",
+            transition: `transform ${phase.seconds}s var(--ease-breath, ease-in-out), opacity 1s ease`,
             transform:
-              phase.label === "Breathe in"
+              phase.label === "Breathe in" || phase.label === "Pause gently"
                 ? "scale(1.12)"
-                : phase.label === "Hold gently"
-                  ? "scale(1.12)"
-                  : "scale(1)",
+                : "scale(1)",
             opacity: running ? 0.9 : 0.4,
           }}
         />
         <circle cx="120" cy="120" r="2.5" fill="var(--gold)" opacity="0.8" />
       </svg>
-      <p className="t-meta text-ink-faint">
+      <p className="t-meta text-ink-faint" aria-live="off">
         {phase.label} · {second}
       </p>
       <span className="sr-only" aria-live="polite">

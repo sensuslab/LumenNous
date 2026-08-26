@@ -1,14 +1,23 @@
 import { corpusCategoryProfiles } from "@/data/corpus";
+import { getCoherenceSessionForCategory } from "@/data/session-templates";
+import {
+  GROUNDING_REGULATION_INSTRUCTION,
+  avoidsBreathFocus,
+  isBreathFocusAvoidance,
+} from "@/lib/coherence";
 import {
   EngineRequestSchema,
   EngineResultSchema,
   type Affirmation,
   type Category,
+  type ConceptEngineFrame,
   type EngineRequest,
   type EngineResult,
   type Practice,
   type Prayer,
   type ReflectionPrompt,
+  type SourceRelation,
+  type TraditionLabel,
 } from "@/lib/schemas";
 import {
   classifySafety,
@@ -22,10 +31,11 @@ export interface EngineLibrary {
   affirmations: readonly Affirmation[];
   practices: readonly Practice[];
   prompts: readonly ReflectionPrompt[];
+  conceptFrames: readonly ConceptEngineFrame[];
 }
 
 export interface EngineHistory {
-  version: 1;
+  version: 2;
   bags: Record<string, string[]>;
   lastBySlot: Record<string, string>;
   cycleBySlot: Record<string, number>;
@@ -44,8 +54,8 @@ export interface EngineOptions {
   random?: () => number;
 }
 
-const STORAGE_KEY = "lumennous-engine-history-v1";
-const HISTORY_VERSION = 1;
+const STORAGE_KEY = "lumennous-engine-history-v2";
+const HISTORY_VERSION = 2;
 const RECENT_FINGERPRINT_LIMIT = 12;
 const DEFAULT_CATEGORY_ID = "grounding-and-stillness";
 const CLASSIFIER_STOP_WORDS = new Set([
@@ -378,6 +388,32 @@ function hash(value: string): string {
   return `ln-${(result >>> 0).toString(36)}`;
 }
 
+function uniqueSourceUses(
+  uses: ReadonlyArray<
+    | { anchorId: string; relation: SourceRelation }
+    | undefined
+  >,
+): Array<{ anchorId: string; relation: SourceRelation }> {
+  const byAnchor = new Map<string, { anchorId: string; relation: SourceRelation }>();
+  for (const use of uses) {
+    if (use && !byAnchor.has(use.anchorId)) byAnchor.set(use.anchorId, use);
+  }
+  return [...byAnchor.values()];
+}
+
+function resultTraditionLabels(
+  prayer: Prayer | undefined,
+  hasSources: boolean,
+  addedLabels: readonly TraditionLabel[] = [],
+): TraditionLabel[] {
+  const base = prayer
+    ? prayer.traditionLabels
+    : hasSources
+      ? ["original-composition", "modern-interpretation"] as TraditionLabel[]
+      : ["original-composition"] as TraditionLabel[];
+  return [...new Set([...base, ...addedLabels])];
+}
+
 function safetyResult(
   request: EngineRequest,
   classification: SafetyClassification,
@@ -402,6 +438,9 @@ function safetyResult(
     reflectionPrompts: [],
     closing,
     sourceIds: [],
+    sourceUses: [],
+    conceptIds: [],
+    worldviewProfile: request.worldviewProfile,
     traditionLabels: [],
     audioRecommendationIds: [],
     safetyNote: "This fixed response is written and reviewed by people. It is not assembled by the Engine.",
@@ -440,17 +479,77 @@ export function composeWithEngine(
   if (!category) throw new Error("The Engine needs at least one active category.");
   if (safety.level !== "none") return safetyResult(request, safety, category, now);
 
+  const conceptFrame =
+    request.outputType !== "combined-practice" && request.conceptId
+      ? library.conceptFrames.find(
+          (frame) => frame.conceptId === request.conceptId,
+        )
+      : undefined;
+  if (request.conceptId && request.outputType !== "combined-practice") {
+    if (!conceptFrame) {
+      throw new Error(`Unknown contemplative concept lens "${request.conceptId}".`);
+    }
+    if (!conceptFrame.compatibleWorldviews.includes(request.worldviewProfile)) {
+      throw new Error(
+        `The selected concept lens is not available for the ${request.worldviewProfile} worldview profile.`,
+      );
+    }
+    if (
+      containsAvoidance(
+        [
+          conceptFrame.title,
+          conceptFrame.description,
+          conceptFrame.prayerLine,
+          conceptFrame.affirmation,
+          conceptFrame.practiceStep,
+          conceptFrame.reflectionPrompt,
+        ].join(" "),
+        request.avoidances,
+      )
+    ) {
+      throw new Error(
+        `The selected concept lens conflicts with a requested avoidance.`,
+      );
+    }
+  }
+
   const history = historyStore.read();
-  const key = `${category.id}:${request.outputType}:${request.duration}:${request.tone}:${request.languagePreference}`;
-  const needsPrayer = request.outputType === "prayer" || request.outputType === "combined-practice";
-  const needsAffirmation =
-    request.outputType === "affirmation" || request.outputType === "combined-practice";
-  const needsPractice =
-    request.outputType === "meditation" || request.outputType === "combined-practice";
+  const key = `${category.id}:${request.outputType}:${request.duration}:${request.tone}:${request.languagePreference}:${request.worldviewProfile}:${conceptFrame?.id ?? "open"}`;
+  const coherenceSession =
+    request.outputType === "combined-practice"
+      ? getCoherenceSessionForCategory(category.id)
+      : undefined;
+  const breathFreeCoherence =
+    coherenceSession !== undefined && avoidsBreathFocus(request.avoidances);
+  const otherCoherenceAvoidances = request.avoidances.filter(
+    (avoidance) => !isBreathFocusAvoidance(avoidance),
+  );
+  if (
+    coherenceSession &&
+    containsAvoidance(
+      [
+        coherenceSession.opening,
+        ...coherenceSession.stages.flatMap((stage) => [
+          stage.instruction,
+          stage.prompt,
+        ]),
+        coherenceSession.closing,
+      ].join(" "),
+      otherCoherenceAvoidances,
+    )
+  ) {
+    throw new Error(
+      `The reviewed coherence wording conflicts with a requested avoidance for ${category.name}.`,
+    );
+  }
+  const needsPrayer = request.outputType === "prayer";
+  const needsAffirmation = request.outputType === "affirmation";
+  const needsPractice = request.outputType === "meditation";
   const needsPrompt =
     request.duration !== "brief" &&
     category.id !== "sleep-and-rest" &&
-    request.outputType !== "affirmation";
+    request.outputType !== "affirmation" &&
+    request.outputType !== "combined-practice";
 
   const prayerPick = needsPrayer
     ? takeFromBag(`${key}:prayer`, prayerCandidates(request, category, library), history, random)
@@ -471,13 +570,24 @@ export function composeWithEngine(
         random,
       )
     : { item: undefined, cycle: 1 };
-  const promptPick = needsPrompt
-    ? takeFromBag(`${key}:prompt`, promptCandidates(request, category, library), history, random)
-    : { item: undefined, cycle: 1 };
-
   const prayer = prayerPick.item;
   const affirmation = affirmationPick.item;
   const practice = practicePick.item;
+  const prayerPromptCandidates = prayer
+    ? prayer.reflectionPromptIds
+        .map((id) => library.prompts.find((candidate) => candidate.id === id))
+        .filter((candidate): candidate is ReflectionPrompt => candidate !== undefined)
+    : [];
+  const promptPick = needsPrompt
+    ? takeFromBag(
+        `${key}:prompt`,
+        prayerPromptCandidates.length > 0
+          ? prayerPromptCandidates
+          : promptCandidates(request, category, library),
+        history,
+        random,
+      )
+    : { item: undefined, cycle: 1 };
   const prompt = promptPick.item;
   if (needsPrayer && !prayer) {
     throw new Error(`No compatible prayer is available for ${category.name}.`);
@@ -488,9 +598,13 @@ export function composeWithEngine(
   if (needsPractice && !practice) {
     throw new Error(`No compatible practice is available for ${category.name}.`);
   }
-  const recipeIds = [prayer?.id, affirmation?.id, practice?.id, prompt?.id].filter(
-    (id): id is string => id !== undefined,
-  );
+  const recipeIds = [
+    prayer?.id,
+    affirmation?.id,
+    practice?.id,
+    prompt?.id,
+    coherenceSession?.id,
+  ].filter((id): id is string => id !== undefined);
   if (recipeIds.length === 0) {
     throw new Error(`No compatible library material is available for ${category.name}.`);
   }
@@ -503,52 +617,138 @@ export function composeWithEngine(
   historyStore.write(history);
 
   const targetMinutes = DURATION_MINUTES[request.duration];
-  const practiceDuration = practice
-    ? practice.durationOptions.reduce((closest, option) =>
-        Math.abs(option - targetMinutes) < Math.abs(closest - targetMinutes) ? option : closest,
+  const practiceDuration = coherenceSession
+    ? Math.ceil(
+        coherenceSession.stages.reduce(
+          (total, stage) => total + stage.seconds,
+          0,
+        ) / 60,
       )
-    : prayer?.practiceDuration ?? 0;
-  const sourceIds = [...new Set([...(prayer?.sourceIds ?? []), ...(practice?.sourceIds ?? [])])];
+    : practice
+      ? practice.durationOptions.reduce((closest, option) =>
+          Math.abs(option - targetMinutes) < Math.abs(closest - targetMinutes)
+            ? option
+            : closest,
+        )
+      : prayer?.practiceDuration ?? 0;
+  const sourceIds = [
+    ...new Set([
+      ...(prayer?.sourceIds ?? []),
+      ...(affirmation?.sourceIds ?? []),
+      ...(practice?.sourceIds ?? []),
+      ...(coherenceSession?.sourceIds ?? []),
+      ...(conceptFrame?.sourceIds ?? []),
+    ]),
+  ];
+  const sourceUses = uniqueSourceUses([
+    ...(prayer?.sourceUses ?? []),
+    ...(affirmation?.sourceUses ?? []),
+    ...(practice?.sourceUses ?? []),
+    ...(prompt?.sourceUses ?? []),
+    ...(conceptFrame?.sourceUses ?? []),
+  ]);
   const cycle = Math.max(
     prayerPick.cycle,
     affirmationPick.cycle,
     practicePick.cycle,
-    promptPick.cycle,
   );
   const title =
     request.outputType === "affirmation"
       ? `A line for ${category.name}`
-      : practice?.title ?? prayer?.title ?? category.name;
+      : coherenceSession
+        ? `Coherence prayer for ${category.name}`
+        : practice?.title ?? prayer?.title ?? category.name;
   const practiceSafetyNote = practice?.safetyNotes.trim() ?? "";
-  const userFacingSafetyNote = /[.!?]$/.test(practiceSafetyNote)
-    ? practiceSafetyNote
+  const coherenceSafetyNote = coherenceSession
+    ? breathFreeCoherence
+      ? [
+          "Use visual and contact-point grounding instead of breath counting. Stop if orienting makes you more distressed or disoriented.",
+          "This practice does not replace medical or mental-health care and does not guarantee healing or any external outcome.",
+          coherenceSession.variant === "challenge-reset"
+            ? "If you may be in danger, prioritise leaving, contacting a trusted person or emergency support over completing the timer."
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ")
+      : coherenceSession.safetyNotes.trim()
     : "";
+  const userFacingSafetyNote = [practiceSafetyNote, coherenceSafetyNote]
+    .filter((note) => /[.!?]$/.test(note))
+    .join(" ");
+  const conceptSafetyNote = conceptFrame?.safetyNote.trim() ?? "";
 
   return EngineResultSchema.parse({
     title,
     categoryId: category.id,
     category: category.name,
     outputType: request.outputType,
-    opening: practice?.preparation ?? prayer?.opening ?? "A line to carry into this moment.",
-    prayer: prayer?.body ?? "",
-    affirmation: affirmation?.text ?? "",
+    opening:
+      coherenceSession
+        ? coherenceSession.opening
+        : request.outputType === "meditation"
+        ? practice?.preparation ?? "Arrive as you are."
+        : prayer?.opening ?? "A line to carry into this moment.",
+    prayer:
+      conceptFrame && request.outputType === "prayer"
+        ? [conceptFrame.prayerLine, prayer?.body ?? ""].filter(Boolean).join("\n\n")
+        : prayer?.body ?? "",
+    affirmation:
+      conceptFrame && request.outputType === "affirmation"
+        ? conceptFrame.affirmation
+        : affirmation?.text ?? "",
     practiceDuration,
-    practiceSteps: practice?.steps.map((step) => step.instruction) ?? [],
-    reflectionPrompts: prompt ? [prompt.text] : [],
-    closing: practice?.closing ?? prayer?.closing ?? "Read it slowly, and keep only what feels honest.",
-    sourceIds,
-    traditionLabels: prayer?.traditionLabels ?? [],
-    audioRecommendationIds: [
-      ...new Set([...(prayer?.audioIds ?? []), ...(practice?.audioIds ?? [])]),
+    practiceSteps: coherenceSession
+      ? coherenceSession.stages.map((stage) =>
+          stage.id === "regulate" && breathFreeCoherence
+            ? GROUNDING_REGULATION_INSTRUCTION
+            : stage.instruction,
+        )
+      : [
+          ...(conceptFrame && request.outputType === "meditation"
+            ? [conceptFrame.practiceStep]
+            : []),
+          ...(practice?.steps.map((step) => step.instruction) ??
+            (request.outputType === "prayer" ? prayer?.practiceSteps ?? [] : [])),
+        ],
+    reflectionPrompts: [
+      ...(conceptFrame && request.outputType !== "affirmation"
+        ? [conceptFrame.reflectionPrompt]
+        : []),
+      ...(prompt ? [prompt.text] : []),
     ],
-    safetyNote: userFacingSafetyNote,
+    closing:
+      coherenceSession
+        ? coherenceSession.closing
+        : request.outputType === "meditation"
+        ? practice?.closing ?? "Return gently."
+        : prayer?.closing ??
+          "Read it slowly, and keep only what feels honest.",
+    sourceIds,
+    sourceUses,
+    conceptIds: conceptFrame ? [conceptFrame.conceptId] : [],
+    worldviewProfile: request.worldviewProfile,
+    traditionLabels: resultTraditionLabels(
+      prayer,
+      sourceIds.length > 0,
+      conceptFrame?.traditionLabels ?? [],
+    ),
+    audioRecommendationIds: [
+      ...new Set([
+        ...(prayer?.audioIds ?? []),
+        ...(practice?.audioIds ?? []),
+        ...(coherenceSession?.audioTrackIds ?? []),
+      ]),
+    ],
+    safetyNote: [userFacingSafetyNote, conceptSafetyNote]
+      .filter(Boolean)
+      .join(" "),
     safetyLevel: "none",
     assembledAt: now().toISOString(),
     fingerprint,
     recipe: {
       prayerId: prayer?.id,
       affirmationId: affirmation?.id,
-      practiceId: practice?.id,
+      practiceId: practice?.id ?? coherenceSession?.id,
       promptIds: prompt ? [prompt.id] : [],
       cycle,
     },

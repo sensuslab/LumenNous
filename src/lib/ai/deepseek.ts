@@ -4,7 +4,10 @@ import { z } from "zod";
 
 export const DEEPSEEK_BASE_URL =
   process.env.DEEPSEEK_BASE_URL ?? "https://api.deepseek.com";
-export const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL ?? "deepseek-v4-pro";
+/* Flash is the deployed default: the Create flow only ever asks for one short,
+   structured composition, so the reasoning-tier cost and latency bought nothing.
+   Override per environment with DEEPSEEK_MODEL. */
+export const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL ?? "DeepSeek-V4-Flash-0731";
 
 export const DeepSeekMessageSchema = z.object({
   role: z.enum(["system", "user", "assistant"]),
@@ -60,15 +63,21 @@ export async function createDeepSeekCompletion({
       max_tokens: maxTokens,
       temperature,
       stream: false,
-      thinking: { type: "enabled" },
-      reasoning_effort: "high",
     }),
     cache: "no-store",
     signal: AbortSignal.timeout(60_000),
   });
 
   if (!response.ok) {
-    throw new Error(`DeepSeek request failed with status ${response.status}.`);
+    /* Surface the upstream reason. A bad key answers 401 and a rejected model
+       or parameter answers 400 with an explanatory body, and the two were
+       previously indistinguishable in the logs. The body is provider text and
+       never contains the request credentials. */
+    const detail = await response.text().catch(() => "");
+    const summary = detail.replace(/\s+/g, " ").trim().slice(0, 300);
+    throw new Error(
+      `DeepSeek request failed with status ${response.status}.${summary ? ` ${summary}` : ""}`,
+    );
   }
 
   const payload = DeepSeekResponseSchema.parse(await response.json());

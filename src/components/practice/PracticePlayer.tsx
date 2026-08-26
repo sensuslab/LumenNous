@@ -79,7 +79,8 @@ export function PracticePlayer({
       const oscillator = context.createOscillator();
       const gain = context.createGain();
       oscillator.type = "sine";
-      oscillator.frequency.value = 528;
+      // An ordinary C5 interface cue, with no therapeutic-frequency claim.
+      oscillator.frequency.value = 523.25;
       gain.gain.setValueAtTime(0.06, context.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.9);
       oscillator.connect(gain).connect(context.destination);

@@ -21,6 +21,16 @@ import {
   categories,
   categoryById,
   categoryBySlug,
+  contemplativeConceptById,
+  contemplativeConceptBySlug,
+  contemplativeConcepts,
+  contemplativePathwayBySlug,
+  contemplativePathways,
+  conceptEngineFrameByConceptId,
+  conceptEngineFrames,
+  editorialReviews,
+  passageAnchorById,
+  passageAnchors,
   playlistBySlug,
   playlists,
   practices,
@@ -29,7 +39,13 @@ import {
   reflectionPromptById,
   reflectionPrompts,
   sourceById,
+  sourceEditionById,
+  sourceEditions,
+  sourceReviewPolicies,
   sources,
+  sessionBySlug,
+  sessionByVariant,
+  sessionTemplates,
   teachingBySlug,
   teachings,
   validateContent,
@@ -38,11 +54,20 @@ import type {
   Affirmation,
   AudioItem,
   Category,
+  ContemplativeConcept,
+  ContemplativePathway,
+  ConceptEngineFrame,
+  EditorialReview,
+  PassageAnchor,
   Playlist,
   Practice,
   Prayer,
   ReflectionPrompt,
   Source,
+  SourceEdition,
+  SourceReviewPolicy,
+  SessionTemplate,
+  SessionVariant,
   Teaching,
 } from "./schemas";
 
@@ -196,6 +221,79 @@ export function listSources(): Source[] {
   return sources;
 }
 
+export function getSourceEditionById(id: string): SourceEdition | undefined {
+  return sourceEditionById.get(id);
+}
+
+export function listSourceEditions(): SourceEdition[] {
+  return sourceEditions;
+}
+
+export function listSourceReviewPolicies(): SourceReviewPolicy[] {
+  return sourceReviewPolicies;
+}
+
+export function getPassageAnchorById(id: string): PassageAnchor | undefined {
+  return passageAnchorById.get(id);
+}
+
+export function getPassageAnchorsByIds(ids: readonly string[]): PassageAnchor[] {
+  return [...new Set(ids)]
+    .map((id) => passageAnchorById.get(id))
+    .filter((anchor): anchor is PassageAnchor => anchor !== undefined);
+}
+
+export function getPassageAnchorsBySourceIds(
+  ids: readonly string[],
+): PassageAnchor[] {
+  const sourceIdSet = new Set(ids);
+  return passageAnchors.filter((anchor) => sourceIdSet.has(anchor.sourceId));
+}
+
+export function listPassageAnchors(): PassageAnchor[] {
+  return passageAnchors;
+}
+
+export function getContemplativeConceptById(
+  id: string,
+): ContemplativeConcept | undefined {
+  return contemplativeConceptById.get(id);
+}
+
+export function getContemplativeConceptBySlug(
+  slug: string,
+): ContemplativeConcept | undefined {
+  return contemplativeConceptBySlug.get(slug);
+}
+
+export function listContemplativeConcepts(): ContemplativeConcept[] {
+  return contemplativeConcepts;
+}
+
+export function getContemplativePathwayBySlug(
+  slug: string,
+): ContemplativePathway | undefined {
+  return contemplativePathwayBySlug.get(slug);
+}
+
+export function listContemplativePathways(): ContemplativePathway[] {
+  return contemplativePathways;
+}
+
+export function getConceptEngineFrameByConceptId(
+  conceptId: string,
+): ConceptEngineFrame | undefined {
+  return conceptEngineFrameByConceptId.get(conceptId);
+}
+
+export function listConceptEngineFrames(): ConceptEngineFrame[] {
+  return conceptEngineFrames;
+}
+
+export function listEditorialReviews(): EditorialReview[] {
+  return editorialReviews;
+}
+
 export function getAudioById(id: string): AudioItem | undefined {
   return audioItemById.get(id);
 }
@@ -230,6 +328,20 @@ export function getTeachingBySlug(slug: string): Teaching | undefined {
 
 export function listTeachings(): Teaching[] {
   return teachings;
+}
+
+export function listSessionTemplates(): readonly SessionTemplate[] {
+  return sessionTemplates;
+}
+
+export function getSessionBySlug(slug: string): SessionTemplate | undefined {
+  return sessionBySlug.get(slug);
+}
+
+export function getSessionByVariant(
+  variant: SessionVariant,
+): SessionTemplate | undefined {
+  return sessionByVariant.get(variant);
 }
 
 /* ------------------------------------------------------------------ */

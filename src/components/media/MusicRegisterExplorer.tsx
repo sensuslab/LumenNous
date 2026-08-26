@@ -21,34 +21,35 @@ const FAMILY_LABELS: Record<MusicFamily, string> = {
 const EVIDENCE_LABELS: Record<MusicRegisterItem["evidenceLabel"], string> = {
   TRADITIONAL_PRACTICE: "Traditional practice",
   EXPERIENTIAL_CLAIM: "Experiential claim",
-  SCIENTIFIC_EVIDENCE: "Research-informed",
+  SCIENTIFIC_EVIDENCE: "Research-aligned format",
   PRELIMINARY_EVIDENCE: "Preliminary evidence",
   COMMERCIALLY_POPULAR_BUT_UNSUBSTANTIATED: "Unsubstantiated claim",
   CONTRADICTED_OR_MISLEADING: "Contradicted or misleading",
 };
 
-const READINESS_LABELS: Record<MusicRegisterItem["readinessState"], string> = {
-  ready_for_editorial_review: "Editorial review",
-  needs_rights_review: "Rights review",
-  needs_theological_or_cultural_review: "Cultural review",
-  needs_claim_review: "Claim review",
-  blocked: "Reference only",
-  format_reference_only: "Format reference",
-};
-
-function formatViews(views: number): string {
-  return new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(views);
+function formatDuration(seconds: number | null): string {
+  if (seconds === null) return "Length unavailable";
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remaining = seconds % 60;
+  return hours > 0
+    ? `${hours}:${String(minutes).padStart(2, "0")}:${String(remaining).padStart(2, "0")}`
+    : `${minutes}:${String(remaining).padStart(2, "0")}`;
 }
 
 function canPlay(item: MusicRegisterItem): boolean {
-  return item.playbackMode === "embed" && item.readinessState !== "blocked";
+  return (
+    item.playbackMode === "embed" &&
+    item.readinessState !== "blocked" &&
+    item.claimRisk !== "blocked"
+  );
 }
 
-function sourceTone(item: MusicRegisterItem): "blue" | "gold" | "warn" | "neutral" {
-  if (item.readinessState === "blocked") return "warn";
-  if (item.readinessState === "ready_for_editorial_review") return "blue";
-  if (item.evidenceLabel === "TRADITIONAL_PRACTICE") return "gold";
-  return "neutral";
+function reviewLabel(item: MusicRegisterItem): string {
+  if (item.readinessState === "ready_for_editorial_review") return "Reviewed";
+  return item.readinessState
+    .replace(/^needs_/, "Needs ")
+    .replaceAll("_", " ");
 }
 
 export function MusicRegisterExplorer({
@@ -61,20 +62,25 @@ export function MusicRegisterExplorer({
   const [query, setQuery] = useState("");
   const [family, setFamily] = useState<MusicFamily | null>(null);
   const [frequency, setFrequency] = useState<number | null>(null);
-  const [playableOnly, setPlayableOnly] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const families = useMemo(
-    () => [...new Set(items.map((item) => item.family))],
+  const reviewedItems = useMemo(
+    () =>
+      items.filter(
+        (item) => item.readinessState !== "blocked" && item.claimRisk !== "blocked",
+      ),
     [items],
+  );
+  const families = useMemo(
+    () => [...new Set(reviewedItems.map((item) => item.family))],
+    [reviewedItems],
   );
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return items.filter((item) => {
+    return reviewedItems.filter((item) => {
       if (family && item.family !== family) return false;
       if (frequency && !item.frequenciesHz.includes(frequency)) return false;
-      if (playableOnly && !canPlay(item)) return false;
       if (!needle) return true;
       const haystack = [
         item.id,
@@ -89,9 +95,9 @@ export function MusicRegisterExplorer({
         .toLowerCase();
       return haystack.includes(needle);
     });
-  }, [family, frequency, items, playableOnly, query]);
+  }, [family, frequency, query, reviewedItems]);
 
-  const playableCount = items.filter(canPlay).length;
+  const playableCount = reviewedItems.filter(canPlay).length;
   const minFrequency = frequencies[0] ?? 0;
   const maxFrequency = frequencies.at(-1) ?? 1;
   const logMin = Math.log(minFrequency || 1);
@@ -101,20 +107,19 @@ export function MusicRegisterExplorer({
     setQuery("");
     setFamily(null);
     setFrequency(null);
-    setPlayableOnly(false);
   }
 
   return (
     <section aria-labelledby="full-register-title" className="mt-12">
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line-subtle pb-4">
         <div>
-          <p className="t-eyebrow text-blue">Complete research register</p>
+          <p className="t-eyebrow text-blue">Public review complete</p>
           <h2 id="full-register-title" className="t-h2 mt-2 text-ink-strong">
-            Music library
+            Reviewed listening
           </h2>
         </div>
         <p className="t-meta text-ink-faint">
-          {items.length} records · {playableCount} play here
+          {reviewedItems.length} selections · {playableCount} playable here
         </p>
       </div>
 
@@ -126,7 +131,7 @@ export function MusicRegisterExplorer({
             aria-hidden="true"
           />
           <label htmlFor="music-search" className="sr-only">
-            Search the music register
+            Search reviewed listening
           </label>
           <input
             id="music-search"
@@ -156,53 +161,46 @@ export function MusicRegisterExplorer({
           </div>
         </div>
 
-        <div className="mt-6 border-t border-line-subtle pt-5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="t-meta uppercase text-ink-faint">Pitch labels</p>
-            <p className="t-meta text-ink-faint">Register labels, not health claims</p>
-          </div>
-          <div className="relative mt-4 h-8" aria-hidden="true">
-            <div className="absolute left-0 right-0 top-1/2 h-px bg-line" />
-            {frequencies.map((value) => {
-              const left = ((Math.log(value) - logMin) / logSpan) * 100;
-              return (
-                <span
+        {frequencies.length > 0 ? (
+          <div className="mt-6 border-t border-line-subtle pt-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="t-meta uppercase text-ink-faint">Pitch labels</p>
+              <p className="t-meta text-ink-faint">Register labels, not health claims</p>
+            </div>
+            <div className="relative mt-4 h-8" aria-hidden="true">
+              <div className="absolute left-0 right-0 top-1/2 h-px bg-line" />
+              {frequencies.map((value) => {
+                const left = ((Math.log(value) - logMin) / logSpan) * 100;
+                return (
+                  <span
+                    key={value}
+                    className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-blue bg-bg-1"
+                    style={{ left: `${left}%` }}
+                  />
+                );
+              })}
+            </div>
+            <div role="group" aria-label="Filter by pitch label" className="flex flex-wrap gap-2">
+              {frequencies.map((value) => (
+                <button
                   key={value}
-                  className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-blue bg-bg-1"
-                  style={{ left: `${left}%` }}
-                />
-              );
-            })}
+                  type="button"
+                  aria-pressed={frequency === value}
+                  onClick={() => setFrequency((current) => (current === value ? null : value))}
+                >
+                  <Chip selected={frequency === value} tone="violet">
+                    {value} Hz
+                  </Chip>
+                </button>
+              ))}
+            </div>
           </div>
-          <div role="group" aria-label="Filter by pitch label" className="flex flex-wrap gap-2">
-            {frequencies.map((value) => (
-              <button
-                key={value}
-                type="button"
-                aria-pressed={frequency === value}
-                onClick={() => setFrequency((current) => (current === value ? null : value))}
-              >
-                <Chip selected={frequency === value} tone="violet">
-                  {value} Hz
-                </Chip>
-              </button>
-            ))}
-          </div>
-        </div>
+        ) : null}
 
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-line-subtle pt-5">
-          <label className="inline-flex min-h-11 cursor-pointer items-center gap-3 font-sans text-sm text-ink-muted">
-            <input
-              type="checkbox"
-              checked={playableOnly}
-              onChange={(event) => setPlayableOnly(event.target.checked)}
-              className="h-5 w-5 accent-[var(--blue)]"
-            />
-            Playable in app
-          </label>
+        <div className="mt-5 flex flex-wrap items-center justify-end gap-3 border-t border-line-subtle pt-5">
           <p aria-live="polite" className="t-meta text-ink-faint">
             {filtered.length} {filtered.length === 1 ? "result" : "results"}
-            {query || family || frequency || playableOnly ? (
+            {query || family || frequency ? (
               <button
                 type="button"
                 onClick={reset}
@@ -215,7 +213,7 @@ export function MusicRegisterExplorer({
         </div>
       </div>
 
-      <div aria-label="Complete music register">
+      <div aria-label="Reviewed music selections">
         {filtered.map((item) => {
           const playable = canPlay(item);
           const active = activeId === item.id;
@@ -231,16 +229,14 @@ export function MusicRegisterExplorer({
                     <span className="text-ink-faint" aria-hidden="true">·</span>
                     <span className="t-meta text-ink-muted">{FAMILY_LABELS[item.family]}</span>
                     <span className="text-ink-faint" aria-hidden="true">·</span>
-                    <span className="t-meta text-ink-muted">{item.duration}</span>
+                    <span className="t-meta text-ink-muted">
+                      {formatDuration(item.durationSeconds)}
+                    </span>
                   </div>
                   <h3 className="mt-2 font-display text-lg leading-snug text-ink-strong">{item.title}</h3>
-                  <p className="t-body-sm mt-1 text-ink-muted">
-                    {item.channel} · {formatViews(item.viewsChecked)} views at review
-                  </p>
+                  <p className="t-body-sm mt-1 text-ink-muted">{item.channel}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <Chip kind="source" tone={sourceTone(item)}>
-                      {READINESS_LABELS[item.readinessState]}
-                    </Chip>
+                    <Chip kind="source" tone="blue">{reviewLabel(item)}</Chip>
                     <Chip kind="source" tone="neutral">
                       {EVIDENCE_LABELS[item.evidenceLabel]}
                     </Chip>
@@ -250,12 +246,6 @@ export function MusicRegisterExplorer({
                       </Chip>
                     ))}
                   </div>
-                  {item.family === "BINAURAL" ? (
-                    <p className="t-meta mt-3 flex items-center gap-2 text-warn">
-                      <Icon name="ear" className="h-4 w-4" aria-hidden="true" />
-                      Headphones are needed to perceive the stereo beat.
-                    </p>
-                  ) : null}
                   <div className="mt-4 flex flex-wrap items-center gap-3">
                     {playable ? (
                       <button
@@ -267,9 +257,19 @@ export function MusicRegisterExplorer({
                         <Icon name={active ? "x" : "play"} className="h-4 w-4" aria-hidden="true" />
                         {active ? "Close player" : "Play here"}
                       </button>
+                    ) : item.playbackMode === "link" ? (
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="glass inline-flex min-h-11 items-center gap-2 rounded-sm px-4 py-2 font-sans text-sm font-semibold text-ink-strong hover:border-line"
+                      >
+                        <Icon name="arrow-up-right" className="h-4 w-4" aria-hidden="true" />
+                        Open on YouTube
+                      </a>
                     ) : (
                       <span className="inline-flex min-h-11 items-center font-sans text-sm text-ink-faint">
-                        Playback unavailable pending review
+                        Playback unavailable
                       </span>
                     )}
                     <span className="t-meta text-ink-faint">{item.playlistFit}</span>
@@ -297,7 +297,7 @@ export function MusicRegisterExplorer({
       </div>
 
       {filtered.length === 0 ? (
-        <p className="t-body py-8 text-ink-muted">No register entries match those filters.</p>
+        <p className="t-body py-8 text-ink-muted">No reviewed selections match those filters.</p>
       ) : null}
     </section>
   );

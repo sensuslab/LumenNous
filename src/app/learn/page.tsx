@@ -1,7 +1,11 @@
 import Link from "next/link";
 import type { JSX } from "react";
 import type { Metadata } from "next";
-import { listTeachings } from "@/lib/content";
+import {
+  listContemplativeConcepts,
+  listContemplativePathways,
+  listTeachings,
+} from "@/lib/content";
 import { classificationChip } from "@/components/prayer/SourceBadge";
 import { Chip } from "@/components/ui/Chip";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -21,6 +25,8 @@ export const metadata: Metadata = {
 
 export default function LearnPage(): JSX.Element {
   const teachings = listTeachings();
+  const pathways = listContemplativePathways();
+  const concepts = listContemplativeConcepts();
 
   return (
     <>
@@ -37,6 +43,24 @@ export default function LearnPage(): JSX.Element {
             simply find beautiful and useful.
           </p>
         </section>
+
+        <GlassCard className="mt-8 border-[rgba(167,155,232,0.3)]" interactive>
+          <Link href="/concepts" className="group block">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <Chip kind="source" classification="EDIT">Concept Atlas</Chip>
+              <span className="t-meta text-ink-faint">{concepts.length} traced concepts</span>
+            </div>
+            <h2 className="t-h2 mt-3 text-ink-strong">Follow an idea to its sources</h2>
+            <p className="t-body-sm mt-2 max-w-[60ch] text-ink-muted">
+              Compare distinct ancient and modern strands, see the boundaries that
+              travel with each idea, and find its pathways and Create applications.
+            </p>
+            <span className="t-meta mt-4 inline-flex items-center gap-1 text-ink-faint group-hover:text-violet">
+              Open the Concept Atlas
+              <Icon name="arrow-up-right" className="h-3.5 w-3.5" aria-hidden="true" />
+            </span>
+          </Link>
+        </GlassCard>
 
         <section aria-labelledby="legend" className="glass mt-8 rounded-md p-5">
           <h2 id="legend" className="t-label flex items-center gap-2 font-sans text-ink-strong">
@@ -63,6 +87,40 @@ export default function LearnPage(): JSX.Element {
           >
             Our full label system →
           </Link>
+        </section>
+
+        <section aria-labelledby="pathways" className="mt-10">
+          <div className="flex items-end justify-between gap-3 border-b border-line-subtle pb-3">
+            <h2 id="pathways" className="t-eyebrow text-violet">
+              Guided pathways · {pathways.length}
+            </h2>
+            <Link
+              href="/pathways"
+              className="t-meta inline-flex min-h-11 items-center text-ink-muted hover:text-violet"
+            >
+              View all
+            </Link>
+          </div>
+          <div className="mt-5 grid grid-cols-1 gap-4">
+            {pathways.map((pathway) => (
+              <GlassCard key={pathway.id} as="article" interactive>
+                <Link href={`/pathways/${pathway.slug}`} className="group block">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <Chip kind="source" classification="MOD">PATHWAY</Chip>
+                    <span className="t-meta text-ink-faint">
+                      {pathway.stages.length} stages · {pathway.estimatedMinutes} min
+                    </span>
+                  </div>
+                  <h3 className="t-h3 mt-3 text-ink-strong">{pathway.title}</h3>
+                  <p className="t-body-sm mt-2 text-ink-muted">{pathway.summary}</p>
+                  <span className="t-meta mt-3 inline-flex items-center gap-1 text-ink-faint group-hover:text-violet">
+                    Begin the pathway
+                    <Icon name="arrow-up-right" className="h-3.5 w-3.5" />
+                  </span>
+                </Link>
+              </GlassCard>
+            ))}
+          </div>
         </section>
 
         <section aria-labelledby="guides" className="mt-10">
@@ -102,7 +160,7 @@ export default function LearnPage(): JSX.Element {
             <div>
               <h2 className="t-h3 text-ink-strong">How LumenNous assembles content</h2>
               <p className="t-body-sm mt-2 text-ink-muted">
-                Create selects and combines reviewed prayers, affirmations,
+                Create selects and combines human-authored prayers, affirmations,
                 practices and prompts on your device. It cycles through each
                 compatible shelf before reshuffling, so the experience stays varied.
               </p>

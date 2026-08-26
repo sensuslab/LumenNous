@@ -15,6 +15,7 @@
  */
 
 import { SourceSchema, type Source } from "../lib/schemas";
+import ingestedSourceRecords from "./ingested-sources.json";
 
 const raw: Source[] = [
   {
@@ -109,6 +110,134 @@ const raw: Source[] = [
       "The Thunder, Perfect Mind. Coptic text from Nag Hammadi Codex VI. A paradoxical poetic self-disclosure of a feminine divine figure, echoing earlier Isis aretalogies.",
     copyrightNotes: "Reference only.",
     lastVerified: "2026-07-18",
+  },
+  {
+    id: "src-gospel-of-truth",
+    title: "The Gospel of Truth (Nag Hammadi Codices I and XII)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Valentinian Christian / Gnostic tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "The Gospel of Truth. Coptic witnesses in Nag Hammadi Codices I and XII; translated in Robinson, ed., The Nag Hammadi Library in English. A meditation on knowledge, error, belonging, fullness and rest.",
+    copyrightNotes:
+      "Translation rights remain with the translators and publisher; use passage anchors for reference and write original adaptations.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-exegesis-on-soul",
+    title: "The Exegesis on the Soul (Nag Hammadi Codex II)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Early Christian / Gnostic soul tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "The Exegesis on the Soul. Nag Hammadi Codex II,6. A symbolic account of descent, dispersion, reorientation and return.",
+    copyrightNotes:
+      "Reference the tractate; do not reproduce the modern English translation at length.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-authoritative-teaching",
+    title: "Authoritative Teaching (Nag Hammadi Codex VI)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Gnostic / philosophical soul tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "Authoritative Teaching. Nag Hammadi Codex VI,3. Uses the image of the word as medicine for perception and knowledge of the soul's root.",
+    copyrightNotes:
+      "Reference only; product language should be original paraphrase or clearly labelled interpretation.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-discourse-eighth-ninth",
+    title: "The Discourse on the Eighth and Ninth (Nag Hammadi Codex VI)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Hermetic tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "The Discourse on the Eighth and Ninth. Nag Hammadi Codex VI,6. A Hermetic dialogue of prayer, silence, hymn and ascent.",
+    copyrightNotes:
+      "Translation rights retained by the translator/publisher; cite and adapt rather than reproduce.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-prayer-thanksgiving",
+    title: "The Prayer of Thanksgiving (Nag Hammadi Codex VI)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Hermetic thanksgiving tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "The Prayer of Thanksgiving. Nag Hammadi Codex VI,7. A communal prayer centred on mind, speech, knowledge and preservation in embodied life.",
+    copyrightNotes:
+      "Reference only; use the prayer's movement as a structure for original composition.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-teachings-silvanus",
+    title: "The Teachings of Silvanus (Nag Hammadi Codex VII)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Early Christian wisdom teaching",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "The Teachings of Silvanus. Nag Hammadi Codex VII,4. Moral and contemplative instruction on mind, reason, discipline and self-knowledge.",
+    copyrightNotes:
+      "Reference only; avoid reproducing extended translated passages.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-nag-hammadi-melchizedek",
+    title: "Melchizedek (Nag Hammadi Codex IX)",
+    author: "",
+    institution: "The Nag Hammadi Library in English",
+    year: null,
+    sourceType: "ancient-text",
+    tradition: "Early Christian / Gnostic revelatory tradition",
+    claimClassification: "historical-teaching",
+    url: "",
+    citation:
+      "Melchizedek. Nag Hammadi Codex IX,1. A highly fragmentary revelatory and priestly tractate; it must not be collapsed into later esoteric interpretations of Melchizedek.",
+    copyrightNotes:
+      "The tractate is fragmentary and the modern translation is copyrighted; reference only.",
+    lastVerified: "2026-08-25",
+  },
+  {
+    id: "src-grumbine-melchizedek",
+    title: "Melchizedek; or, The Secret Doctrine of the Bible",
+    author: "J. C. F. C. Grumbine",
+    institution: "The Order of the White Rose",
+    year: 1919,
+    sourceType: "modern-spiritual",
+    tradition: "Christian esotericism / mysticism",
+    claimClassification: "modern-interpretation",
+    url: "",
+    citation:
+      "Grumbine, J. C. F. C. Melchizedek; or, The Secret Doctrine of the Bible. Boston: The Order of the White Rose, 1919.",
+    copyrightNotes:
+      "The supplied EPUB is an OCR scan with variable accuracy. Confirm rights by release jurisdiction and verify any exact wording against page images before publication.",
+    lastVerified: "2026-08-25",
   },
   {
     id: "src-psalms-nrsv",
@@ -351,9 +480,198 @@ const raw: Source[] = [
     copyrightNotes: "Linked as an external public resource.",
     lastVerified: "2026-07-18",
   },
+  {
+    id: "src-quantum-prayers-coherence",
+    title:
+      "Quantum Prayers: Coherence, Consciousness & The Art of Aligned Prayer",
+    author: "",
+    institution: "User-provided source document",
+    year: null,
+    sourceType: "modern-spiritual",
+    tradition: "Contemporary spiritual synthesis / Quantum Prayer methodology",
+    claimClassification: "modern-interpretation",
+    url: "",
+    citation:
+      "Quantum Prayers: Coherence, Consciousness & The Art of Aligned Prayer. User-provided 43-page PDF reviewed July 2026. Cited for its five-stage contemplative method, not as scientific authority for quantum-mechanical claims.",
+    copyrightNotes:
+      "Local source supplied for editorial review; summarised and adapted, not reproduced.",
+    lastVerified: "2026-07-23",
+  },
+  {
+    id: "src-neuroscience-frequency-music",
+    title: "Neuroscience of Frequency Based Music",
+    author: "",
+    institution: "User-provided research memo",
+    year: null,
+    sourceType: "reference-work",
+    tradition: "Music, auditory neuroscience and wellness research synthesis",
+    claimClassification: "modern-interpretation",
+    url: "",
+    citation:
+      "Neuroscience of Frequency Based Music. User-provided research memo reviewed July 2026. Used as a scoping document; individual claims were checked against primary studies and systematic reviews.",
+    copyrightNotes:
+      "Local research memo. Its reference list and evidence grades are incomplete, so it is not treated as a systematic review.",
+    lastVerified: "2026-07-23",
+  },
+  {
+    id: "src-youtube-audio-register-expanded",
+    title: "Expanded YouTube Audio Register",
+    author: "",
+    institution: "LumenNous editorial research",
+    year: 2026,
+    sourceType: "reference-work",
+    tradition: "Contemplative-audio editorial catalogue",
+    claimClassification: "modern-interpretation",
+    url: "",
+    citation:
+      "youtube_audio_register_expanded.csv. User-provided 153-record editorial audit catalogue reviewed July 2026; preserved verbatim in the project research corpus.",
+    copyrightNotes:
+      "Metadata audit only. Linked audio remains the property of its creators and platforms.",
+    lastVerified: "2026-07-23",
+  },
+  {
+    id: "src-slow-breathing-systematic-review",
+    title:
+      "How Breath-Control Can Change Your Life: A Systematic Review on Psycho-Physiological Correlates of Slow Breathing",
+    author:
+      "Andrea Zaccaro, Andrea Piarulli, Marco Laurino, Erika Garbella, Danilo Menicucci, Bruno Neri and Angelo Gemignani",
+    institution: "Frontiers in Human Neuroscience",
+    year: 2018,
+    sourceType: "academic-article",
+    tradition: "Psychophysiology / slow-breathing research",
+    claimClassification: "research-synthesis",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC6137615/",
+    citation:
+      "Zaccaro A, Piarulli A, Laurino M, et al. How Breath-Control Can Change Your Life. Front Hum Neurosci. 2018;12:353. doi:10.3389/fnhum.2018.00353. Systematic review of 15 studies in healthy participants.",
+    copyrightNotes: "Open-access scholarly article; paraphrased, not reproduced.",
+    lastVerified: "2026-07-23",
+  },
+  {
+    id: "src-music-listening-anxiety-meta-analysis",
+    title:
+      "Effects of music therapy on anxiety: A meta-analysis of randomized controlled trials",
+    author:
+      "Guangli Lu, Ruiying Jia, Dandan Liang, Jingfen Yu, Zhen Wu and Chaoran Chen",
+    institution: "Psychiatry Research",
+    year: 2021,
+    sourceType: "academic-article",
+    tradition: "Music-therapy outcomes research",
+    claimClassification: "research-synthesis",
+    url: "https://pubmed.ncbi.nlm.nih.gov/34365216/",
+    citation:
+      "Lu G, Jia R, Liang D, et al. Effects of music therapy on anxiety: A meta-analysis of randomized controlled trials. Psychiatry Res. 2021;304:114137. doi:10.1016/j.psychres.2021.114137. Thirty-two studies, 1,924 participants.",
+    copyrightNotes:
+      "Abstract and citation used under ordinary scholarly reference practice. Results apply to studied interventions, not every track in the catalogue.",
+    lastVerified: "2026-07-23",
+  },
+  {
+    id: "src-natural-sounds-synthesis",
+    title:
+      "A synthesis of health benefits of natural sounds and their distribution in national parks",
+    author: "Rachel T. Buxton et al.",
+    institution: "Proceedings of the National Academy of Sciences",
+    year: 2021,
+    sourceType: "academic-article",
+    tradition: "Soundscape and environmental-health research",
+    claimClassification: "research-synthesis",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8040792/",
+    citation:
+      "Buxton RT et al. A synthesis of health benefits of natural sounds and their distribution in national parks. Proc Natl Acad Sci USA. 2021;118(14):e2013097118. Systematic review of 36 articles with 18 in meta-analysis.",
+    copyrightNotes:
+      "Open-access scholarly article; modality-level findings are not presented as proof for a particular YouTube recording.",
+    lastVerified: "2026-07-23",
+  },
+  {
+    id: "src-binaural-entrainment-review",
+    title:
+      "Binaural beats to entrain the brain? A systematic review of effects on brain oscillatory activity",
+    author: "",
+    institution: "PLOS ONE / PubMed Central",
+    year: 2023,
+    sourceType: "academic-article",
+    tradition: "Auditory neuroscience",
+    claimClassification: "research-synthesis",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC10198548/",
+    citation:
+      "Binaural beats to entrain the brain? A systematic review of the effects of binaural beat stimulation on brain oscillatory activity, and implications for psychological research and intervention. PLOS ONE. 2023. PMCID: PMC10198548.",
+    copyrightNotes:
+      "Open-access systematic review; findings were heterogeneous and do not establish reliable state control.",
+    lastVerified: "2026-07-23",
+  },
+  {
+    id: "src-adhd-coloured-noise-meta-analysis",
+    title:
+      "Do White Noise and Pink Noise Help With Attention in Attention-Deficit/Hyperactivity Disorder?",
+    author:
+      "Joel T. Nigg, Alisha Bruton, Michael B. Kozlowski, Jeanette M. Johnstone and Sarah L. Karalunas",
+    institution:
+      "Journal of the American Academy of Child & Adolescent Psychiatry",
+    year: 2024,
+    sourceType: "academic-article",
+    tradition: "ADHD and attention research",
+    claimClassification: "research-synthesis",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC11283987/",
+    citation:
+      "Nigg JT, Bruton A, Kozlowski MB, Johnstone JM, Karalunas SL. Systematic Review and Meta-Analysis: Do White Noise and Pink Noise Help With Attention in ADHD? J Am Acad Child Adolesc Psychiatry. 2024;63(8):778–788. doi:10.1016/j.jaac.2023.12.014.",
+    copyrightNotes:
+      "Open manuscript. The small laboratory-task benefit was limited to ADHD/high-symptom groups; no brown-noise studies were identified.",
+    lastVerified: "2026-07-23",
+  },
+  {
+    id: "src-singing-bowl-systematic-review",
+    title: "Therapeutic effects of singing bowls: A systematic review of clinical studies",
+    author: "",
+    institution: "PubMed Central",
+    year: 2025,
+    sourceType: "academic-article",
+    tradition: "Sound-based wellness research",
+    claimClassification: "research-synthesis",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC12063014/",
+    citation:
+      "Therapeutic effects of singing bowls: A systematic review of clinical studies. 2025. PMCID: PMC12063014. Nineteen heterogeneous studies; assessed randomised trials were at high risk of bias.",
+    copyrightNotes:
+      "Open-access scholarly article; used to justify a preliminary/experiential label, not a therapeutic promise.",
+    lastVerified: "2026-07-23",
+  },
+  {
+    id: "src-who-safe-listening",
+    title: "Deafness and hearing loss: Safe listening",
+    author: "World Health Organization",
+    institution: "World Health Organization",
+    year: 2026,
+    sourceType: "health-resource",
+    tradition: "Public-health hearing guidance",
+    claimClassification: "research-synthesis",
+    url: "https://www.who.int/news-room/questions-and-answers/item/deafness-and-hearing-loss-safe-listening",
+    citation:
+      "World Health Organization. Deafness and hearing loss: Safe listening. Updated 6 March 2026. Guidance emphasises that volume, listening duration and repeated exposure jointly determine risk.",
+    copyrightNotes:
+      "WHO public-health guidance; linked and paraphrased.",
+    lastVerified: "2026-07-23",
+  },
+  {
+    id: "src-quantum-rng-null-study",
+    title:
+      "A large-scale test of micro-psychokinesis using quantum random number generators",
+    author: "",
+    institution: "Frontiers in Psychology / PubMed Central",
+    year: 2018,
+    sourceType: "academic-article",
+    tradition: "Consciousness claims / confirmatory experimental research",
+    claimClassification: "research-synthesis",
+    url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC5872141/",
+    citation:
+      "A large-scale test of micro-psychokinesis using quantum random number generators. Front Psychol. 2018. PMCID: PMC5872141. Online study with 12,571 participants; confirmatory analysis supported the null model.",
+    copyrightNotes:
+      "Open-access scholarly article; cited to prevent claims that intention reliably changes quantum random events.",
+    lastVerified: "2026-07-23",
+  },
 ];
 
 // Validated at module load — a malformed source record fails the build/tests.
-export const sources: Source[] = SourceSchema.array().parse(raw);
+export const sources: Source[] = SourceSchema.array().parse([
+  ...raw,
+  ...ingestedSourceRecords,
+]);
 
 export const sourceById = new Map(sources.map((source) => [source.id, source]));

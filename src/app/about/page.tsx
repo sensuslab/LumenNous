@@ -47,7 +47,7 @@ export default function AboutPage(): JSX.Element {
             <p className="t-eyebrow text-gold">It is</p>
             <ul className="t-body-sm mt-4 space-y-3 text-ink-muted">
               <li>A free library of prayers, affirmations, practices and listening.</li>
-              <li>An on-device Engine that assembles a personal practice from that library.</li>
+              <li>A Create flow that uses AI for your own words and the on-board library for chosen intentions.</li>
               <li>A quiet room that works in seconds, offline-friendly, account-free.</li>
             </ul>
           </GlassCard>
@@ -94,9 +94,9 @@ export default function AboutPage(): JSX.Element {
           <div>
             <ProseH2>Who tends the library</ProseH2>
             <p className="t-body mt-4 max-w-[62ch] text-ink-muted">
-              Content is researched, drafted and reviewed by editors. Seed
-              material is marked &ldquo;draft editorial content under
-              review&rdquo; until its final pass. Sources are real and cited;
+              Content is researched and drafted by editors. Seed material stays
+              marked &ldquo;draft editorial content under review&rdquo; until
+              source, safety and copy review are complete. Sources are real and cited;
               nothing is invented.
             </p>
           </div>
@@ -114,7 +114,7 @@ export default function AboutPage(): JSX.Element {
               {
                 n: "02",
                 title: "Compose",
-                body: "Editors write the library. Create selects compatible records on your device, validates the result and shows exactly how it was assembled. It does not call an external AI service or invent sources.",
+                body: "Editors write the library and safety boundaries. In this test build, Create sends 'based on my words' requests to the configured AI service for a bounded original composition. When you choose a specific intention, the on-board library system assembles the result. Fixed safety responses still bypass generation.",
               },
               {
                 n: "03",
@@ -133,12 +133,65 @@ export default function AboutPage(): JSX.Element {
               </li>
             ))}
           </ol>
+          <Link
+            href="/prayer-engine"
+            className="t-body-sm mt-6 inline-flex min-h-11 items-center font-sans font-medium text-violet underline-offset-4 hover:underline"
+          >
+            How the PrayerEngine assembles a practice
+          </Link>
+        </section>
+
+        <section aria-labelledby="coherence-method" className="mt-14">
+          <ProseH2 id="coherence-method">
+            The embodied coherence method
+          </ProseH2>
+          <p className="t-body mt-4 max-w-[62ch] text-ink-muted">
+            Our Quantum Prayer sessions preserve a reviewed five-stage
+            sequence from the supplied methodology while making its safety and
+            evidence boundaries explicit.
+          </p>
+          <ol className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-5">
+            {[
+              ["Regulate", "60s", "Easy 4–2–6 counts or natural breath"],
+              ["Embody", "30s", "Support, posture, shoulders and jaw"],
+              ["Evoke", "30s", "A believable quality; always optional"],
+              ["Articulate", "30s", "One intention, spoken three times"],
+              ["Release", "30s", "Gratitude without gripping the result"],
+            ].map(([title, time, body], index) => (
+              <li
+                key={title}
+                className="rounded-sm border border-line-subtle p-3"
+              >
+                <p className="t-meta text-violet">
+                  {index + 1} · {time}
+                </p>
+                <h3 className="t-label mt-1 font-sans text-ink-strong">
+                  {title}
+                </h3>
+                <p className="t-meta mt-2 text-ink-muted">{body}</p>
+              </li>
+            ))}
+          </ol>
+          <p className="t-body-sm mt-5 max-w-[62ch] text-ink-muted">
+            Here, coherence means aligning breath, body, attention, words and
+            action. “Quantum” is contemplative metaphor—not evidence that
+            thought collapses reality, changes probability or controls another
+            person. Emotional evocation may be skipped, the breath count may be
+            dropped, and no session guarantees an external outcome.
+          </p>
+          <Link
+            href="/sessions"
+            className="t-body-sm mt-3 inline-flex min-h-11 items-center font-sans font-medium text-violet underline-offset-4 hover:underline"
+          >
+            Review and begin the five session variants
+          </Link>
         </section>
 
         <section aria-labelledby="boundaries" className="mt-14">
           <ProseH2 id="boundaries">Boundaries &amp; quiet commitments</ProseH2>
           <ul className="t-body mt-4 max-w-[62ch] space-y-3 text-ink-muted">
             <li>No prayer, practice or piece of music here replaces professional medical or psychological care.</li>
+            <li>Reviewed listening is optional music-supported prayer, not professional music therapy; silence is always a complete choice.</li>
             <li>Nothing promises guaranteed healing, wealth, protection or manifestation — and suffering is never blamed on insufficient belief.</li>
             <li>We never diagnose spiritual attack, possession or contamination, and random library picks are never presented as messages from beyond.</li>
             <li>If you arrive in distress, you will be met with grounding and encouragement toward trusted, human support — not with metaphysical escalation.</li>

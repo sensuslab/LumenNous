@@ -12,7 +12,7 @@ import { HorizonGlow } from "@/components/celestial/HorizonGlow";
 export const metadata: Metadata = {
   title: "Privacy",
   description:
-    "Privacy in plain language: no account, local-only saved items, on-device composition, and no analytics in this build.",
+    "Privacy in plain language: no account, local-only saved items, optional server-routed AI composition, and no analytics in this build.",
 };
 
 const SECTIONS: { id: string; title: string; body: string }[] = [
@@ -24,12 +24,12 @@ const SECTIONS: { id: string; title: string; body: string }[] = [
   {
     id: "local-storage",
     title: "Local storage — your device, your rules",
-    body: "Saved items and display preferences live in your browser's local storage, only after you've been told and can decline. They are not synced, not backed up by us and not visible to us. Clearing browser data removes them. Export is available as JSON from Saved.",
+    body: "Saved items, display preferences and optional practice progress live in your browser's local storage, only after you've been told and can decline. Pathways store stage IDs; a completed daily Inner Practice stores its date and concept ID. Neither stores reflections, journal text or worldview choices. These records are not synced, not backed up by us and not visible to us. Clearing browser data removes them. Saved items can be exported as JSON from Saved.",
   },
   {
     id: "local-engine",
-    title: "The on-device Engine",
-    body: "When you create a prayer or meditation, your request is classified and matched entirely in your browser. It is not sent to our server or to an AI provider, and the words are discarded after the composition. Local history contains only content IDs, shuffle bags and cycle counters so the next result is less repetitive.",
+    title: "Create and AI",
+    body: "When you leave the intention set to 'based on my words' in this test build, your request is sent to the configured AI service through the LumenNous server route. When you choose a specific intention from the dropdown, the on-board library system assembles the result without a model call. Fixed safety responses are handled locally and do not ask the model to improvise. Local history contains only content IDs, shuffle bags and cycle counters so repeated local fallbacks are less repetitive.",
   },
   {
     id: "analytics",
@@ -49,7 +49,7 @@ const SECTIONS: { id: string; title: string; body: string }[] = [
   {
     id: "security",
     title: "Security",
-    body: "There are no AI keys or composition credentials because Create does not call an external service. Normal secure hosting protections still apply when the app shell or third-party media links are loaded.",
+    body: "The AI key is held server-side as a Render environment variable and is never exposed to the browser. Normal secure hosting protections still apply when the app shell or third-party media links are loaded.",
   },
   {
     id: "sensitive",
@@ -78,7 +78,7 @@ export default function PrivacyPage(): JSX.Element {
           <ul className="t-body mt-4 space-y-3 text-ink">
             <li>No account. No name, email or location asked for, ever.</li>
             <li>Saved items live only in your browser. We never see them.</li>
-            <li>Create runs on your device. Your request is not sent anywhere.</li>
+            <li>Create uses AI only for &lsquo;based on my words&rsquo; requests in this test build.</li>
             <li>This build contains no analytics or advertising trackers.</li>
             <li>Delete local data any time from Saved. It was only ever on your device.</li>
           </ul>
